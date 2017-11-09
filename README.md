@@ -15,14 +15,19 @@ alarm_control_panel: !include alarm.yaml
 Features:
 
 -Optional clock display
+
 -Digit code entry on disarm
+
 -Themed colours depending on alarm state
+
 -Countdown timer on 'Pending' state
 
 To be implemented:
 
 -List of open sensors with overide option
+
 -Better themes (possibly a full black one with a Cylon style bar when activated?)
+
 -Anything anyone else can think of
 
 Beware, here be dragons! There may be bugs, issues whilst I get this off the ground and there will definately be design problems when used with different size browsers etc. Hopefully we can conquer these in due course!..
