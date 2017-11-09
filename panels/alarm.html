@@ -401,8 +401,8 @@ Polymer({
 	var hours   = timeNow.getHours();
         var minutes = timeNow.getMinutes();
 	var meridiem = (hours >= 12) ? " P.M" : " A.M";
-	this.hours = hours;
-	this.minutes = minutes;
+	this.hours = ("0" + hours).slice(-2);
+	this.minutes = ("0" + minutes).slice(-2);
 	this.meridiem = meridiem;
 	this.async(this.updateTime,1000);
   },
