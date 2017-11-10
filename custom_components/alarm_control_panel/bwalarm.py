@@ -104,14 +104,14 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._returnto     = STATE_ALARM_DISARMED
         self._timeoutat    = None
        
-        self._warning_colour = config[CONF_WARNING_COLOUR] if config[CONF_WARNING_COLOUR] else 'orange'
-        self._pending_colour = config[CONF_PENDING_COLOUR] if config[CONF_PENDING_COLOUR] else 'orange'
-        self._disarmed_colour = config[CONF_DISARMED_COLOUR] if config[CONF_DISARMED_COLOUR] else '#03A9F4'
-        self._triggered_colour = config[CONF_TRIGGERED_COLOUR] if config[CONF_TRIGGERED_COLOUR] else 'red'
-        self._armed_away_colour = config[CONF_ARMED_AWAY_COLOUR] if config[CONF_ARMED_AWAY_COLOUR] else 'black'
-        self._armed_home_colour = config[CONF_ARMED_HOME_COLOUR] if config[CONF_ARMED_HOME_COLOUR] else 'black'
+        self._warning_colour = config.get(CONF_WARNING_COLOUR, 'orange')
+        self._pending_colour = config.get(CONF_PENDING_COLOUR, 'orange')
+        self._disarmed_colour = config.get(CONF_DISARMED_COLOUR, '#03A9F4')
+        self._triggered_colour = config.get(CONF_TRIGGERED_COLOUR, 'red')
+        self._armed_away_colour = config.get(CONF_ARMED_AWAY_COLOUR, 'black')
+        self._armed_home_colour = config.get(CONF_ARMED_HOME_COLOUR, 'black')
        
-        self._clock = config[CONF_CLOCK] if config[CONF_CLOCK] else False
+        self._clock = config.get(CONF_WARNING_COLOUR, False)
 
         self.clearsignals()
 
