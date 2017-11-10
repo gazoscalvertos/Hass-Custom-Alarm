@@ -111,7 +111,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._armed_away_colour = config.get(CONF_ARMED_AWAY_COLOUR, 'black')
         self._armed_home_colour = config.get(CONF_ARMED_HOME_COLOUR, 'black')
        
-        self._clock = config.get(CONF_WARNING_COLOUR, False)
+        self._clock = config.get(CONF_CLOCK, False)
 
         self.clearsignals()
 
