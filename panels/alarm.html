@@ -119,110 +119,122 @@
 		     text-align: center;
 		  } 
 		  /* xs < 768 */
-		  @media screen and (max-width: 767px) {
-		     .sign {
-			font-size: x-large;
-		     }
-		  }
+	     @media screen and (max-width: 767px) {
+	     .sign {
+	     font-size: x-large;
+	     }
+	     }
 
-		  /* sm */
-		  @media screen and (min-width: 768px) {
-		     .sign {
-			font-size: xx-large;
-		     }
-		  }
+	     /* sm */
+	     @media screen and (min-width: 768px) {
+	     .sign {
+	     font-size: xx-large;
+	     }
+	     }
 
-		  /* md */
-		  @media screen and (min-width: 992px) {
-		  }
+	     /* md */
+	     @media screen and (min-width: 992px) {
+	     }
 
-		  /* lg */
-		  @media screen and (min-width: 1200px) {
-		  }
-		  .sign {
-		     margin-left: -20px;	
-		  }
-		  .ok {
-		     color: green;
-		  }
-		  .warning {
-		     color: orange;
-		  }
-		  .danger {
-		     color: red;
-		  }
-		  .name .active {
-		     color: red;
-		  }
-		  div.box-header {
-		     width: 33%;
-		  }
-		  div.countdown-timer {
-		     display: var(--countdown-timer-display);
-		  }
-		  div.code {
-		     text-transform: capitalize;
-		  }
-		  div.code iron-label{
-		     font-size: x-large;
-		  }
-		  paper-button {
-		     background: #6b8d9c;
-		     color: #ffffff;
-		  }
-		  div.arm paper-button {
-		     width: 48%;
-		     height: 100px;
-		  }
-		  div.digits paper-button{
-		     width: calc(33%);
-		     height: 50px;
-		     margin-top: 4px;
-		  }
-		  .disarm {
-		     width: 100%; 
-		     height: 104px;
-		     margin-top: 4px;
-		  }
-		  .clear {
-		     width: 100%;
-		     height: 50px;
-		     margin-top: 4px;
-		     margin-bottom: 4px;
-		  }
-		  div.options {
-		     padding-top: 10px;
-		  }
-		  div.options paper-button{
-		     width: 96.5%;
-		  }
-		  .tappable {
-		     cursor: pointer;
-		     margin-top: 2px;
-		     font-size: 1.2em;
-		  }
-		  .time {
-		     color: var( --primary-color);
-		     text-shadow: 1px 1px #6b8d9b;
-		     display: var(--time-display);
-		  }
-		  #hour, #minute {
-		     font-size: -webkit-xxx-large;
-		  }
-		  #middle {
-		     text-align: center;
-		     font-size: -webkit-xxx-large;
-		     padding-left: 8px;
-		  }
-		  #meridiem {
-		     display: inline-block;
-		     vertical-align: middle;
-		     line-height: normal;
-		     height: 100%;
-		     font-size: small;
-		     margin-left: -29px;
-		     color: #6b8d9b;
-		  }
+	     /* lg */
+	     @media screen and (min-width: 1200px) {
+	     }
+	     .sign {
+	     margin-left: -20px;	
+	     }
+	     .ok {
+	     color: green;
+	     }
+	     .warning {
+	     color: orange;
+	     }
+	     .danger {
+	     color: red;
+	     }
+	     .name .active {
+	     color: red;
+	     }
+	     div.box-header {
+	     width: 33%;
+	     }
+	     div.countdown-timer {
+	     display: var(--countdown-timer-display);
+	     }
+	     div.code {
+	     text-transform: capitalize;
+	     }
+	     div.code iron-label{
+	     font-size: x-large;
+	     }
+	     paper-button {
+	     background: #6b8d9c;
+	     color: #ffffff;
+	     }
+	     div.arm paper-button {
+	     width: 48%;
+	     height: 100px;
+		<!-- -webkit-transition: width 1s ease-in-out; -->
+		<!-- -moz-transition: width 1s ease-in-out; -->
+		<!-- -o-transition: width 1s ease-in-out; -->
+		<!-- transition: width 1s ease-in-out;  -->
+	     }
+	     div.arm paper-button.big {
+		width: 68%;
+	     }
+	     div.arm paper-button.little {
+		width: 28%;
+	     }
+
+	     div.digits paper-button{
+		width: calc(33%);
+		height: 50px;
+		margin-top: 4px;
+	     }
+	     .disarm {
+		width: 100%; 
+		height: 104px;
+		margin-top: 4px;
+	     }
+	     .clear {
+		width: 100%;
+		height: 50px;
+		margin-top: 4px;
+		margin-bottom: 4px;
+	     }
+	     div.options {
+		padding-top: 10px;
+	     }
+	     div.options paper-button{
+		width: 96.5%;
+	     }
+	     .tappable {
+		cursor: pointer;
+		margin-top: 2px;
+		font-size: 1.2em;
+	     }
+	     .time {
+		color: var( --primary-color);
+		text-shadow: 1px 1px #6b8d9b;
+		display: var(--time-display);
+	     }
+	     #hour, #minute {
+		font-size: -webkit-xxx-large;
+	     }
+	     #middle {
+		text-align: center;
+		font-size: -webkit-xxx-large;
+		padding-left: 8px;
+		margin-right: -5px;
+	     }
+	     #meridiem {
+		display: inline-block;
+		vertical-align: middle;
+		line-height: normal;
+		height: 100%;
+		font-size: small;
+		margin-left: -29px;
+		color: #6b8d9b;
+	     }
       </style>
       <app-header-layout has-scrolling-region>
 	 <app-header slot="header" fixed>
@@ -286,8 +298,8 @@
 		  </div>
 
 		  <div class='box arm zone-card'>
-		     <paper-button on-tap='callService' data-call='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
-		     <paper-button on-tap='callService' data-call='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
+		     <paper-button id='arm-home' on-tap='callService' data-call='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
+		     <paper-button id='arm-away' on-tap='callService' data-call='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
 		  </div>
 	       </div>
 	    </template>
@@ -330,6 +342,19 @@
 	    </template>
 
 	    <div class='statecard'>
+
+	       <template is='dom-if' if='[[opencount]]'>
+		  <div class='box-outer' style='max-width: 100%;' >
+		     <div class='title' style=' background-color: orange;' >Open Sensors</div>
+		     <div class='box-inner'>
+			<template is='dom-repeat' items='[[opensensors(allsensors)]]' as='entity'>
+			   <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+			</template>
+		     </div>
+		  </div>
+	       </template>
+
+
 	       <div class='horizontal layout center-justified'>
 		  <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
 		     <div class='box-outer box-sensors'>
@@ -404,18 +429,20 @@ Polymer({
       ignored:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
       allsensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)' },
       code:       { type: String, value: '' },
-      openCount:  { type: Number, value: 0 },
+      opencount:  { type: Number, value: 0 },
       hours:      { type: String, value: '??' },
       minutes:    { type: String, value: '??' },
       meridiem:   { type: String, value: '?M' },
       // Hold our unobservers
       cleanup:    { type: Array, value: [] },
+      attemptedArm:   { type: Boolean, value: false }, 
    },
    changeTheme: function() {
       //    console.log(this.alarm.attributes.warning_colour);
       this.updateStyles({'--countdown-timer-display': 'none'});
       this.updateStyles({'--time-display': 'initial'});
       if (this.alarm.state == 'disarmed') {
+	 if (this.attemptedArm == true) { this.resetButtons(); }
 	 this.updateStyles({'--primary-color': this.alarm.attributes.disarmed_colour});
       } else if (this.alarm.state == 'armed_away') {
 	 this.updateStyles({'--primary-color': this.alarm.attributes.armed_away_colour});
@@ -474,6 +501,7 @@ Polymer({
 	 this.opencount = ret.length;
 	 return ret;
       }
+
    },
    closedsensors: function(all)   {
       if (all == false) {
@@ -529,8 +557,74 @@ Polymer({
    callService: function(ev) {
       ev.stopPropagation();
       var call = ev.target.getAttribute('data-call');
-      this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
-      this.code = '';
+      if (call == 'cancel') { //cancel alarm set and return page to default settings
+	 this.resetButtons();
+      } else if (ev.target.getAttribute('data-override')) { //Override of open sensors has been pressed so activate alarm
+	 this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code})
+      } else if (call == 'alarm_arm_home' && this.checkOpenSensors(call)) { //Check if trying to activate home with open sensors. If so ping the warning message
+	 console.log('WARNING open sensors');
+      } else { //No open sensors or another service call
+	 this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
+	 this.code = '';
+      }
+   },
+   checkOpenSensors: function(call) {
+      if (this.opencount == 0) {
+	 return false;
+      } else {
+	 this.attemptedArm = true;
+	 var btnArmHome = Polymer.dom(this.root).querySelector('#arm-home');
+	 var btnArmAway = Polymer.dom(this.root).querySelector('#arm-away');
+
+	 btnArmHome.classList.add('big');
+	 btnArmAway.classList.add('little');
+
+	 this.override = document.createAttribute("data-override");
+	 this.override.value = "true";
+	 btnArmHome.setAttributeNode(this.override);
+	 var arm_mode = document.createAttribute("data-call");
+	 arm_mode.value = call;
+	 btnArmHome.setAttributeNode(arm_mode);
+
+	 var arm_mode2 = document.createAttribute("data-call");
+	 arm_mode2.value = 'cancel';
+	 btnArmAway.setAttributeNode(arm_mode2);
+
+	 btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
+	 btnArmAway.innerHTML = 'Cancel Arm';	
+
+	 var pageContent = Polymer.dom(this.root).querySelector('.content');
+	 pageContent.classList.add('shake');
+
+	 return true;
+      }
+   },
+   resetButtons: function() {
+      this.attemptedArm = false;
+
+      var pageContent = Polymer.dom(this.root).querySelector('.content');
+      pageContent.classList.remove('shake');
+
+      var btnArmHome = Polymer.dom(this.root).querySelector('#arm-home');
+      var btnArmAway = Polymer.dom(this.root).querySelector('#arm-away');
+
+      btnArmHome.classList.remove('big');
+      btnArmAway.classList.remove('little');
+
+      //var override = document.createAttribute("data-override");
+      btnArmHome.removeAttributeNode(this.override);
+
+      var arm_mode = document.createAttribute("data-call");
+      arm_mode.value = 'alarm_arm_home';
+      btnArmHome.setAttributeNode(arm_mode);
+
+      var arm_mode2 = document.createAttribute("data-call");
+      arm_mode2.value = 'alarm_arm_away';
+      btnArmAway.setAttributeNode(arm_mode2);
+
+      btnArmHome.innerHTML = "<iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode";
+      btnArmAway.innerHTML = "<iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode";
+
    },
    entityTapped: function (ev) {
       ev.stopPropagation();

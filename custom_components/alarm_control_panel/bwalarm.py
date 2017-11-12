@@ -26,6 +26,7 @@ CONF_IMMEDIATE = 'immediate'
 CONF_DELAYED   = 'delayed'
 CONF_IGNORE    = 'homemodeignore'
 CONF_NOTATHOME = 'notathome'
+CONF_OVERRIDE  = 'override'
 CONF_ALARM     = 'alarm'
 CONF_WARNING   = 'warning'
 
@@ -63,6 +64,7 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_DELAYED):   cv.entity_ids, # things that allow a delay before alarm
     vol.Optional(CONF_IGNORE): cv.entity_ids,  # things that we ignore when at home
     vol.Optional(CONF_NOTATHOME): cv.entity_ids,  # things that we ignore when at home BACKWARDS COMPAT
+    vol.Optional(CONF_OVERRIDE): cv.entity_ids,  # sensors that can be ignored if open when trying to set alarm in away mode
     vol.Optional(CONF_WARNING_COLOUR):   cv.string, # Custom colour of warning display
     vol.Optional(CONF_PENDING_COLOUR): cv.string, # Custom colour of pending display
     vol.Optional(CONF_DISARMED_COLOUR):   cv.string, # Custom colour of disarmed display
@@ -91,6 +93,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._immediate    = set(config.get(CONF_IMMEDIATE, []))
         self._delayed      = set(config.get(CONF_DELAYED, []))
         self._ignore       = set(config.get(CONF_IGNORE, []) if config.get(CONF_IGNORE, []) != [] else config.get(CONF_NOTATHOME, []))
+        self._override      = set(config.get(CONF_OVERRIDE, []))
         self._allinputs    = self._immediate | self._delayed | self._ignore
         self._allsensors   = self._allinputs | set(config.get(CONF_HEADSUP, []))
         self._alarm        = config[CONF_ALARM]
@@ -132,6 +135,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         return {
             'immediate':  sorted(list(self.immediate)),
             'delayed':    sorted(list(self.delayed)),
+            'override':   sorted(list(self._override)),
             'ignored':    sorted(list(self.ignored)),
             'allsensors': sorted(list(self._allsensors)),
             'changedby':  self.changed_by,

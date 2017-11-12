@@ -8,9 +8,10 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
-## Changelog
+### Changelog
 
-- You can now use either homemodeignore or notathome group title for sensors that need to be ignored during home mode
+- (12/11/17) You can now use either homemodeignore or notathome group title for sensors that need to be ignored during home mode
+- (12/11/17) Added a check (displays open sensors in highlighted group) for open sensors when setting alarm (changes button text to override alarm). **NOTE** override in alarm.yaml isn't quite ready yet and you will still need to manually override via the button in the interface for now.
 
 ## Installation Guide
 To get this running add the files from this repo into your home assistant configuration directory, then add the following to your configuration.yaml file:
@@ -31,7 +32,7 @@ panel_custom: !include panel_custom.yaml
 - Countdown timer on 'Pending' state
 
 ### To be implemented:
-- List of open sensors with overide option
+- (DONE) List of open sensors with overide option
 
 - Customisable Themes
   - Time Based themes (Dark at Night - Light during day)

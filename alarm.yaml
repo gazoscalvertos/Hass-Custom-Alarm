@@ -7,7 +7,7 @@ alarm: automation.alarm_triggered
 warning: automation.alarm_warning
 clock: True
 
-#### COLOURS ###### Use any HTML format
+#### COLOURS ###########  Use any HTML format
 warning_colour: 'orange'
 pending_colour: 'orange'
 disarmed_colour: '#03A9F4'
@@ -15,17 +15,28 @@ armed_home_colour: 'black'
 armed_away_colour: 'black'
 triggered_colour: 'red'
 
+# Sensors in this group tigger the alarm immediately
 immediate:
   - binary_sensor.top_floor_multi_sensor_sensor
   - binary_sensor.lounge_multi_sensor_sensor
+  - binary_sensor.toilet_window_sensor
+  - binary_sensor.back_door_sensor
+  - binary_sensor.lounge_doors_sensor
+  - binary_sensor.kitchen_window_sensor
+
+# Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
 delayed:
   - binary_sensor.kitchen_multi_sensor_sensor
   - binary_sensor.hall_multi_sensor_sensor
   - binary_sensor.toilet_multi_sensor_sensor
   - binary_sensor.front_door_sensor
-  - binary_sensor.back_door_sensor
-  - binary_sensor.lounge_doors_sensor
-  - binary_sensor.kitchen_window_sensor
   - binary_sensor.garage_door_sensor
-notathome:
+
+# Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility
+# Note sensors can exist in more than one group notice top_floor appears in two groups
+homemodeignore:
   - binary_sensor.top_floor_multi_sensor_sensor
+
+# Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
+override:
+  - binary_sensor.hall_multi_sensor_sensor
