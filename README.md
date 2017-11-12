@@ -20,7 +20,7 @@ panel_custom: !include panel_custom.yaml
 
 ```
 
-###Features:
+### Features:
 
 - Optional clock display
 
@@ -30,7 +30,7 @@ panel_custom: !include panel_custom.yaml
 
 - Countdown timer on 'Pending' state
 
-###To be implemented:
+### To be implemented:
 
 - List of open sensors with overide option
 
