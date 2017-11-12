@@ -12,7 +12,7 @@ This is very much a community project so if you wish to chip in then please do!!
 
 To get this running add the files from this repo into your home assistant configuration directory, then add the following to your configuration.yaml file:
 
-**NOTE:** If you already have a panel_custom.yaml for say floorplan then take the copy and paste the code from this repo into your panel_custom.yaml to prevent floorplan from being overritten.
+**NOTE:** If you already have a panel_custom.yaml for say floorplan then just copy and paste the code from this repo file into your own panel_custom.yaml to prevent floorplan from being overritten.
 
 ```
 alarm_control_panel: !include alarm.yaml
