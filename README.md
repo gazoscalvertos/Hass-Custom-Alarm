@@ -8,6 +8,10 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
+## Changelog
+
+- You can now use either homemodeignore or notathome group title for sensors that need to be ignored during home mode
+
 ## Installation Guide
 To get this running add the files from this repo into your home assistant configuration directory, then add the following to your configuration.yaml file:
 

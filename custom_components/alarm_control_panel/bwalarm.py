@@ -24,6 +24,7 @@ import homeassistant.helpers.config_validation as cv
 CONF_HEADSUP   = 'headsup'
 CONF_IMMEDIATE = 'immediate'
 CONF_DELAYED   = 'delayed'
+CONF_IGNORE    = 'homemodeignore'
 CONF_NOTATHOME = 'notathome'
 CONF_ALARM     = 'alarm'
 CONF_WARNING   = 'warning'
@@ -60,7 +61,8 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_HEADSUP):   cv.entity_ids, # things to show as a headsup, not alarm on
     vol.Optional(CONF_IMMEDIATE): cv.entity_ids, # things that cause an immediate alarm
     vol.Optional(CONF_DELAYED):   cv.entity_ids, # things that allow a delay before alarm
-    vol.Optional(CONF_NOTATHOME): cv.entity_ids,  # things that we ignore when at home
+    vol.Optional(CONF_IGNORE): cv.entity_ids,  # things that we ignore when at home
+    vol.Optional(CONF_NOTATHOME): cv.entity_ids,  # things that we ignore when at home BACKWARDS COMPAT
     vol.Optional(CONF_WARNING_COLOUR):   cv.string, # Custom colour of warning display
     vol.Optional(CONF_PENDING_COLOUR): cv.string, # Custom colour of pending display
     vol.Optional(CONF_DISARMED_COLOUR):   cv.string, # Custom colour of disarmed display
@@ -88,8 +90,8 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._name         = config[CONF_NAME]
         self._immediate    = set(config.get(CONF_IMMEDIATE, []))
         self._delayed      = set(config.get(CONF_DELAYED, []))
-        self._notathome    = set(config.get(CONF_NOTATHOME, []))
-        self._allinputs    = self._immediate | self._delayed | self._notathome
+        self._ignore       = set(config.get(CONF_IGNORE, []) if config.get(CONF_IGNORE, []) != [] else config.get(CONF_NOTATHOME, []))
+        self._allinputs    = self._immediate | self._delayed | self._ignore
         self._allsensors   = self._allinputs | set(config.get(CONF_HEADSUP, []))
         self._alarm        = config[CONF_ALARM]
         self._warning      = config[CONF_WARNING]
@@ -204,8 +206,8 @@ class BWAlarm(alarm.AlarmControlPanel):
         #self.delayed = set(filter(self.noton, self._delayed))
         self.delayed = self._delayed
         if athome:
-            self.immediate -= self._notathome
-            self.delayed -= self._notathome
+            self.immediate -= self._ignore
+            self.delayed -= self._ignore
         self.ignored = self._allinputs - (self.immediate | self.delayed)
 
     def clearsignals(self):
