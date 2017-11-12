@@ -2,9 +2,9 @@
 ## Intro :-)
 Welcome my fellow modders, tinkerers, home assistant wizards!!
 
-This repo is a custom take on the [default alarm provided in this link] (https://home-assistant.io/components/alarm_control_panel.manual/)
+This repo is a custom take on the [default alarm provided in this link](https://home-assistant.io/components/alarm_control_panel.manual/)
 
-First of all a big thanks to [drytoastman for getting this off the ground] (https://community.home-assistant.io/t/a-different-take-on-an-alarm-system/7809)
+First of all a big thanks to [drytoastman for getting this off the ground](https://community.home-assistant.io/t/a-different-take-on-an-alarm-system/7809)
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
@@ -57,4 +57,4 @@ BTC Address: 1HNCMM6psd3VJjhLJR9xmKcE6ykcYyhUEy
 
 ## Credits
 
-[A great countdown JS that I have slightly modded] (https://github.com/johnschult/jquery.countdown360)
+[A great countdown JS that I have slightly modded](https://github.com/johnschult/jquery.countdown360)
