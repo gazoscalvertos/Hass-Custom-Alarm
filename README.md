@@ -11,14 +11,15 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
 ### Changelog
-
+- (13/11/17) Added sample automation.yaml. Fixed GUI issues with groups. Outlined base code for 'Perimeter mode'
 - (12/11/17) You can now use either homemodeignore or notathome group title for sensors that need to be ignored during home mode
 - (12/11/17) Added a check (displays open sensors in highlighted group) for open sensors when setting alarm (changes button text to override alarm). **NOTE** override in alarm.yaml isn't quite ready yet and you will still need to manually override via the button in the interface for now.
 
 ## Installation Guide
-To get this running add the files from this repo into your home assistant configuration directory, then add the following to your configuration.yaml file:
+To get this running add the files (alarm.yaml, panels/alarm.html, custom_components/alarm_control_panel/bwalarm.py) from this repo into your home assistant configuration directory, then add the following to your configuration.yaml file:
 
 **NOTE:** If you already have a panel_custom.yaml for say floorplan then just copy and paste the code from this repo file into your own panel_custom.yaml to prevent floorplan from being overritten.
+**NOTE:** Same goes for Automations.yaml. Append the samples inside of this file into your own automations.yaml
 
 ```
 alarm_control_panel: !include alarm.yaml
