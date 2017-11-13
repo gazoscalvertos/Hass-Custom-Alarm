@@ -2,6 +2,8 @@
 ## Intro :-)
 Welcome my fellow modders, tinkerers, home assistant wizards!!
 
+Follow the new thread [here](https://community.home-assistant.io/t/yet-another-take-on-an-alarm-system/32386)
+
 This repo is a custom take on the [default alarm provided in this link](https://home-assistant.io/components/alarm_control_panel.manual/)
 
 First of all a big thanks to @drytoastman [for getting this off the ground](https://community.home-assistant.io/t/a-different-take-on-an-alarm-system/7809)
