@@ -448,6 +448,8 @@ Polymer({
 	 this.updateStyles({'--primary-color': this.alarm.attributes.armed_away_colour});
       } else if ( this.alarm.state == 'armed_home') {
 	 this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour});
+      } else if ( this.alarm.state == 'armed_perimeter') {
+         this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour}); //SORT THIS OUT
       } else if (this.alarm.state == 'pending') {
 	 this.updateStyles({'--primary-color': this.alarm.attributes.pending_colour});
 	 this.updateStyles({'--countdown-timer-display': 'initial'});
@@ -497,7 +499,7 @@ Polymer({
       if (all == false) {
 	 return false;
       } else {
-	 ret = all.filter(function (e) { return ['on', 'open', 'detected', 'unlocked'].indexOf(e.state) > -1; }); 
+	 ret = all.filter(function (e) { return ['on', 'open', 'detected', 'unlocked'].indexOf(e.state.toLowerCase()) > -1; }); 
 	 this.opencount = ret.length;
 	 return ret;
       }
@@ -507,7 +509,7 @@ Polymer({
       if (all == false) {
 	 return false;
       } else {
-	 ret = all.filter(function (e) { return ['off', 'closed', 'undetected', 'locked'].indexOf(e.state) > -1; });
+	 ret = all.filter(function (e) { return ['off', 'closed', 'undetected', 'locked'].indexOf(e.state.toLowerCase()) > -1; });
 	 return ret;
       }
    },
@@ -561,7 +563,7 @@ Polymer({
 	 this.resetButtons();
       } else if (ev.target.getAttribute('data-override')) { //Override of open sensors has been pressed so activate alarm
 	 this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code})
-      } else if (call == 'alarm_arm_home' && this.checkOpenSensors(call)) { //Check if trying to activate home with open sensors. If so ping the warning message
+      } else if ((call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night') && this.checkOpenSensors(call)) { //Check if trying to activate home with open sensors. If so ping the warning message
 	 console.log('WARNING open sensors');
       } else { //No open sensors or another service call
 	 this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
