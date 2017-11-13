@@ -15,6 +15,7 @@ armed_home_colour: 'black'
 armed_away_colour: 'black'
 triggered_colour: 'red'
 
+############# SENSOR GROUPS ########################
 # Sensors in this group tigger the alarm immediately
 immediate:
   - binary_sensor.top_floor_multi_sensor_sensor
@@ -38,5 +39,5 @@ homemodeignore:
   - binary_sensor.top_floor_multi_sensor_sensor
 
 # Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
-override:
-  - binary_sensor.hall_multi_sensor_sensor
+#override:
+#  - binary_sensor.hall_multi_sensor_sensor
