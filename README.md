@@ -24,23 +24,19 @@ panel_custom: !include panel_custom.yaml
 ```
 ### Features:
 - Optional clock display
-
 - Digit code entry on disarm
-
 - Themed colours depending on alarm state
-
 - Countdown timer on 'Pending' state
 
 ### To be implemented:
 - (DONE) List of open sensors with overide option
-
+- Perimeter mode
+- delayed and immediate mode 'per' alarm activation (home/away/perimeter?)
 - Customisable Themes
   - Time Based themes (Dark at Night - Light during day)
   - Possibly a full black one with a Cylon style bar when activated?
   - Please submit some ideas here
-
 - Guest mode / reduced feature set
-
 - Anything anyone else can think of
 
 ## Note!
