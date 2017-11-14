@@ -1,4 +1,5 @@
-- alias: '[Alarm] Away Mode Armed'
+- id: alarm_armed_away
+  alias: '[Alarm] Away Mode Armed'
   trigger:
   - platform: state
     entity_id: alarm_control_panel.house
@@ -12,7 +13,8 @@
       message: 'The house alarm has been switched on in away mode. Goodbye'
     service: notify.example_phone_tts
 
-- alias: '[Alarm] Home Mode Armed'
+- id: alarm_armed_home
+  alias: '[Alarm] Home Mode Armed'
   trigger:
   - platform: state
     entity_id: alarm_control_panel.house
@@ -26,7 +28,8 @@
       message: 'The house alarm has been switched on in home mode. Goodnight'
     service: notify.example_phone_tts
 
-- alias: '[Alarm] Away Mode Arming'
+- id: alarm_arming_away
+  alias: '[Alarm] Away Mode Arming'
   trigger:
   - platform: state
     entity_id: alarm_control_panel.house
@@ -36,7 +39,8 @@
       message: 'House alarm activating, ensure all doors and windows are closed'
     service: notify.example_phone_tts
 
-- alias: '[Alarm] Disarmed'
+- id: alarm_disarmed
+  alias: '[Alarm] Disarmed'
   trigger:
   - platform: state
     entity_id: alarm_control_panel.house
@@ -52,7 +56,8 @@
       message: 'The house alarm has been Deactivated'
     service: notify.example_phone_tts
 
-- alias: '[Alarm] Triggered'
+- id: alarm_triggered
+  alias: '[Alarm] Triggered'
   trigger:
   - platform: state
     entity_id: alarm_control_panel.house
@@ -65,7 +70,8 @@
       message: 'ALARM TRIGGERED!!! {{ states[states.alarm_control_panel.house.attributes.changed_by.split(".")[0]][ states.alarm_control_panel.house.attributes.changed_by.split(".")[1]].name }}'
       target: email/example@gmail.com
 
-- alias: '[Alarm] Warning'
+- id: alarm_warning
+  alias: '[Alarm] Warning'
   trigger:
   - platform: state
     entity_id: alarm_control_panel.house
