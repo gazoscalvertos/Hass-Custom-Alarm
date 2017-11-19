@@ -119,122 +119,141 @@
 		     text-align: center;
 		  } 
 		  /* xs < 768 */
-	     @media screen and (max-width: 767px) {
-	     .sign {
-	     font-size: x-large;
-	     }
-	     }
+		  @media screen and (max-width: 767px) {
+		     .sign {
+			font-size: x-large;
+		     }
+		     #hour, #minute, #middle {
+			font-size: xx-large;
+		     }
+		     #meridiem {
+			font-size: 10px;
+			margin-left: -20px;
+			margin-right: 3px;
+		     }
+		  }
 
-	     /* sm */
-	     @media screen and (min-width: 768px) {
-	     .sign {
-	     font-size: xx-large;
-	     }
-	     }
+		  /* sm */
+		  @media screen and (min-width: 768px) {
+		     .sign {
+			font-size: xx-large;
+		     }
+		     #hour, #minute, #middle {
+			font-size: -webkit-xxx-large;
+		     }
+		     #meridiem {
+			font-size: small;
+			margin-left: -29px;
+		     }
+		  }
 
-	     /* md */
-	     @media screen and (min-width: 992px) {
-	     }
+		  /* md */
+		  @media screen and (min-width: 992px) {
+		  }
 
-	     /* lg */
-	     @media screen and (min-width: 1200px) {
-	     }
-	     .sign {
-	     margin-left: -20px;	
-	     }
-	     .ok {
-	     color: green;
-	     }
-	     .warning {
-	     color: orange;
-	     }
-	     .danger {
-	     color: red;
-	     }
-	     .name .active {
-	     color: red;
-	     }
-	     div.box-header {
-	     width: 33%;
-	     }
-	     div.countdown-timer {
-	     display: var(--countdown-timer-display);
-	     }
-	     div.code {
-	     text-transform: capitalize;
-	     }
-	     div.code iron-label{
-	     font-size: x-large;
-	     }
-	     paper-button {
-	     background: #6b8d9c;
-	     color: #ffffff;
-	     }
-	     div.arm paper-button {
-	     width: 48%;
-	     height: 100px;
-		<!-- -webkit-transition: width 1s ease-in-out; -->
-		<!-- -moz-transition: width 1s ease-in-out; -->
-		<!-- -o-transition: width 1s ease-in-out; -->
-		<!-- transition: width 1s ease-in-out;  -->
-	     }
-	     div.arm paper-button.big {
-		width: 68%;
-	     }
-	     div.arm paper-button.little {
-		width: 28%;
-	     }
+		  /* lg */
+		  @media screen and (min-width: 1200px) {
+		  }
+		  .sign {
+		     margin-left: -20px;	
+		  }
+		  .ok {
+		     color: green;
+		  }
+		  .warning {
+		     color: orange;
+		  }
+		  .danger {
+		     color: red;
+		  }
+		  .name .active {
+		     color: red;
+		  }
+		  div.box-header {
+		     width: 33%;
+		  }
+		  div.countdown-timer {
+		     display: var(--countdown-timer-display);
+		  }
 
-	     div.digits paper-button{
-		width: calc(33%);
-		height: 50px;
-		margin-top: 4px;
-	     }
-	     .disarm {
-		width: 100%; 
-		height: 104px;
-		margin-top: 4px;
-	     }
-	     .clear {
-		width: 100%;
-		height: 50px;
-		margin-top: 4px;
-		margin-bottom: 4px;
-	     }
-	     div.options {
-		padding-top: 10px;
-	     }
-	     div.options paper-button{
-		width: 96.5%;
-	     }
-	     .tappable {
-		cursor: pointer;
-		margin-top: 2px;
-		font-size: 1.2em;
-	     }
-	     .time {
-		color: var( --primary-color);
-		text-shadow: 1px 1px #6b8d9b;
-		display: var(--time-display);
-	     }
-	     #hour, #minute {
-		font-size: -webkit-xxx-large;
-	     }
-	     #middle {
-		text-align: center;
-		font-size: -webkit-xxx-large;
-		padding-left: 8px;
-		margin-right: -5px;
-	     }
-	     #meridiem {
-		display: inline-block;
-		vertical-align: middle;
-		line-height: normal;
-		height: 100%;
-		font-size: small;
-		margin-left: -29px;
-		color: #6b8d9b;
-	     }
+		  div.code {
+		     text-transform: capitalize;
+		  }
+
+		  div.code iron-label {
+		     font-size: x-large;
+		  }
+
+		  paper-button {
+		     background: #6b8d9c;
+		     color: #ffffff;
+		  }
+		  div.arm paper-button {
+		     width: 100%; 
+		     height: 100px; 
+		     text-align: -webkit-center;
+		  }
+		  div.arm paper-button.big {
+		     width: 68%;
+		  }
+		  div.arm paper-button.little {
+		     width: 28%;
+		  }
+
+		  div.digits paper-button{
+		     width: calc(25%);
+		     height: 77px;
+		     margin-top: 4px;
+		     background: var(--primary-color);
+		     color: var(--primary-background-color);
+		     opacity: 0.9;
+		  }
+		  div.options {
+		     padding-top: 10px;
+		  }
+		  div.options paper-button{
+		     width: 96.5%;
+		  }
+		  .tappable {
+		     cursor: pointer;
+		     margin-top: 2px;
+		     font-size: 1.2em;
+		  }
+		  .time {
+		     color: var( --primary-color);
+		     text-shadow: 1px 1px #6b8d9b;
+		     display: var(--time-display);
+		  }
+		  #middle {
+		     text-align: center;
+		     padding-left: 8px;
+		     margin-right: -5px;
+		  }
+		  #meridiem {
+		     display: inline-block;
+		     vertical-align: middle;
+		     line-height: normal;
+		     height: 100%;
+		     color: #6b8d9b;
+		  }
+		  #weather {
+		     color: var( --primary-color); 
+
+		  }
+		  #weather-icon img {
+		     width: 70px;
+		  }
+		  #weather-summary span {
+		     display: inline-block;
+		     vertical-align: middle;
+		     line-height: normal;
+		     font-weight: bolder;
+		     margin-left: 5px;
+		  }
+		  .hide {
+		     display: none;
+		  }
+
       </style>
       <app-header-layout has-scrolling-region>
 	 <app-header slot="header" fixed>
@@ -265,28 +284,14 @@
 
 
 	       <div class='box zone-card box-header'>  
-		  <div class='summary'>
-		     <template is='dom-if' if='[[issecure(allsensors)]]'>
-			<div class='sign ok'>
-			   <iron-icon icon="mdi:checkbox-marked-circle" item-icon></iron-icon>
-			   Secured
-			</div>
-		     </template>
-		     <template is='dom-if' if='[[!issecure(allsensors)]]'>
-			<template is='dom-if' if='[[isdisarmed(alarm)]]'>
-			   <div class='sign warning'>
-			      <iron-icon icon="mdi:alert-circle-outline" item-icon></iron-icon>
-			      Open Sensors x[[opencount]]
-			   </div>
-			</template>
-			<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-			   <div class='sign danger'>
-			      <iron-icon icon="mdi:alert-circle" item-icon></iron-icon>
-			      Open Sensors x[[opencount]]
-			   </div>
-			</template>
-		     </template>
-		  </div>
+		  <template is='dom-if' if='[[alarm.attributes.weather]]'>
+		     <div id='weather-icon'>
+			<img src=[[weather.attributes.entity_picture]]></img>
+		     </div>
+		     <div id='weather-summary'>
+			<span>[[weather.state]]</span>
+		     </div>
+		  </template>
 	       </div>
 
 	    </div>
@@ -298,6 +303,7 @@
 		  </div>
 
 		  <div class='box arm zone-card'>
+		     <paper-button id='arm-perimeter' on-tap='callService' data-call='alarm_arm_night' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Perimeter Mode</paper-button> 
 		     <paper-button id='arm-home' on-tap='callService' data-call='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
 		     <paper-button id='arm-away' on-tap='callService' data-call='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
 		  </div>
@@ -309,33 +315,29 @@
 	       <div class='statecard'>
 		  <div class='box-outer'>
 		     <div class='title code'>
-			<iron-label>[[computeLabel(alarm.state)]] Mode&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[code]]</iron-label>
+			<iron-label>[[computeLabel(alarm.state)]] Mode Activated&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[code]]</iron-label>
 		     </div>
-		     <div class='box-inner horizontal layout center-justified'>
-
-			<div style='width:80%'>
+		     <div class='horizontal layout center-justified'>
+			<div style='width:100%'>
 			   <div class='digits horizontal layout center-justified'>
 			      <paper-button on-tap='callcode' data-digit=1 raised>1</paper-button>
 			      <paper-button on-tap='callcode' data-digit=2 raised>2</paper-button>
 			      <paper-button on-tap='callcode' data-digit=3 raised>3</paper-button>
+			      <paper-button class='disarm' on-tap='callService' data-call='alarm_disarm' raised>Disarm</paper-button>
 			   </div>
 			   <div class='digits horizontal layout center-justified'>
 			      <paper-button on-tap='callcode' data-digit=4 raised>4</paper-button>
 			      <paper-button on-tap='callcode' data-digit=5 raised>5</paper-button>
 			      <paper-button on-tap='callcode' data-digit=6 raised>6</paper-button>
+			      <paper-button class='clear' on-tap='callclearcode' raised>Clear</paper-button>
 			   </div>
 			   <div class='digits horizontal layout center-justified'>
 			      <paper-button on-tap='callcode' data-digit=7 raised>7</paper-button>
 			      <paper-button on-tap='callcode' data-digit=8 raised>8</paper-button>
 			      <paper-button on-tap='callcode' data-digit=9 raised>9</paper-button>
+			      <paper-button on-tap='callcode' data-digit=0 raised>0</paper-button>
 			   </div>
 			</div>
-
-			<div style='width:20%'>
-			   <paper-button class='disarm' on-tap='callService' data-call='alarm_disarm' raised>Disarm</paper-button>
-			   <paper-button class='clear' on-tap='callclearcode' raised>Clear</paper-button>
-			</div>
-
 		     </div>
 		  </div>
 	       </div>
@@ -345,7 +347,7 @@
 
 	       <template is='dom-if' if='[[opencount]]'>
 		  <div class='box-outer' style='max-width: 100%;' >
-		     <div class='title' style=' background-color: orange;' >Open Sensors</div>
+		     <div class='title' style=' background-color: orange;' >[[opencount]]x Open Sensors</div>
 		     <div class='box-inner'>
 			<template is='dom-repeat' items='[[opensensors(allsensors)]]' as='entity'>
 			   <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
@@ -356,25 +358,44 @@
 
 
 	       <div class='horizontal layout center-justified'>
-		  <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+
+		  <template is='dom-if' if='[[isperimeter(alarm)]]'>
 		     <div class='box-outer box-sensors'>
-			<div class='title'>Delayed Alarms</div>
+			<div class='title'>Immediate Sensors</div>
 			<div class='box-inner'>
-			   <template is='dom-repeat' items='[[delayed]]' as='entity'>
+			   <template is='dom-repeat' items='[[perimeter]]' as='entity'>
 			      <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
 			   </template>
 			</div>
 		     </div>
 
-		     <div class='box-outer box-sensors'>
-			<div class='title'>Immediate Alarms</div>
-			<div class='box-inner'>
-			   <template is='dom-repeat' items='[[immediate]]' as='entity'>
-			      <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-			   </template>
-			</div>
-		     </div>
+
 		  </template>
+
+
+
+		  <template is='dom-if' if='[[!isperimeter(alarm)]]'>
+		     <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+			<div class='box-outer box-sensors'>
+			   <div class='title'>Delayed Sensors</div>
+			   <div class='box-inner'>
+			      <template is='dom-repeat' items='[[delayed]]' as='entity'>
+				 <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+			      </template>
+			   </div>
+			</div>
+
+			<div class='box-outer box-sensors'>
+			   <div class='title'>Immediate Sensors</div>
+			   <div class='box-inner'>
+			      <template is='dom-repeat' items='[[immediate]]' as='entity'>
+				 <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+			      </template>
+			   </div>
+			</div>
+		     </template>
+		  </template>
+
 	       </div>        
 
 	       <div class='box-outer' style='max-width: 100%;' >
@@ -427,7 +448,9 @@ Polymer({
       immediate:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.immediate)' },
       delayed:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.delayed)' },
       ignored:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
+      perimeter:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.perimeter)' },
       allsensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)' },
+      weather:	  { type: Object },
       code:       { type: String, value: '' },
       opencount:  { type: Number, value: 0 },
       hours:      { type: String, value: '??' },
@@ -449,7 +472,7 @@ Polymer({
       } else if ( this.alarm.state == 'armed_home') {
 	 this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour});
       } else if ( this.alarm.state == 'armed_perimeter') {
-         this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour}); //SORT THIS OUT
+	 this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour}); //SORT THIS OUT
       } else if (this.alarm.state == 'pending') {
 	 this.updateStyles({'--primary-color': this.alarm.attributes.pending_colour});
 	 this.updateStyles({'--countdown-timer-display': 'initial'});
@@ -477,7 +500,15 @@ Polymer({
       countdown.start();
    },
    onAttached: function() {
-      this.updateTime();
+      if (this.alarm.attributes.clock) {
+	 this.updateTime();
+      }
+      if (this.alarm.attributes.weather) {
+	 this.getWeather();
+      }
+   },
+   getWeather: function() {
+      this.weather = this.hass.states['sensor.dark_sky_summary'];
    },
    updateTime: function() {
       var timeNow = new Date();
@@ -494,6 +525,7 @@ Polymer({
    wtf: function (e) { debugger; return e; },
    // Helpers to figure out what to display 
    isdisarmed:  function(alarm) { return alarm.state == "disarmed"; },
+   isperimeter:  function(alarm) { return alarm.state == "armed_perimeter"; },
    issecure:    function(all)   { return this.opensensors(all).length == 0; },
    opensensors: function(all)   { 
       if (all == false) {
@@ -524,23 +556,25 @@ Polymer({
    },
    computeIcon: function (state) {
       switch (state) {
-	 case 'disarmed':   return 'mdi:shield-outline';
-	 case 'armed_away': return 'mdi:security-home';
-	 case 'armed_home': return 'mdi:security-home';
-	 case 'pending':    return 'mdi:walk';
-	 case 'warning':    return 'mdi:run';
-	 case 'triggered':  return 'mdi:alert-circle';
+	 case 'disarmed':        return 'mdi:shield-outline';
+	 case 'armed_away':      return 'mdi:security-home';
+	 case 'armed_home':      return 'mdi:security-home';
+	 case 'pending':         return 'mdi:walk';
+	 case 'warning':         return 'mdi:run';
+	 case 'triggered':       return 'mdi:alert-circle';
+	 case 'armed_perimeter': return 'mdi:security-home';
       }
       return 'mdi:help';
    },
    computeLabel: function (state) {
       switch (state) {
-	 case 'disarmed':   return 'off';
-	 case 'armed_away': return 'away';
-	 case 'armed_home': return 'home';
-	 case 'pending':    return 'leave';
-	 case 'warning':    return 'warn';
-	 case 'triggered':  return 'alarm';
+	 case 'disarmed':   	 return 'off';
+	 case 'armed_away': 	 return 'away';
+	 case 'armed_home': 	 return 'home';
+	 case 'pending':    	 return 'leave';
+	 case 'warning':    	 return 'warn';
+	 case 'triggered':  	 return 'alarm';
+	 case 'armed_perimeter': return 'perimeter';
       }
       return state;
    },
@@ -575,11 +609,15 @@ Polymer({
 	 return false;
       } else {
 	 this.attemptedArm = true;
-	 var btnArmHome = Polymer.dom(this.root).querySelector('#arm-home');
-	 var btnArmAway = Polymer.dom(this.root).querySelector('#arm-away');
 
+	 var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
+	 var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+	 var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+
+	 btnArmPerimeter.classList.add('hide');
 	 btnArmHome.classList.add('big');
 	 btnArmAway.classList.add('little');
+
 
 	 this.override = document.createAttribute("data-override");
 	 this.override.value = "true";
@@ -607,11 +645,13 @@ Polymer({
       var pageContent = Polymer.dom(this.root).querySelector('.content');
       pageContent.classList.remove('shake');
 
-      var btnArmHome = Polymer.dom(this.root).querySelector('#arm-home');
-      var btnArmAway = Polymer.dom(this.root).querySelector('#arm-away');
+      var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
+      var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+      var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
 
       btnArmHome.classList.remove('big');
       btnArmAway.classList.remove('little');
+      btnArmPerimeter.classList.remove('hide');
 
       //var override = document.createAttribute("data-override");
       btnArmHome.removeAttributeNode(this.override);

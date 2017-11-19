@@ -40,6 +40,7 @@ CONF_ARMED_AWAY_COLOUR  = 'armed_away_colour'
 CONF_ARMED_HOME_COLOUR  = 'armed_home_colour'
 
 CONF_CLOCK = 'clock'
+CONF_WEATHER = 'weather'
 
 # Add a new state for the time after an delayed sensor and an actual alarm
 STATE_ALARM_WARNING = 'warning'
@@ -76,7 +77,8 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_TRIGGERED_COLOUR): cv.string,  # Custom colour of triggered display
     vol.Optional(CONF_ARMED_AWAY_COLOUR): cv.string,  # Custom colour of armed away display
     vol.Optional(CONF_ARMED_HOME_COLOUR): cv.string,  # Custom colour of armed home display
-    vol.Optional(CONF_CLOCK): cv.boolean  # DIsplay clock on panel?
+    vol.Optional(CONF_CLOCK): cv.boolean,  # DIsplay clock on panel
+    vol.Optional(CONF_WEATHER): cv.boolean  # DIsplay weather on panel
 })
 
 _LOGGER = logging.getLogger(__name__)
@@ -124,6 +126,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._armed_home_colour = config.get(CONF_ARMED_HOME_COLOUR, 'black')
        
         self._clock = config.get(CONF_CLOCK, False)
+        self._weather = config.get(CONF_WEATHER, False)
 
         self.clearsignals()
 
@@ -155,7 +158,8 @@ class BWAlarm(alarm.AlarmControlPanel):
             'armed_home_colour':  self._armed_home_colour,
             'armed_away_colour':  self._armed_away_colour,
             'countdown_time':  self._countdown_time,
-            'clock':  self._clock
+            'clock':  self._clock,
+            'weather':  self._weather
         }
 
 
@@ -171,7 +175,7 @@ class BWAlarm(alarm.AlarmControlPanel):
     def state_change_listener(self, event):
         """ Something changed, we only care about things turning on at this point """
         new = event.data.get('new_state', None)
-        if new is None or new.state != STATE_ON:
+        if new is None or new.state.lower() != STATE_ON:
             return
         eid = event.data['entity_id']
         if eid in self.immediate:
