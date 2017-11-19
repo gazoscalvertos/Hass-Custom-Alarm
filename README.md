@@ -11,6 +11,7 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
 ### Changelog
+- (19/11/17) Added optional perimeter mode (activates a 'perimeter' group only) which could also ne known as 'Home Day' mode. Added weather sensor into status bar (You must have dark sky weather component enabled specifically sensor.dark_sky_summary), added 0 to code panel.
 - (13/11/17) Added sample automation.yaml. Fixed GUI issues with groups. Outlined base code for 'Perimeter mode'
 - (12/11/17) You can now use either homemodeignore or notathome group title for sensors that need to be ignored during home mode
 - (12/11/17) Added a check (displays open sensors in highlighted group) for open sensors when setting alarm (changes button text to override alarm). **NOTE** override in alarm.yaml isn't quite ready yet and you will still need to manually override via the button in the interface for now.
@@ -26,14 +27,17 @@ alarm_control_panel: !include alarm.yaml
 panel_custom: !include panel_custom.yaml
 ```
 ### Features:
-- Optional clock display
+- Code panel 0-9 on disarm only
+- Weather Status (Optional) - **NOTE:** You must have dark sky weather component enabled specifically sensor.dark_sky_summary.
+- Peimeter Mode (Optional) - Allows you to part activate the alarm in Home Day mode. I use this to only arm a particular set of sensors (doors) whilst im using all floors.
+- clock display (Optional)
 - Digit code entry on disarm
 - Themed colours depending on alarm state
 - Countdown timer on 'Pending' state
 
 ### To be implemented:
 - (DONE) List of open sensors with overide option
-- Perimeter mode
+- (Done) Perimeter mode
 - delayed and immediate mode 'per' alarm activation (home/away/perimeter?)
 - Customisable Themes
   - Time Based themes (Dark at Night - Light during day)
