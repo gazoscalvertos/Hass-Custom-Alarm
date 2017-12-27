@@ -10,7 +10,11 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
+### Testing
+- Tested on HA v0.59.1
+
 ### Changelog
+- (27/12/17) Added support for devices with open/closed, true/false, locked/unlocked, detected/undetected statuses. There are some heavy changes on the code in readiness for a settings page and an optional screensaver.
 - (19/11/17) Added optional perimeter mode (activates a 'perimeter' group only) which could also ne known as 'Home Day' mode. Added weather sensor into status bar (You must have dark sky weather component enabled specifically sensor.dark_sky_summary), added 0 to code panel.
 - (13/11/17) Added sample automation.yaml. Fixed GUI issues with groups. Outlined base code for 'Perimeter mode'
 - (12/11/17) You can now use either homemodeignore or notathome group title for sensors that need to be ignored during home mode
