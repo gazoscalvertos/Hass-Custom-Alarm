@@ -180,15 +180,19 @@ class BWAlarm(alarm.AlarmControlPanel):
     def state_change_listener(self, event):
         """ Something changed, we only care about things turning on at this point """
         new = event.data.get('new_state', None)
-        if new is None or new.state.lower() != STATE_ON or new.state.lower() != STATE_TRUE or new.state.lower() != STATE_UNLOCKED or new.state_lower() != STATE_OPEN or new.state.lower() != STATE_DETECTED:
+#        _LOGGER.warning(new.state.lower())
+        if new is None:
             return
-        eid = event.data['entity_id']
-        if eid in self.immediate:
-            self._lasttrigger = eid
-            self.process_event(Events.ImmediateTrip)
-        elif eid in self.delayed:
-            self._lasttrigger = eid
-            self.process_event(Events.DelayedTrip)
+        if new.state.lower() == STATE_ON or new.state.lower() == STATE_TRUE or new.state.lower() == STATE_UNLOCKED or new.state_lower() == STATE_OPEN or new.state.lower() == STATE_DETECTED:
+            eid = event.data['entity_id']
+            if eid in self.immediate:
+                self._lasttrigger = eid
+                self.process_event(Events.ImmediateTrip)
+            elif eid in self.delayed:
+                self._lasttrigger = eid
+                self.process_event(Events.DelayedTrip)
+        #else:
+        #    return
 
     @property
     def code_format(self):
@@ -310,7 +314,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif new == STATE_ALARM_DISARMED:
                 self._returnto = new
                 self.clearsignals()
-
+  
             # Things to do on leaving state
             if old == STATE_ALARM_WARNING or old == STATE_ALARM_PENDING:
                 _LOGGER.debug("Turning off warning")
