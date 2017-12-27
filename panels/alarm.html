@@ -1121,7 +1121,6 @@ Polymer({
       var settingsContent = Polymer.dom(this.root).querySelector('#settings');
       settingsContent.classList.add('remove');
 
-
       this.startTimer();
    },
    goInactive: function () {
@@ -1179,7 +1178,6 @@ Polymer({
 	 this.opencount = ret.length;
 	 return ret;
       }
-
    },
    closedsensors: function(all)   {
       if (all == false) {
@@ -1189,7 +1187,6 @@ Polymer({
 	 return ret;
       }
    },
-
    computeSensors: function(hass, ids) {
       if (ids == undefined) {
 	 // Control the exception when this.alarm is not ready
@@ -1256,12 +1253,14 @@ Polymer({
 
 	 var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
 	 var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
-	 var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+	 
+	 if (this.alarm.attributes.perimeter_mode) {
+             var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+	     btnArmPerimeter.classList.add('remove');
+         }
 
-	 btnArmPerimeter.classList.add('remove');
 	 btnArmHome.classList.add('big');
 	 btnArmAway.classList.add('little');
-
 
 	 this.override = document.createAttribute("data-override");
 	 this.override.value = "true";
@@ -1291,11 +1290,12 @@ Polymer({
 
       var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
       var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
-      var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
-
+      if (this.alarm.attributes.perimeter_mode) {
+         var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+         btnArmPerimeter.classList.remove('remove');
+      }
       btnArmHome.classList.remove('big');
       btnArmAway.classList.remove('little');
-      btnArmPerimeter.classList.remove('remove');
 
       //var override = document.createAttribute("data-override");
       btnArmHome.removeAttributeNode(this.override);

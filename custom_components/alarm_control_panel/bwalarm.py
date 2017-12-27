@@ -136,7 +136,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.clearsignals()
 
     ### Alarm properties
-
     @property
     def should_poll(self) -> bool: return False
     @property
@@ -148,8 +147,8 @@ class BWAlarm(alarm.AlarmControlPanel):
     @property
     def device_state_attributes(self):
         return {
-            'immediate':  sorted(list(self._immediate)),
-            'delayed':    sorted(list(self._delayed)),
+            'immediate':  sorted(list(self.immediate)),
+            'delayed':    sorted(list(self.delayed)),
             'override':   sorted(list(self._override)),
             'ignored':    sorted(list(self.ignored)),
             'allsensors': sorted(list(self._allsensors)),
@@ -169,7 +168,6 @@ class BWAlarm(alarm.AlarmControlPanel):
 
 
     ### Actions from the outside world that affect us, turn into enum events for internal processing
-
     def time_change_listener(self, eventignored):
         """ I just treat the time events as a periodic check, its simpler then (re-/un-)registration """
         if self._timeoutat is not None:
@@ -180,10 +178,9 @@ class BWAlarm(alarm.AlarmControlPanel):
     def state_change_listener(self, event):
         """ Something changed, we only care about things turning on at this point """
         new = event.data.get('new_state', None)
-#        _LOGGER.warning(new.state.lower())
         if new is None:
             return
-        if new.state.lower() == STATE_ON or new.state.lower() == STATE_TRUE or new.state.lower() == STATE_UNLOCKED or new.state_lower() == STATE_OPEN or new.state.lower() == STATE_DETECTED:
+        if new.state.lower() == STATE_ON or new.state.lower() == STATE_TRUE or new.state.lower() == STATE_UNLOCKED or new.state.lower() == STATE_OPEN or new.state.lower() == STATE_DETECTED:
             eid = event.data['entity_id']
             if eid in self.immediate:
                 self._lasttrigger = eid
@@ -191,8 +188,6 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif eid in self.delayed:
                 self._lasttrigger = eid
                 self.process_event(Events.DelayedTrip)
-        #else:
-        #    return
 
     @property
     def code_format(self):
@@ -205,14 +200,9 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.process_event(Events.Disarm)
 
     def alarm_arm_home(self, code):
-        _LOGGER.warning(code)
-        #if not self._validate_code(code, STATE_ALARM_ARMED_HOME):
-        #    return
         self.process_event(Events.ArmHome)
 
     def alarm_arm_away(self, code=None):
-        #if not self._validate_code(code, STATE_ALARM_ARMED_AWAY):
-        #    return
         self.process_event(Events.ArmAway)
 
     def alarm_arm_night(self, code=None):
@@ -221,19 +211,17 @@ class BWAlarm(alarm.AlarmControlPanel):
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
 
-
     ### Internal processing
-
     def setsignals(self, alarmMode):
         """ Figure out what to sense and how """
         if alarmMode == Events.ArmHome or alarmMode == Events.ArmAway:
-            self.immediate = self._immediate
-            self.delayed = self._delayed
+            self.immediate = self._immediate.copy()
+            self.delayed = self._delayed.copy()
         if alarmMode == Events.ArmHome:
             self.immediate -= self._ignore
             self.delayed -= self._ignore
         if alarmMode == Events.ArmPerimeter:
-           self.immediate = self._perimeter
+           self.immediate = self._perimetear.copy()
         self.ignored = self._allsensors - (self.immediate | self.delayed)
 
     def clearsignals(self):
@@ -243,20 +231,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.ignored = self._allsensors.copy()
 
     def process_event(self, event):
-        """ 
-           WARNING THIS CODE HAS CHANGED. NOTE LIKELY INCORRECT. 
-           This is the core logic function.
-           The possible states and things that can change our state are:
-                 Actions:  isensor dsensor timeout arm_home arm_away disarm trigger
-           Current State: 
-             disarmed         X       X       X      armh     pend     *     trig
-             pending(T1)      X       X      arma     X        X      dis    trig
-             armed(h/a)      trig    warn     X       X        X      dis    trig
-             warning(T1)      X       X      trig     X        X      dis    trig
-             triggered(T2)    X       X      last     X        X      dis     *
-           As the only non-timed states are disarmed, armed_home and armed_away,
-           they are the only ones we can return to after an alarm.
-        """
         old = self._state
 
         # Update state if applicable
@@ -297,19 +271,15 @@ class BWAlarm(alarm.AlarmControlPanel):
                 switch.turn_on(self._hass, self._warning)
                 self._timeoutat = now() + self._pending_time
                 self._returnto = STATE_ALARM_ARMED_AWAY
-                #self.setsignals(False)
                 self.setsignals(Events.ArmAway)
             elif new == STATE_ALARM_ARMED_HOME:
                 self._returnto = new
-                #self.setsignals(True)
                 self.setsignals(Events.ArmHome)
             elif new == STATE_ALARM_ARMED_AWAY:
                 self._returnto = new
-                #self.setsignals(False)
                 self.setsignals(Events.ArmAway)
             elif new == STATE_ALARM_ARMED_PERIMETER:
                 self._returnto = new
-                #self.setsignals(False)
                 self.setsignals(Events.ArmPerimeter)
             elif new == STATE_ALARM_DISARMED:
                 self._returnto = new
@@ -330,5 +300,5 @@ class BWAlarm(alarm.AlarmControlPanel):
         """Validate given code."""
         check = self._code is None or code == self._code
         if not check:
-            _LOGGER.warning("Invalid code given for %s", state)
+            _LOGGER.debug("Invalid code given for %s", state)
         return check
