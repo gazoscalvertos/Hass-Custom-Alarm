@@ -21,6 +21,11 @@ import homeassistant.components.alarm_control_panel as alarm
 import homeassistant.components.switch as switch
 import homeassistant.helpers.config_validation as cv
 
+STATE_TRUE          = 'true'
+STATE_UNLOCKED      = 'unlocked'
+STATE_OPEN          = 'open'
+STATE_DETECTED      = 'detected'
+
 #CONF_HEADSUP        = 'headsup'
 CONF_IMMEDIATE      = 'immediate'
 CONF_DELAYED        = 'delayed'
@@ -175,7 +180,7 @@ class BWAlarm(alarm.AlarmControlPanel):
     def state_change_listener(self, event):
         """ Something changed, we only care about things turning on at this point """
         new = event.data.get('new_state', None)
-        if new is None or new.state.lower() != STATE_ON:
+        if new is None or new.state.lower() != STATE_ON or new.state.lower() != STATE_TRUE or new.state.lower() != STATE_UNLOCKED or new.state_lower() != STATE_OPEN or new.state.lower() != STATE_DETECTED:
             return
         eid = event.data['entity_id']
         if eid in self.immediate:

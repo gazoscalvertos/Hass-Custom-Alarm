@@ -7,7 +7,7 @@ alarm: automation.alarm_triggered
 warning: automation.alarm_warning
 
 clock: True  #Optional - True enables a clock in the center of the status bar
-perimeter_mode: True #Optional - True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
+perimeter_mode: False #Optional - True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
 weather: True #Optional - Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
 
 #### COLOURS ###########  Use any HTML format
@@ -40,7 +40,6 @@ delayed:
 # Note sensors can exist in more than one group notice top_floor appears in two groups
 homemodeignore:
   - binary_sensor.top_floor_multi_sensor_sensor
-  - binary_sensor.lounge_multi_sensor_sensor
 # Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
 #override:
 #  - binary_sensor.hall_multi_sensor_sensor

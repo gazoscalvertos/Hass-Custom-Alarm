@@ -1,5 +1,18 @@
 <script src="/local/lib/jquery-3.2.1.min.js"></script>
 <script src="/local/lib/countdown360.js"></script>
+<style> 
+@font-face {
+   font-family: 'Pacifico';
+   src: url(https://fonts.gstatic.com/s/pacifico/v12/Q_Z9mv4hySLTMoMjnk_rCfesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
+}
+@font-face {
+   font-family: 'Lobster';
+   font-style: normal;
+   font-weight: 400;
+   src: local('Lobster Regular'), local('Lobster-Regular'), url(https://fonts.gstatic.com/s/lobster/v20/cycBf3mfbGkh66G5NhszPQ.woff2) format('woff2');
+   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+</style>
 
 <dom-module id='ha-panel-alarm'>  
    <template>
@@ -8,6 +21,7 @@
    --countdown-timer-display: none;
    --time-display: initial;
 }	
+
 		  app-header-layout {
 		     background-color: var(--primary-background-color);
 		  }
@@ -131,8 +145,15 @@
 			margin-left: -20px;
 			margin-right: 3px;
 		     }
+		     #weather-icon img {
+			width: 40px;
+		     }
+		     .weather {
+			justify-content: center;
+			flex-direction: column;
+			display: flex;
+		     }
 		  }
-
 		  /* sm */
 		  @media screen and (min-width: 768px) {
 		     .sign {
@@ -144,6 +165,9 @@
 		     #meridiem {
 			font-size: small;
 			margin-left: -29px;
+		     }
+		     #weather-icon img {
+			width: 70px;
 		     }
 		  }
 
@@ -238,191 +262,741 @@
 		  }
 		  #weather {
 		     color: var( --primary-color); 
-
 		  }
 		  #weather-icon img {
-		     width: 70px;
+		     color: var(--paper-card-background-color);
+		     text-align: -webkit-center;
 		  }
-		  #weather-summary span {
+		  #weather-icon {
+		     height: 100%;
+		  }
+		  .weather-summary span {
 		     display: inline-block;
 		     vertical-align: middle;
 		     line-height: normal;
 		     font-weight: bolder;
 		     margin-left: 5px;
+		     padding-right: 5px;
+		     text-align: -webkit-center;
+		     height: 100%;
+		     font-family: 'Lobster';
+
 		  }
-		  .hide {
+		  #main-title-bar{
+		     display: flex;                  /* establish flex container */
+		     flex-direction: row;            /* default value; can be omitted */
+		     flex-wrap: nowrap;              /* default value; can be omitted */
+		     justify-content: space-between; /* switched from default (flex-start, see below) */
+		     width: 100%;
+		     margin-left: -35px;
+		  }
+		  #main-title-bar div{
+		  }
+		  #main-title-text{
+		     width: 100%;
+		     position: absolute;
+		     margin-left: -25px;
+		  }
+		  #settings-icon{
+		     width: 5%;	
+		  }
+		  #settings{
+		     height: calc(100vh - 64px);
+		     display: flex;
+		     flex-direction: row;
+		     flex-wrap: nowrap;
+		     justify-content: space-between;
+		     width: 100%;
+		     text-align: center;
+		  }
+		  #settings-title {
+		     width: 50%;
+		     line-height: calc(100vh - 64px);
+		     color: var(--primary-color);
+		     font-size: 70px;
+		     text-shadow: 3px 3px #6b8d9b;
+		  }
+		  #settings-menu {
+		     width: 50%;
+		     background-color: var(--primary-color);
+		  }
+		  .onoffswitch {
+		     position: relative; width: 90px;
+		     margin-bottom: 25px;
+		     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+		  }
+		  .onoffswitch-checkbox {
 		     display: none;
 		  }
+		  .onoffswitch-label {
+		     display: block; overflow: hidden; cursor: pointer;
+		     border: 2px solid #999999; border-radius: 20px;
+		  }
+		  .onoffswitch-inner {
+		     display: block; width: 200%; margin-left: -100%;
+		     transition: margin 0.3s ease-in 0s;
+		  }
+		  .onoffswitch-inner:before, .onoffswitch-inner:after {
+		     display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+		     font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+		     box-sizing: border-box;
+		  }
+		  .onoffswitch-inner:before {
+		     content: "ON";
+		     padding-left: 10px;
+		     background-color: var(--primary-color); color: #FFFFFF;
+		     text-align: left;
+		  }
+		  .onoffswitch-inner:after {
+		     content: "OFF";
+		     padding-right: 10px;
+		     background-color: #EEEEEE; color: #999999;
+		     text-align: right;
+		  }
+		  .onoffswitch-switch {
+		     display: block; width: 22px; margin: 4px;
+		     background: #FFFFFF;
+		     position: absolute; top: 0; bottom: 0;
+		     right: 56px;
+		     border: 2px solid #999999; border-radius: 20px;
+		     transition: all 0.3s ease-in 0s; 
+		  }
+		  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+		     margin-left: 0;
+		  }
+		  .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+		     right: 0px; 
+		  }
+		  .blur {
+		     -webkit-filter: blur(10px);
+		     filter: blur(10px);
+		  }
+		  button {
+		     background-color: #03a9f4;
+		     border-width: 0;
+		     color: white;
+		  }
+		  .hide {
 
+		  }
+		  .hide-bar {
+		     margin-top: -64px;
+		     height: calc(100vh + 64px);
+		  }
+		  #eyecandy {
+		     height: 100vh;
+		     background: linear-gradient(270deg, #050505, #15305d, #4f5258);
+		     background-size: 400% 400%;
+		     -webkit-animation: backgroundAnimation 30s ease infinite;
+		     -moz-animation: backgroundAnimation 30s ease infinite;
+		     animation: backgroundAnimation 30s ease infinite;
+		  }
+		  @-webkit-keyframes backgroundAnimation {
+		     0%{background-position:0% 50%}
+		     50%{background-position:100% 50%}
+		     100%{background-position:0% 50%}
+		  }
+		  @-moz-keyframes backgroundAnimation {
+		     0%{background-position:0% 50%}
+		     50%{background-position:100% 50%}
+		     100%{background-position:0% 50%}
+		  }
+		  @keyframes backgroundAnimation { 
+		     0%{background-position:0% 50%}
+		     50%{background-position:100% 50%}
+		     100%{background-position:0% 50%}
+		  }
+		  .ecTitleDiv {
+
+		     padding-top: 20vh;
+		  }
+
+		  .ecTitle {
+		     display: block;
+		     margin-bottom: 10px; 
+		     font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+		     font-size: -webkit-xxx-large;
+		     text-align: center;
+		     text-transform: uppercase;
+		     text-rendering: optimizeLegibility;
+		     color: #e0dfdc;
+		     letter-spacing: .1em;
+		     text-shadow: 0 -1px 0 #fff, 0 1px 0 #2e2e2e, 0 2px 0 #2c2c2c, 0 3px 0 #2a2a2a, 0 4px 0 #282828, 0 5px 0 #262626, 0 6px 0 #242424, 0 7px 0 #222, 0 8px 0 #202020, 0 9px 0 #1e1e1e, 0 10px 0 #1c1c1c, 0 11px 0 #1a1a1a, 0 12px 0 #181818, 0 13px 0 #161616, 0 14px 0 #141414, 0 15px 0 #121212, 0 22px 30px rgba(0, 0, 0, 0.9);
+
+		  }
+		  .ecAlarm {
+		     display: block;
+		     margin-bottom: 10px;
+		     padding-top: 44vh;
+		     font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+		     font-size: xx-large;
+		     text-align: center;
+		     text-transform: uppercase;
+		     text-rendering: optimizeLegibility;
+		     color: #e0dfdc;
+		     letter-spacing: .1em;
+		  }
+
+		  .remove {
+		     display: none !important;
+		  }
+
+		  #tri {
+		     position: absolute;
+		     top: 50%;
+		     left: 50%;
+		     transform: translate(-50%, 100%);
+		     width: 50px;
+		     height: 50px;
+		  }
+		  #tri .side {
+		     width: 50px;
+		     height: 50px;
+		     position: absolute;
+		     transform-origin: center center;
+		  }
+		  #tri .side:nth-child(1) {
+		     transform: translateX(-100px);
+		  }
+		  #tri .side:nth-child(2) {
+		     transform: translateX(0px);
+		  }
+		  #tri .side:nth-child(3) {
+		     transform: translateX(100px);
+		  }
+		  #tri .side:nth-child(2) {
+		     transform: translateY(-150px);
+		  }
+		  #tri .ring {
+		     width: 50px;
+		     height: 50px;
+		     position: absolute;
+		     background-color: black;
+		     animation-name: rotate, cromatic;
+		     animation-duration: 3s, 3s;
+		     animation-timing-function: linear, linear;
+		     animation-iteration-count: infinite, infinite;
+		     opacity: 0.5;
+		     box-shadow: 0 0 30px black;
+		     border-radius: 20%;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(0) {
+		     margin: 0 0 0 0px;
+		     z-index: 0;
+		     animation-delay: 0s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(1) {
+		     margin: 0 0 0 10px;
+		     z-index: 1;
+		     animation-delay: 0.05s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(2) {
+		     margin: 0 0 0 20px;
+		     z-index: 2;
+		     animation-delay: 0.1s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(3) {
+		     margin: 0 0 0 30px;
+		     z-index: 3;
+		     animation-delay: 0.15s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(4) {
+		     margin: 0 0 0 40px;
+		     z-index: 4;
+		     animation-delay: 0.2s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(5) {
+		     margin: 0 0 0 50px;
+		     z-index: 5;
+		     animation-delay: 0.25s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(6) {
+		     margin: 0 0 0 60px;
+		     z-index: 6;
+		     animation-delay: 0.3s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(7) {
+		     margin: 0 0 0 70px;
+		     z-index: 7;
+		     animation-delay: 0.35s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(8) {
+		     margin: 0 0 0 80px;
+		     z-index: 8;
+		     animation-delay: 0.4s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(9) {
+		     margin: 0 0 0 90px;
+		     z-index: 9;
+		     animation-delay: 0.45s;
+		  }
+
+		  .side:nth-child(1) .ring:nth-child(10) {
+		     margin: 0 0 0 100px;
+		     z-index: 10;
+		     animation-delay: 0.5s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(0) {
+		     margin: 0px 0 0 0px;
+		     z-index: 20;
+		     animation-delay: 2s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(1) {
+		     margin: 7.5px 0 0 -5px;
+		     z-index: 19;
+		     animation-delay: 2.05s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(2) {
+		     margin: 15px 0 0 -10px;
+		     z-index: 18;
+		     animation-delay: 2.1s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(3) {
+		     margin: 22.5px 0 0 -15px;
+		     z-index: 17;
+		     animation-delay: 2.15s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(4) {
+		     margin: 30px 0 0 -20px;
+		     z-index: 16;
+		     animation-delay: 2.2s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(5) {
+		     margin: 37.5px 0 0 -25px;
+		     z-index: 15;
+		     animation-delay: 2.25s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(6) {
+		     margin: 45px 0 0 -30px;
+		     z-index: 14;
+		     animation-delay: 2.3s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(7) {
+		     margin: 52.5px 0 0 -35px;
+		     z-index: 13;
+		     animation-delay: 2.35s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(8) {
+		     margin: 60px 0 0 -40px;
+		     z-index: 12;
+		     animation-delay: 2.4s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(9) {
+		     margin: 67.5px 0 0 -45px;
+		     z-index: 11;
+		     animation-delay: 2.45s;
+		  }
+
+		  .side:nth-child(2) .ring:nth-child(10) {
+		     margin: 75px 0 0 -50px;
+		     z-index: 10;
+		     animation-delay: 2.5s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(0) {
+		     margin: 0px 0 0 0px;
+		     z-index: 0;
+		     animation-delay: 1s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(1) {
+		     margin: -7.5px 0 0 -5px;
+		     z-index: 1;
+		     animation-delay: 1.05s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(2) {
+		     margin: -15px 0 0 -10px;
+		     z-index: 2;
+		     animation-delay: 1.1s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(3) {
+		     margin: -22.5px 0 0 -15px;
+		     z-index: 3;
+		     animation-delay: 1.15s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(4) {
+		     margin: -30px 0 0 -20px;
+		     z-index: 4;
+		     animation-delay: 1.2s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(5) {
+		     margin: -37.5px 0 0 -25px;
+		     z-index: 5;
+		     animation-delay: 1.25s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(6) {
+		     margin: -45px 0 0 -30px;
+		     z-index: 6;
+		     animation-delay: 1.3s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(7) {
+		     margin: -52.5px 0 0 -35px;
+		     z-index: 7;
+		     animation-delay: 1.35s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(8) {
+		     margin: -60px 0 0 -40px;
+		     z-index: 8;
+		     animation-delay: 1.4s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(9) {
+		     margin: -67.5px 0 0 -45px;
+		     z-index: 9;
+		     animation-delay: 1.45s;
+		  }
+
+		  .side:nth-child(3) .ring:nth-child(10) {
+		     margin: -75px 0 0 -50px;
+		     z-index: 10;
+		     animation-delay: 1.5s;
+		  }
+
+		  @keyframes rotate1 {
+		     to {
+			transform: rotate(360deg);
+		     }
+		  }
+		  @keyframes cromatic {
+		     0% {
+			background-color: #870000;
+		     }
+		     30% {
+			background-color: #290f6b;
+		     }
+		     60% {
+			background-color: #290f6b;
+		     }
+		     100% {
+			background-color: #870000;
+		     }
+		  }
+		  .view {
+		     position: relative;
+		     top: 160px;
+		     left: 0;
+		     right: 0;
+		     bottom: 0;
+		     -webkit-perspective: 400;
+		     perspective: 400;
+		  }
+		  .plane {
+		     width: 120px;
+		     height: 120px;
+		     -webkit-transform-style: preserve-3d;
+		     transform-style: preserve-3d;
+		  }
+		  .plane.main {
+		     position: absolute;
+		     top: 0;
+		     left: 0;
+		     right: 0;
+		     bottom: 0;
+		     margin: auto;
+		     -webkit-transform: rotateX(60deg) rotateZ(-30deg);
+		     transform: rotateX(60deg) rotateZ(-30deg);
+		     -webkit-animation: rotate 20s infinite linear;
+		     animation: rotate 20s infinite linear;
+		  }
+		  .plane.main .circle {
+		     width: 120px;
+		     height: 120px;
+		     position: absolute;
+		     -webkit-transform-style: preserve-3d;
+		     transform-style: preserve-3d;
+		     border-radius: 100%;
+		     -webkit-box-sizing: border-box;
+		     box-sizing: border-box;
+		     -webkit-box-shadow: 0 0 60px white, inset 0 0 60px white;
+		     box-shadow: 0 0 60px white, inset 0 0 60px white;
+		  }
+		  .plane.main .circle:nth-child(1) {
+		     -webkit-transform: rotateZ(72deg) rotateX(63.435deg);
+		     transform: rotateZ(72deg) rotateX(63.435deg);
+		  }
+		  .plane.main .circle:nth-child(2) {
+		     -webkit-transform: rotateZ(144deg) rotateX(63.435deg);
+		     transform: rotateZ(144deg) rotateX(63.435deg);
+		  }
+		  .plane.main .circle:nth-child(3) {
+		     -webkit-transform: rotateZ(216deg) rotateX(63.435deg);
+		     transform: rotateZ(216deg) rotateX(63.435deg);
+		  }
+		  .plane.main .circle:nth-child(4) {
+		     -webkit-transform: rotateZ(288deg) rotateX(63.435deg);
+		     transform: rotateZ(288deg) rotateX(63.435deg);
+		  }
+		  .plane.main .circle:nth-child(5) {
+		     -webkit-transform: rotateZ(360deg) rotateX(63.435deg);
+		     transform: rotateZ(360deg) rotateX(63.435deg);
+		  }
+
+		  @-webkit-keyframes rotate {
+		     0% {
+			-webkit-transform: rotateX(0) rotateY(0) rotateZ(0);
+			transform: rotateX(0) rotateY(0) rotateZ(0);
+		     }
+		     100% {
+			-webkit-transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+			transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+		     }
+		  }
+
+		  @keyframes rotate {
+		     0% {
+			-webkit-transform: rotateX(0) rotateY(0) rotateZ(0);
+			transform: rotateX(0) rotateY(0) rotateZ(0);
+		     }
+		     100% {
+			-webkit-transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+			transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+		     }
+		  }
       </style>
       <app-header-layout has-scrolling-region>
 	 <app-header slot="header" fixed>
 	    <app-toolbar>
 	       <ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
-	       <div main-title><iron-icon icon='mdi:security-home'></iron-icon>&nbsp;&nbsp;House Alarm</div>
+	       <div id="main-title-bar">
+		  <div></div>
+		  <div main-title id="main-title-text"><iron-icon icon='mdi:security-home'></iron-icon>&nbsp;&nbsp;House Alarm</div>
+		  <div id="settings-icon"><button on-tap='toggleSettings'><iron-icon icon='mdi:settings'></iron-icon></button></div>
+
+	       </div>
 	    </app-toolbar>
 	 </app-header>
 
 	 <div class='content'>
-	    <div class='horizontal layout center-justified'>
-	       <div class='box zone-card box-header'>
-		  <ha-label-badge icon='[[computeIcon(alarm.state)]]' label='[[computeLabel(alarm.state)]]' description='[[alarm.entityDisplay]]'></ha-label-badge>
-	       </div>
-
-	       <div class='box zone-card box-header' >
-		  <template is='dom-if' if='[[alarm.attributes.clock]]'>
-		     <div id='time' class='time'>
-			<span id="hour">[[hours]]</span>
-			<span id="middle">:
-			   <span id="meridiem">[[meridiem]]</span>
-			</span>
-			<span id="minute">[[minutes]]</span>
-		     </div>
-		  </template>
-		  <div id='countdown' class='countdown-timer'></div>
-	       </div>
-
-
-	       <div class='box zone-card box-header'>  
-		  <template is='dom-if' if='[[alarm.attributes.weather]]'>
-		     <div id='weather-icon'>
-			<img src=[[weather.attributes.entity_picture]]></img>
-		     </div>
-		     <div id='weather-summary'>
-			<span>[[weather.state]]</span>
-		     </div>
-		  </template>
-	       </div>
-
-	    </div>
-
-	    <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-	       <div class='statecard'>
-		  <div class='title arm'>
-		     <iron-label><iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;Alarm Deactivated</iron-label>
+	    <div id='alarm-panel'>	
+	       <div class='horizontal layout center-justified'>
+		  <div class='box zone-card box-header'>
+		     <ha-label-badge icon='[[computeIcon(alarm.state)]]' label='[[computeLabel(alarm.state)]]' description='[[alarm.entityDisplay]]'></ha-label-badge>
 		  </div>
 
-		  <div class='box arm zone-card'>
-		     <paper-button id='arm-perimeter' on-tap='callService' data-call='alarm_arm_night' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Perimeter Mode</paper-button> 
-		     <paper-button id='arm-home' on-tap='callService' data-call='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
-		     <paper-button id='arm-away' on-tap='callService' data-call='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
-		  </div>
-	       </div>
-	    </template>
-
-
-	    <template is='dom-if' if='[[!isdisarmed(alarm)]]'> 
-	       <div class='statecard'>
-		  <div class='box-outer'>
-		     <div class='title code'>
-			<iron-label>[[computeLabel(alarm.state)]] Mode Activated&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[code]]</iron-label>
-		     </div>
-		     <div class='horizontal layout center-justified'>
-			<div style='width:100%'>
-			   <div class='digits horizontal layout center-justified'>
-			      <paper-button on-tap='callcode' data-digit=1 raised>1</paper-button>
-			      <paper-button on-tap='callcode' data-digit=2 raised>2</paper-button>
-			      <paper-button on-tap='callcode' data-digit=3 raised>3</paper-button>
-			      <paper-button class='disarm' on-tap='callService' data-call='alarm_disarm' raised>Disarm</paper-button>
-			   </div>
-			   <div class='digits horizontal layout center-justified'>
-			      <paper-button on-tap='callcode' data-digit=4 raised>4</paper-button>
-			      <paper-button on-tap='callcode' data-digit=5 raised>5</paper-button>
-			      <paper-button on-tap='callcode' data-digit=6 raised>6</paper-button>
-			      <paper-button class='clear' on-tap='callclearcode' raised>Clear</paper-button>
-			   </div>
-			   <div class='digits horizontal layout center-justified'>
-			      <paper-button on-tap='callcode' data-digit=7 raised>7</paper-button>
-			      <paper-button on-tap='callcode' data-digit=8 raised>8</paper-button>
-			      <paper-button on-tap='callcode' data-digit=9 raised>9</paper-button>
-			      <paper-button on-tap='callcode' data-digit=0 raised>0</paper-button>
-			   </div>
+		  <div class='box zone-card box-header' >
+		     <template is='dom-if' if='[[alarm.attributes.clock]]'>
+			<div id='time' class='time'>
+			   <span id="hour">[[hours]]</span>
+			   <span id="middle">:
+			      <span id="meridiem">[[meridiem]]</span>
+			   </span>
+			   <span id="minute">[[minutes]]</span>
 			</div>
-		     </div>
+		     </template>
+		     <div id='countdown' class='countdown-timer'></div>
 		  </div>
+
+
+		  <div class='box zone-card box-header weather'>  
+		     <template is='dom-if' if='[[alarm.attributes.weather]]'>
+			<div id='weather-icon' class='weather-summary'>
+			   <span>[[temp]] &#176;C</span>
+			   <img src=[[weather.attributes.entity_picture]]></img>
+			</div>
+			<div class='weather-summary'>
+			   <span>[[weather.state]]</span>
+			</div>
+		     </template>
+		  </div>
+
 	       </div>
-	    </template>
+	       <template is='dom-if' if='[[isdisarmed(alarm)]]'>
+		  <div class='statecard'>
+		     <div class='title arm'>
+			<iron-label><iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;Alarm Deactivated</iron-label>
+		     </div>
 
-	    <div class='statecard'>
-
-	       <template is='dom-if' if='[[opencount]]'>
-		  <div class='box-outer' style='max-width: 100%;' >
-		     <div class='title' style=' background-color: orange;' >[[opencount]]x Open Sensors</div>
-		     <div class='box-inner'>
-			<template is='dom-repeat' items='[[opensensors(allsensors)]]' as='entity'>
-			   <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+		     <div class='box arm zone-card'>
+			<template is='dom-if' if='[[alarm.attributes.perimeter_mode]]'>
+			   <paper-button id='arm-perimeter' on-tap='callService' data-call='alarm_arm_night' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Perimeter Mode</paper-button> 
 			</template>
+			<paper-button id='arm-home' on-tap='callService' data-call='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
+			<paper-button id='arm-away' on-tap='callService' data-call='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
 		     </div>
 		  </div>
 	       </template>
 
 
-	       <div class='horizontal layout center-justified'>
+	       <template is='dom-if' if='[[!isdisarmed(alarm)]]'> 
+		  <div class='statecard'>
+		     <div class='box-outer'>
+			<div class='title code'>
+			   <iron-label>[[computeLabel(alarm.state)]] Mode Activated&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[code]]</iron-label>
+			</div>
+			<div class='horizontal layout center-justified'>
+			   <div style='width:100%'>
+			      <div class='digits horizontal layout center-justified'>
+				 <paper-button on-tap='callcode' data-digit=1 raised>1</paper-button>
+				 <paper-button on-tap='callcode' data-digit=2 raised>2</paper-button>
+				 <paper-button on-tap='callcode' data-digit=3 raised>3</paper-button>
+				 <paper-button class='disarm' on-tap='callService' data-call='alarm_disarm' raised>Disarm</paper-button>
+			      </div>
+			      <div class='digits horizontal layout center-justified'>
+				 <paper-button on-tap='callcode' data-digit=4 raised>4</paper-button>
+				 <paper-button on-tap='callcode' data-digit=5 raised>5</paper-button>
+				 <paper-button on-tap='callcode' data-digit=6 raised>6</paper-button>
+				 <paper-button class='clear' on-tap='callclearcode' raised>Clear</paper-button>
+			      </div>
+			      <div class='digits horizontal layout center-justified'>
+				 <paper-button on-tap='callcode' data-digit=7 raised>7</paper-button>
+				 <paper-button on-tap='callcode' data-digit=8 raised>8</paper-button>
+				 <paper-button on-tap='callcode' data-digit=9 raised>9</paper-button>
+				 <paper-button on-tap='callcode' data-digit=0 raised>0</paper-button>
+			      </div>
+			   </div>
+			</div>
+		     </div>
+		  </div>
+	       </template>
 
-		  <template is='dom-if' if='[[isperimeter(alarm)]]'>
-		     <div class='box-outer box-sensors'>
-			<div class='title'>Immediate Sensors</div>
+	       <div class='statecard'>
+
+		  <template is='dom-if' if='[[opencount]]'>
+		     <div class='box-outer' style='max-width: 100%;' >
+			<div class='title' style=' background-color: orange;' >[[opencount]]x Open Sensors</div>
 			<div class='box-inner'>
-			   <template is='dom-repeat' items='[[perimeter]]' as='entity'>
+			   <template is='dom-repeat' items='[[opensensors(allsensors)]]' as='entity'>
 			      <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
 			   </template>
 			</div>
 		     </div>
-
-
 		  </template>
 
 
+		  <div class='horizontal layout center-justified'>
 
-		  <template is='dom-if' if='[[!isperimeter(alarm)]]'>
-		     <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-			<div class='box-outer box-sensors'>
-			   <div class='title'>Delayed Sensors</div>
-			   <div class='box-inner'>
-			      <template is='dom-repeat' items='[[delayed]]' as='entity'>
-				 <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-			      </template>
-			   </div>
-			</div>
-
+		     <template is='dom-if' if='[[isperimeter(alarm)]]'>
 			<div class='box-outer box-sensors'>
 			   <div class='title'>Immediate Sensors</div>
 			   <div class='box-inner'>
-			      <template is='dom-repeat' items='[[immediate]]' as='entity'>
+			      <template is='dom-repeat' items='[[perimeter]]' as='entity'>
 				 <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
 			      </template>
 			   </div>
 			</div>
+
+
 		     </template>
-		  </template>
 
-	       </div>        
 
-	       <div class='box-outer' style='max-width: 100%;' >
-		  <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-		     <div class='title'>All Sensors</div>
-		  </template>
-		  <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-		     <div class='title'>Inactive Sensors</div>
-		  </template>
-		  <div class='box-inner'>
 
+		     <template is='dom-if' if='[[!isperimeter(alarm)]]'>
+			<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+			   <div class='box-outer box-sensors'>
+			      <div class='title'>Delayed Sensors</div>
+			      <div class='box-inner'>
+				 <template is='dom-repeat' items='[[delayed]]' as='entity'>
+				    <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+				 </template>
+			      </div>
+			   </div>
+
+			   <div class='box-outer box-sensors'>
+			      <div class='title'>Immediate Sensors</div>
+			      <div class='box-inner'>
+				 <template is='dom-repeat' items='[[immediate]]' as='entity'>
+				    <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+				 </template>
+			      </div>
+			   </div>
+			</template>
+		     </template>
+
+		  </div>        
+
+		  <div class='box-outer' style='max-width: 100%;' >
 		     <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-			<template is='dom-repeat' items='[[opensensors(allsensors)]]' as='entity'>
-			   <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-			</template>
-			<template is='dom-repeat' items='[[closedsensors(allsensors)]]' as='entity'>
-			   <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-			</template>
+			<div class='title'>All Sensors</div>
 		     </template>
-
 		     <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-			<template is='dom-repeat' items='[[ignored]]' as='entity'>
-			   <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-			</template>
+			<div class='title'>Inactive Sensors</div>
 		     </template>
+		     <div class='box-inner'>
+
+			<template is='dom-if' if='[[isdisarmed(alarm)]]'>
+			   <template is='dom-repeat' items='[[opensensors(allsensors)]]' as='entity'>
+			      <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+			   </template>
+			   <template is='dom-repeat' items='[[closedsensors(allsensors)]]' as='entity'>
+			      <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+			   </template>
+			</template>
+
+			<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+			   <template is='dom-repeat' items='[[ignored]]' as='entity'>
+			      <state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+			   </template>
+			</template>
+		     </div>
 		  </div>
 	       </div>
+	    </div>
+	    <div id="settings" class='remove'>
+	       <div id="settings-title">Settings</div>
+	       <div id="settings-menu">
+		  <ul class="settings">
+		     <div class="onoffswitch">
+			<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="screensaverSwitch" checked>
+			<label class="onoffswitch-label" for="screensaverSwitch">
+			   <span class="onoffswitch-inner"></span>
+			   <span class="onoffswitch-switch"></span>
+			</label>
+		     </div>
+		     <div class="onoffswitch">
+			<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="otherSwitch" checked>
+			<label class="onoffswitch-label" for="otherSwitch">
+			   <span class="onoffswitch-inner"></span>
+			   <span class="onoffswitch-switch"></span>
+			</label>
+		     </div>
+
+	       </div>
+	    </div>
+	    <div id='eyecandy' class='remove'>
+	       <div class="ecTitleDiv">
+		  <span class="ecTitle">Calvert</span><br /><span class="ecTitle">Residence</span>
+	       </div>
+	       <div class="view">
+		  <div class="plane main">
+		     <div class="circle"></div>
+		     <div class="circle"></div>
+		     <div class="circle"></div>
+		     <div class="circle"></div>
+		     <div class="circle"></div>
+		     <div class="circle"></div>
+		  </div>
+	       </div>
+	       <div class="ecAlarm">
+		  <span>Disarmed</span>
+	       </div>
+
 	    </div>
 	 </div>
 
@@ -436,7 +1010,11 @@ Polymer({
    attached() {
       this.onAttached();
    },
-
+   ready() {
+      //if (this.screensaver){
+      //	 this.setupEyeCandy();
+      //     }
+   },
    properties: {
       // things that appear in all the other panels 
       hass:     { type: Object },
@@ -450,16 +1028,21 @@ Polymer({
       ignored:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
       perimeter:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.perimeter)' },
       allsensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)' },
-      weather:	  { type: Object },
+      weather:	  { type: String },
+      temp:	  { type: String },
       code:       { type: String, value: '' },
       opencount:  { type: Number, value: 0 },
+      timeoutID:  { type: Number },
       hours:      { type: String, value: '??' },
       minutes:    { type: String, value: '??' },
       meridiem:   { type: String, value: '?M' },
       // Hold our unobservers
       cleanup:    { type: Array, value: [] },
       attemptedArm:   { type: Boolean, value: false }, 
+      screensaver:    { type: Boolean, value: false },
+      settings:	      { type: Boolean, value: false },
    },
+
    changeTheme: function() {
       //    console.log(this.alarm.attributes.warning_colour);
       this.updateStyles({'--countdown-timer-display': 'none'});
@@ -507,8 +1090,69 @@ Polymer({
 	 this.getWeather();
       }
    },
+   //--------------------------------------------------------------//
+   //-----------------EYE CANDY FUNCTION---------------------------//
+   //--------------------------------------------------------------//
+   setupEyeCandy: function () {
+      this.addEventListener("mousemove", this.resetTimer);
+      this.addEventListener("mousedown", this.resetTimer);
+      this.addEventListener("keypress", this.resetTimer);
+      this.addEventListener("DOMMouseScroll", this.resetTimer);
+      this.addEventListener("mousewheel", this.resetTimer);
+      this.addEventListener("touchmove", this.resetTimer);
+      this.addEventListener("MSPointerMove", this.resetTimer);
+
+      this.startTimer();
+   },
+   startTimer: function() {
+      this.timeoutID = this.async(this.goInactive,8000);
+   },
+   resetTimer: function () {
+      clearTimeout(this.timeoutID);
+      this.goActive();
+   },
+   goActive: function() {
+      var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
+      alarmContent.classList.remove('remove');
+      var eyecandyContent = Polymer.dom(this.root).querySelector('#eyecandy');
+      eyecandyContent.classList.add('remove');
+      var appHeader = Polymer.dom(this.root).querySelector('app-header-layout');
+      appHeader.classList.remove('hide-bar');
+      var settingsContent = Polymer.dom(this.root).querySelector('#settings');
+      settingsContent.classList.add('remove');
+
+
+      this.startTimer();
+   },
+   goInactive: function () {
+      var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
+      alarmContent.classList.add('remove');
+      var eyecandyContent = Polymer.dom(this.root).querySelector('#eyecandy');
+      eyecandyContent.classList.remove('remove');
+      var appHeader = Polymer.dom(this.root).querySelector('app-header-layout');
+      appHeader.classList.add('hide-bar');
+      var settingsContent = Polymer.dom(this.root).querySelector('#settings');
+      settingsContent.classList.remove('remove');
+   },
+   //--------------------------------------------------------------//
+   //-----------------EYE CANDY FUNCTION---------------------------//
+   //--------------------------------------------------------------//
    getWeather: function() {
       this.weather = this.hass.states['sensor.dark_sky_summary'];
+      this.temp = Math.ceil((this.hass.states['sensor.dark_sky_apparent_temperature']).state);
+   },
+   toggleSettings() {
+      var settingsContent = Polymer.dom(this.root).querySelector('#settings');
+      var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
+      if (this.settings) {
+	 alarmContent.classList.remove('remove');
+	 settingsContent.classList.add('remove');
+	 this.settings = false;
+      } else {
+	 alarmContent.classList.add('remove');
+	 settingsContent.classList.remove('remove');
+	 this.settings = true;
+      }
    },
    updateTime: function() {
       var timeNow = new Date();
@@ -531,7 +1175,7 @@ Polymer({
       if (all == false) {
 	 return false;
       } else {
-	 ret = all.filter(function (e) { return ['on', 'open', 'detected', 'unlocked'].indexOf(e.state.toLowerCase()) > -1; }); 
+	 ret = all.filter(function (e) { return ['on', 'open', 'true', 'detected', 'unlocked'].indexOf(e.state.toLowerCase()) > -1; }); 
 	 this.opencount = ret.length;
 	 return ret;
       }
@@ -541,7 +1185,7 @@ Polymer({
       if (all == false) {
 	 return false;
       } else {
-	 ret = all.filter(function (e) { return ['off', 'closed', 'undetected', 'locked'].indexOf(e.state.toLowerCase()) > -1; });
+	 ret = all.filter(function (e) { return ['off', 'closed', 'false', 'undetected', 'locked'].indexOf(e.state.toLowerCase()) > -1; });
 	 return ret;
       }
    },
@@ -614,7 +1258,7 @@ Polymer({
 	 var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
 	 var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
 
-	 btnArmPerimeter.classList.add('hide');
+	 btnArmPerimeter.classList.add('remove');
 	 btnArmHome.classList.add('big');
 	 btnArmAway.classList.add('little');
 
@@ -651,7 +1295,7 @@ Polymer({
 
       btnArmHome.classList.remove('big');
       btnArmAway.classList.remove('little');
-      btnArmPerimeter.classList.remove('hide');
+      btnArmPerimeter.classList.remove('remove');
 
       //var override = document.createAttribute("data-override");
       btnArmHome.removeAttributeNode(this.override);
