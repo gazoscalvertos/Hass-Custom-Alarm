@@ -221,7 +221,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             self.immediate -= self._ignore
             self.delayed -= self._ignore
         if alarmMode == Events.ArmPerimeter:
-           self.immediate = self._perimetear.copy()
+           self.immediate = self._perimeter.copy()
         self.ignored = self._allsensors - (self.immediate | self.delayed)
 
     def clearsignals(self):
