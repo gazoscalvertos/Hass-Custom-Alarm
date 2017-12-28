@@ -1028,6 +1028,7 @@ Polymer({
       ignored:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
       perimeter:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.perimeter)' },
       allsensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)' },
+      overrideSensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.override)' },
       weather:	  { type: String },
       temp:	  { type: String },
       code:       { type: String, value: '' },
@@ -1246,40 +1247,46 @@ Polymer({
       }
    },
    checkOpenSensors: function(call) {
-      if (this.opencount == 0) {
-	 return false;
-      } else {
-	 this.attemptedArm = true;
+      if (this.opencount == 0) return false; //check to see how many open sensors there are, if none arm alarm
 
-	 var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
-	 var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
-	 
-	 if (this.alarm.attributes.perimeter_mode) {
-             var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
-	     btnArmPerimeter.classList.add('remove');
-         }
+      for (var sensor in this.allsensors) { //check to see if the open sensor is one to ignore, if so arm alarm
+	 //is it open?
+	 if (['on', 'open', 'true', 'detected', 'unlocked'].indexOf(this.allsensors[sensor].state.toLowerCase()) > -1) { //yes
+	    //is it in the override list?
+	    if (this.overrideSensors.indexOf(this.allsensors[sensor]) == -1) { //No: return so display message
+	       this.attemptedArm = true; //display the warning message and shake
 
-	 btnArmHome.classList.add('big');
-	 btnArmAway.classList.add('little');
+	       var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
+	       var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
 
-	 this.override = document.createAttribute("data-override");
-	 this.override.value = "true";
-	 btnArmHome.setAttributeNode(this.override);
-	 var arm_mode = document.createAttribute("data-call");
-	 arm_mode.value = call;
-	 btnArmHome.setAttributeNode(arm_mode);
+	       if (this.alarm.attributes.perimeter_mode) {
+		  var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+		  btnArmPerimeter.classList.add('remove');
+	       }
+	       btnArmHome.classList.add('big');
+	       btnArmAway.classList.add('little');
 
-	 var arm_mode2 = document.createAttribute("data-call");
-	 arm_mode2.value = 'cancel';
-	 btnArmAway.setAttributeNode(arm_mode2);
+	       this.override = document.createAttribute("data-override");
+	       this.override.value = "true";
+	       btnArmHome.setAttributeNode(this.override);
 
-	 btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
-	 btnArmAway.innerHTML = 'Cancel Arm';	
+	       var arm_mode = document.createAttribute("data-call");
+	       arm_mode.value = call;
+	       btnArmHome.setAttributeNode(arm_mode);
 
-	 var pageContent = Polymer.dom(this.root).querySelector('.content');
-	 pageContent.classList.add('shake');
+	       var arm_mode2 = document.createAttribute("data-call");
+	       arm_mode2.value = 'cancel';
+	       btnArmAway.setAttributeNode(arm_mode2);
+	       btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
+	       btnArmAway.innerHTML = 'Cancel Arm';
 
-	 return true;
+	       var pageContent = Polymer.dom(this.root).querySelector('.content');
+	       pageContent.classList.add('shake');
+
+	       return true;
+
+	    }
+	 }          
       }
    },
    resetButtons: function() {
@@ -1291,8 +1298,8 @@ Polymer({
       var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
       var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
       if (this.alarm.attributes.perimeter_mode) {
-         var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
-         btnArmPerimeter.classList.remove('remove');
+	 var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+	 btnArmPerimeter.classList.remove('remove');
       }
       btnArmHome.classList.remove('big');
       btnArmAway.classList.remove('little');
