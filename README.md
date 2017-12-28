@@ -14,6 +14,8 @@ This is very much a community project so if you wish to chip in then please do!!
 - Tested on HA v0.59.1
 
 ### Changelog
+- (28/12/17) Added a new feature 'Panic Mode' this allows you to set a panic code in the alarm.yaml. When using this code to deactivate the alarm, the alarm is deactivated however a special attribute panic_mode is set to ACTIVE. Use this backed with your automations to trigger custom messages to those who can assist.
+- (28/12/17) Added support for override sensors. When sensors are placed in this group any which are open when activing the alarm are ignored. 
 - (27/12/17) Added support for devices with open/closed, true/false, locked/unlocked, detected/undetected statuses. There are some heavy changes on the code in readiness for a settings page and an optional screensaver.
 - (19/11/17) Added optional perimeter mode (activates a 'perimeter' group only) which could also ne known as 'Home Day' mode. Added weather sensor into status bar (You must have dark sky weather component enabled specifically sensor.dark_sky_summary), added 0 to code panel.
 - (13/11/17) Added sample automation.yaml. Fixed GUI issues with groups. Outlined base code for 'Perimeter mode'
@@ -38,10 +40,10 @@ panel_custom: !include panel_custom.yaml
 - Digit code entry on disarm
 - Themed colours depending on alarm state
 - Countdown timer on 'Pending' state
+- Panic Mode
+- Notification of Open Sensors with the option to override
 
 ### To be implemented:
-- (DONE) List of open sensors with overide option
-- (Done) Perimeter mode
 - delayed and immediate mode 'per' alarm activation (home/away/perimeter?)
 - Customisable Themes
   - Time Based themes (Dark at Night - Light during day)

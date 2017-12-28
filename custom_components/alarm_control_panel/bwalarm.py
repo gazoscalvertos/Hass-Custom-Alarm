@@ -26,7 +26,7 @@ STATE_UNLOCKED      = 'unlocked'
 STATE_OPEN          = 'open'
 STATE_DETECTED      = 'detected'
 
-#CONF_HEADSUP        = 'headsup'
+CONF_PANIC_CODE     = 'panic_code'
 CONF_IMMEDIATE      = 'immediate'
 CONF_DELAYED        = 'delayed'
 CONF_IGNORE         = 'homemodeignore'
@@ -68,7 +68,7 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Required(CONF_ALARM):     cv.entity_id,  # switch/group to turn on when alarming
     vol.Required(CONF_WARNING):   cv.entity_id,  # switch/group to turn on when warning
     vol.Optional(CONF_CODE):      cv.string,
-    #vol.Optional(CONF_HEADSUP):   cv.entity_ids, # things to show as a headsup, not alarm on
+    vol.Optional(CONF_PANIC_CODE):      cv.string,
     vol.Optional(CONF_IMMEDIATE): cv.entity_ids, # things that cause an immediate alarm
     vol.Optional(CONF_DELAYED):   cv.entity_ids, # things that allow a delay before alarm
     vol.Optional(CONF_IGNORE): cv.entity_ids,  # things that we ignore when at home
@@ -113,7 +113,8 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._alarm        = config[CONF_ALARM]
         self._warning      = config[CONF_WARNING]
         self._code         = config[CONF_CODE] if config[CONF_CODE] else None
-       
+        self._panic_code   = config.get(CONF_PANIC_CODE, None)
+
         self._countdown_time = config[CONF_PENDING_TIME]
         self._pending_time = datetime.timedelta(seconds=config[CONF_PENDING_TIME])
         self._trigger_time = datetime.timedelta(seconds=config[CONF_TRIGGER_TIME])
@@ -129,7 +130,9 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._triggered_colour = config.get(CONF_TRIGGERED_COLOUR, 'red')
         self._armed_away_colour = config.get(CONF_ARMED_AWAY_COLOUR, 'black')
         self._armed_home_colour = config.get(CONF_ARMED_HOME_COLOUR, 'black')
-       
+        
+        self._panic_mode = "deactivated"
+
         self._clock = config.get(CONF_CLOCK, False)
         self._weather = config.get(CONF_WEATHER, False)
 
@@ -161,6 +164,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             'triggered_colour':  self._triggered_colour,
             'armed_home_colour':  self._armed_home_colour,
             'armed_away_colour':  self._armed_away_colour,
+            'panic_mode': self._panic_mode,
             'countdown_time':  self._countdown_time,
             'clock':  self._clock,
             'weather':  self._weather
@@ -195,6 +199,15 @@ class BWAlarm(alarm.AlarmControlPanel):
         return None if self._code is None else '.+'
 
     def alarm_disarm(self, code=None):
+        
+        #If the provided code matches the panic alarm then deactivate the alarm but set the state of the panic mode to active.
+        if self._validate_panic_code(code):
+            self.process_event(Events.Disarm)
+            self._panic_mode = "ACTIVE"
+            # Let HA know that something changed
+            self.schedule_update_ha_state()
+            return
+
         if not self._validate_code(code, STATE_ALARM_DISARMED):
             return
         self.process_event(Events.Disarm)
@@ -226,6 +239,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def clearsignals(self):
         """ Clear all our signals, we aren't listening anymore """
+        self._panic_mode = "deactivated"
         self.immediate = set()
         self.delayed = set()
         self.ignored = self._allsensors.copy()
@@ -301,4 +315,11 @@ class BWAlarm(alarm.AlarmControlPanel):
         check = self._code is None or code == self._code
         if not check:
             _LOGGER.debug("Invalid code given for %s", state)
+        return check
+
+    def _validate_panic_code(self, code):
+        """Validate given code."""
+        check = code == self._panic_code
+        if check:
+           _LOGGER.warning("[ALARM] PANIC MODE ACTIVATED!!!")
         return check

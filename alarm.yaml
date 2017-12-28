@@ -1,8 +1,12 @@
 platform: bwalarm
 name: House
-code: !secret alarm_code
+
+code: !secret alarm_code #Code, should consist of one or more digits ie 6482
+panic_code: !secret panic_code #[OPTIONAL] Panic Code should consist of one or more digits ie 9876, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner. 
+
 pending_time: 25 #Grace time in seconds to allow for exit and entry using Away mode
 trigger_time: 600
+
 alarm: automation.alarm_triggered
 warning: automation.alarm_warning
 
@@ -41,8 +45,8 @@ delayed:
 homemodeignore:
   - binary_sensor.top_floor_multi_sensor_sensor
 # Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
-#override:
-#  - binary_sensor.hall_multi_sensor_sensor
+override:
+  - binary_sensor.hall_multi_sensor_sensor
 
 # This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
 perimeter:
