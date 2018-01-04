@@ -10,6 +10,8 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
+<img align="right" width="300" height="300" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
+
 ### Testing
 - Tested on HA v0.59.1
 
