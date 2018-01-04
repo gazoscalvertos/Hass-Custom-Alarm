@@ -1,5 +1,7 @@
 # Home Assistant - Custom Alarm Interface!
 ## Intro :-)
+<img align="right" width="300" height="300" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
+
 Welcome my fellow modders, tinkerers, home assistant wizards!!
 
 Follow the new thread [here](https://community.home-assistant.io/t/yet-another-take-on-an-alarm-system/32386)
@@ -10,10 +12,9 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
-<img align="right" width="300" height="300" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
 
 ### Testing
-- Tested on HA v0.59.1
+- Tested on HA v0.60
 
 ### Changelog
 - (28/12/17) Added a new feature 'Panic Mode' this allows you to set a panic code in the alarm.yaml. When using this code to deactivate the alarm, the alarm is deactivated however a special attribute panic_mode is set to ACTIVE. Use this backed with your automations to trigger custom messages to those who can assist.
@@ -46,12 +47,18 @@ panel_custom: !include panel_custom.yaml
 - Notification of Open Sensors with the option to override
 
 ### To be implemented:
+- Settings page to adjust non-critical features (colours/information)
+- MQTT Support
+- Debug Mode available in settings
+- Screensaver
+- Lockout of HA sidebar when armed
 - delayed and immediate mode 'per' alarm activation (home/away/perimeter?)
 - Customisable Themes
   - Time Based themes (Dark at Night - Light during day)
   - Possibly a full black one with a Cylon style bar when activated?
   - Please submit some ideas here
 - Guest mode / reduced feature set
+- Clean up of code (html/css/python)
 - Anything anyone else can think of
 
 ## Note!
@@ -62,7 +69,7 @@ Thanks to the community for all the input into this.
 
 All of this modding, coding, tinkering is very thirsty work. Consider buying me a beer :beer: :+1:
 
-BTC Address: 1HNCMM6psd3VJjhLJR9xmKcE6ykcYyhUEy
+BTC Address: 1NFeyzpKKiKbBYSmCLQZQLxBqJbhSbqmwd
 
 ## Credits
 [A great countdown JS that I have slightly modded](https://github.com/johnschult/jquery.countdown360)
