@@ -12,11 +12,11 @@ First of all a big thanks to @drytoastman [for getting this off the ground](http
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
-
 ### Testing
-- Tested on HA v0.60
+- Tested on HA v0.60.1
 
 ### Changelog
+- (08/01/17) NEW FEATURE - MQTT Integration. Enable this by setting mqtt to True in the yaml. See alarm.yaml for optional settings. This is based on the [manual mqtt code](https://home-assistant.io/components/alarm_control_panel.manual_mqtt/). [MQTT Needs to be enabled in your HA setup and configured appropriately](https://home-assistant.io/docs/mqtt/broker/#embedded-broker) then you should be able to use [custom panels such as this](https://play.google.com/store/apps/details?id=com.thanksmister.iot.mqtt.alarmpanel&hl=en)
 - (28/12/17) Added a new feature 'Panic Mode' this allows you to set a panic code in the alarm.yaml. When using this code to deactivate the alarm, the alarm is deactivated however a special attribute panic_mode is set to ACTIVE. Use this backed with your automations to trigger custom messages to those who can assist.
 - (28/12/17) Added support for override sensors. When sensors are placed in this group any which are open when activing the alarm are ignored. 
 - (27/12/17) Added support for devices with open/closed, true/false, locked/unlocked, detected/undetected statuses. There are some heavy changes on the code in readiness for a settings page and an optional screensaver.
@@ -36,6 +36,7 @@ alarm_control_panel: !include alarm.yaml
 panel_custom: !include panel_custom.yaml
 ```
 ### Features:
+- MQTT Integration
 - Code panel 0-9 on disarm only
 - Weather Status (Optional) - **NOTE:** You must have dark sky weather component enabled specifically sensor.dark_sky_summary.
 - Peimeter Mode (Optional) - Allows you to part activate the alarm in Home Day mode. I use this to only arm a particular set of sensors (doors) whilst im using all floors.
