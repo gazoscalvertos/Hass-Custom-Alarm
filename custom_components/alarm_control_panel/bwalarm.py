@@ -21,13 +21,12 @@ from homeassistant.const import (
 from homeassistant.core          import callback
 from homeassistant.util.dt       import utcnow                       as now
 from homeassistant.helpers.event import async_track_point_in_time
-from homeassistant.util          import sanitize_filename
 from homeassistant.helpers.event import async_track_state_change
+from homeassistant.util          import sanitize_filename
 
 import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
-import homeassistant.components.mqtt                                 as mqtt
 
 DOMAIN                       = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
@@ -135,7 +134,10 @@ _LOGGER = logging.getLogger(__name__)
 
 @asyncio.coroutine
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
-    alarm = BWAlarm(hass, config)
+    mqtt = None
+    if (config[CONF_MQTT]):
+        import homeassistant.components.mqtt                                 as mqtt
+    alarm = BWAlarm(hass, config, mqtt)
     hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
     async_add_devices([alarm])
@@ -151,8 +153,9 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
    
 class BWAlarm(alarm.AlarmControlPanel):
 
-    def __init__(self, hass, config):
+    def __init__(self, hass, config, mqtt):
         """ Initalize the alarm system """
+        self.mqtt = mqtt
         self._hass         = hass
         self._name         = config[CONF_NAME]
         self._immediate    = set(config.get(CONF_IMMEDIATE, []))
@@ -196,14 +199,19 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._settings_list = []
 
         #-------------------------------------MQTT--------------------------------------------------
+        self._qos = 0
+        self._state_topic = 'home/alarm'
+        self._command_topic = 'home/alarm/set'
         self._mqtt           = config[CONF_MQTT]
+        if (self._mqtt):
+            self._qos = config.get(self.mqtt.CONF_QOS, 0)
+            self._state_topic = config.get(self.mqtt.CONF_STATE_TOPIC, 'home/alarm')
+            self._command_topic = config.get(self.mqtt.CONF_COMMAND_TOPIC, 'home/alarm/set')
         self._payload_disarm = config.get(CONF_PAYLOAD_DISARM)
         self._payload_arm_home = config.get(CONF_PAYLOAD_ARM_HOME)
         self._payload_arm_away= config.get(CONF_PAYLOAD_ARM_AWAY)
         self._payload_arm_night = config.get(CONF_PAYLOAD_ARM_NIGHT)
-        self._qos = config.get(mqtt.CONF_QOS, 0)
-        self._state_topic = config.get(mqtt.CONF_STATE_TOPIC, 'home/alarm')
-        self._command_topic = config.get(mqtt.CONF_COMMAND_TOPIC, 'home/alarm/set')
+        
         #--------------------------------------END--------------------------------------------
 
         #------------------------------------SETTINGS----------------------------------------------------
@@ -437,18 +445,20 @@ class BWAlarm(alarm.AlarmControlPanel):
            _LOGGER.warning("[ALARM] PANIC MODE ACTIVATED!!!")
         return check
 
+    @asyncio.coroutine
     def async_added_to_hass(self):
         """Subscribe mqtt events.
         This method must be run in the event loop and returns a coroutine.
         """
-        async_track_state_change(
-            self.hass, self.entity_id, self._async_state_changed_listener
-        )
+        if (self._mqtt):
+            async_track_state_change(
+                self.hass, self.entity_id, self._async_state_changed_listener
+            )
 
         @callback
         def message_received(topic, payload, qos):
             """Run when new MQTT message has been received."""
-            _LOGGER.error("[ALARM] MQTT Topic: %s Payload: %s", topic, payload)
+            _LOGGER.debug("[ALARM] MQTT Topic: %s Payload: %s", topic, payload)
             if payload == self._payload_disarm:
                 self.alarm_disarm(self._code)
             elif payload == self._payload_arm_home:
@@ -460,13 +470,14 @@ class BWAlarm(alarm.AlarmControlPanel):
             else:
                 _LOGGER.warning("Received unexpected payload: %s", payload)
                 return
-
-        return mqtt.async_subscribe(
-            self.hass, self._command_topic, message_received, self._qos)
-
+        if (self._mqtt):
+            return self.mqtt.async_subscribe(
+                self.hass, self._command_topic, message_received, self._qos)
+        
     @asyncio.coroutine
     def _async_state_changed_listener(self, entity_id, old_state, new_state):
         """Publish state change to MQTT."""
-        mqtt.async_publish(self.hass, self._state_topic, new_state.state,
+        if (self._mqtt):
+            self.mqtt.async_publish(self.hass, self._state_topic, new_state.state,
                            self._qos, True)
-        _LOGGER.debug("[ALARM] MQTT state changed")
+            _LOGGER.debug("[ALARM] MQTT state changed")
