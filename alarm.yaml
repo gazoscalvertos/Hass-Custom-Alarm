@@ -10,9 +10,22 @@ trigger_time: 600
 alarm: automation.alarm_triggered
 warning: automation.alarm_warning
 
-clock: True  #Optional - True enables a clock in the center of the status bar
-perimeter_mode: True #Optional - True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
-weather: True #Optional - Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
+#[OPTIONAL SETTINGS] 
+clock: True  #[Optional] - False by default. True enables a clock in the center of the status bar
+perimeter_mode: True #[Optional] - False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
+weather: True #[Optional] - False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
+#settings: True #[OPTIONAL] True/False. Enables a settings mode which allows you to define certain settings in the UI without the need to restart HA after certain config changes. This will be used for fluid settings such as enabling/disabling the screensaver mode once implmented. NOTE for this to work you will need to create a directory within your HA config directory named 'alarm_settings' this is where the settings file will be managed. Also ensure you have the appropriate permissions/ownership for the HA user to create/amend the file.
+#hide_all_sensors: True #[NOT IN USE YET, Optional] - False by default. Setting this to True hides the 'All Sensors' box which displays every sensor when in disarmed mode.
+
+#[MQTT RELATED]
+mqtt: True #[OPTIONAL] - False by default. Settings this to True will enable MQTT Mode. Uncomment options below to use See the README for guidance.
+#state_topic: home/alarm #[OPTIONAL] The MQTT topic HA will publish state updates to.
+#command_topic: home/alarm/set [OPTIONAL] The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.
+#qos: 0 #[OPTIONAL] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
+#payload_disarm: "DISARM" #[OPTIONAL] The payload to disarm this Alarm Panel. Default is “DISARM”.
+#payload_arm_home: "ARM_HOME" #[OPTIONAL] The payload to set armed-home mode on this Alarm Panel. Default is “ARM_HOME”.
+#payload_arm_away: "ARM_AWAY" #[OPTIONAL] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
+#payload_arm_night: "ARM_NIGHT" #[OPTIONAL] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
 
 #### COLOURS ###########  Use any HTML format
 warning_colour: 'orange'
