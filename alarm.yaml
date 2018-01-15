@@ -10,24 +10,28 @@ trigger_time: 600
 alarm: automation.alarm_triggered
 warning: automation.alarm_warning
 
-#[OPTIONAL SETTINGS] 
+##[OPTIONAL SETTINGS] 
 clock: True  #[Optional] - False by default. True enables a clock in the center of the status bar
 perimeter_mode: True #[Optional] - False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
 weather: True #[Optional] - False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
-#settings: True #[OPTIONAL] True/False. Enables a settings mode which allows you to define certain settings in the UI without the need to restart HA after certain config changes. This will be used for fluid settings such as enabling/disabling the screensaver mode once implmented. NOTE for this to work you will need to create a directory within your HA config directory named 'alarm_settings' this is where the settings file will be managed. Also ensure you have the appropriate permissions/ownership for the HA user to create/amend the file.
-#hide_all_sensors: True #[NOT IN USE YET, Optional] - False by default. Setting this to True hides the 'All Sensors' box which displays every sensor when in disarmed mode.
+#settings: True #[NOT YET IMPLEMENTED, OPTIONAL] True/False. Enables a settings mode which allows you to define certain settings in the UI without the need to restart HA after certain config changes. This will be used for fluid settings such as enabling/disabling the screensaver mode once implmented. NOTE for this to work you will need to create a directory within your HA config directory named 'alarm_settings' this is where the settings file will be managed. Also ensure you have the appropriate permissions/ownership for the HA user to create/amend the file.
+#hide_all_sensors: True #[NOT YET IMPLEMENTED, Optional] - False by default. Setting this to True hides the 'All Sensors' box which displays every sensor when in disarmed mode.
 
-#[MQTT RELATED]
+##[PASSCODE RELATED]
+#passcode_attempts: 3 #[Optional] Disabled if commented out. When a value equal or greater than 0 is set, the system will only allow the set amount of password attempts before timing out
+#passcode_attempts_timeout: 30 #[Optional] Default 30 seconds. When set with the password attempts option the panel will timeout for the amount of seconds set if the password is entered incorrectly as per the password_attempts option. The system will then reset the allowed password attempts
+
+##[MQTT RELATED]
 mqtt: True #[OPTIONAL] - False by default. Settings this to True will enable MQTT Mode. Uncomment options below to use See the README for guidance.
 #state_topic: home/alarm #[OPTIONAL] The MQTT topic HA will publish state updates to.
 #command_topic: home/alarm/set [OPTIONAL] The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.
-#qos: 0 #[OPTIONAL] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
+#aassqos: 0 #[OPTIONAL] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
 #payload_disarm: "DISARM" #[OPTIONAL] The payload to disarm this Alarm Panel. Default is “DISARM”.
 #payload_arm_home: "ARM_HOME" #[OPTIONAL] The payload to set armed-home mode on this Alarm Panel. Default is “ARM_HOME”.
 #payload_arm_away: "ARM_AWAY" #[OPTIONAL] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
 #payload_arm_night: "ARM_NIGHT" #[OPTIONAL] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
 
-#### COLOURS ###########  Use any HTML format
+############### COLOURS ###########  Use any HTML format
 warning_colour: 'orange'
 pending_colour: 'orange'
 disarmed_colour: '#03A9F4'
@@ -36,7 +40,7 @@ armed_away_colour: 'black'
 triggered_colour: 'red'
 
 ############# SENSOR GROUPS ########################
-# Sensors in this group tigger the alarm immediately
+##Sensors in this group tigger the alarm immediately
 immediate:
   - binary_sensor.top_floor_multi_sensor_sensor
   - binary_sensor.lounge_multi_sensor_sensor
@@ -45,7 +49,7 @@ immediate:
   - binary_sensor.lounge_doors_sensor
   - binary_sensor.kitchen_window_sensor
 
-# Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
+##Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
 delayed:
   - binary_sensor.kitchen_multi_sensor_sensor
   - binary_sensor.hall_multi_sensor_sensor
@@ -53,15 +57,15 @@ delayed:
   - binary_sensor.front_door_sensor
   - binary_sensor.garage_door_sensor
 
-# Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility
-# Note sensors can exist in more than one group notice top_floor appears in two groups
+##Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility
+##Note sensors can exist in more than one group notice top_floor appears in two groups
 homemodeignore:
   - binary_sensor.top_floor_multi_sensor_sensor
-# Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
+##Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
 override:
   - binary_sensor.hall_multi_sensor_sensor
 
-# This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
+##This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
 perimeter:
   - binary_sensor.toilet_window_sensor
   - binary_sensor.back_door_sensor
@@ -69,3 +73,12 @@ perimeter:
   - binary_sensor.kitchen_window_sensor
   - binary_sensor.front_door_sensor
   - binary_sensor.garage_door_sensor
+
+##[OPTIONAL] - CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. 
+##This is to be used when the state of the device is not recognised by the panel. Examples are provided below 
+#custom_supported_statuses_on:
+#  - running #EXAMPLE
+#  - flipped #EXAMPLE
+#custom_supported_statuses_off:
+#  - not_running #EXAMPLE
+#  - unflipped   #EXAMPLE
