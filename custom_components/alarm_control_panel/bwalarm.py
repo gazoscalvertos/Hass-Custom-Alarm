@@ -43,6 +43,8 @@ STATE_UNLOCKED                     = 'unlocked'
 STATE_OPEN                         = 'open'
 STATE_DETECTED                     = 'detected'
 STATE_MOTION                       = 'motion'
+STATE_MOTION_DETECTED              = 'motion_detected'
+STATE_MOTION_DETECTED2             = 'motion detected'
 
 STATE_FALSE                        = 'false'
 STATE_LOCKED                       = 'locked'
@@ -53,7 +55,7 @@ STATE_STANDBY                      = 'standby'
 
 CONF_CUSTOM_SUPPORTED_STATUSES_ON  = 'custom_supported_statuses_on'
 CONF_CUSTOM_SUPPORTED_STATUSES_OFF = 'custom_supported_statuses_off'
-SUPPORTED_STATUSES_ON              = [STATE_ON, STATE_TRUE, STATE_UNLOCKED, STATE_OPEN, STATE_DETECTED, STATE_MOTION]
+SUPPORTED_STATUSES_ON              = [STATE_ON, STATE_TRUE, STATE_UNLOCKED, STATE_OPEN, STATE_DETECTED, STATE_MOTION, STATE_MOTION_DETECTED, STATE_MOTION_DETECTED2]
 SUPPORTED_STATUSES_OFF             = [STATE_OFF, STATE_FALSE, STATE_LOCKED, STATE_CLOSED, STATE_UNDETECTED, STATE_NO_MOTION, STATE_STANDBY]
 
 #//-----------------YAML CONFIG OPTIONS----------------------------
@@ -80,6 +82,7 @@ CONF_CLOCK                   = 'clock'
 CONF_WEATHER                 = 'weather'
 CONF_SETTINGS                = 'settings'
 CONF_HIDE_ALL_SENSORS        = 'hide_all_sensors'
+CONF_HIDE_SIDEBAR            = 'hide_sidebar'
 
 #//-----------------------COLOURS------------------------------------
 CONF_WARNING_COLOUR          = 'warning_colour'
@@ -90,6 +93,7 @@ CONF_ARMED_AWAY_COLOUR       = 'armed_away_colour'
 CONF_ARMED_HOME_COLOUR       = 'armed_home_colour'
 
 #//-----------------------MQTT RELATED-------------------------------
+CONF_OVERRIDE_CODE           = 'override_code'
 CONF_PAYLOAD_DISARM          = 'payload_disarm'
 CONF_PAYLOAD_ARM_HOME        = 'payload_arm_home'
 CONF_PAYLOAD_ARM_AWAY        = 'payload_arm_away'
@@ -137,6 +141,7 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_CLOCK, default=False):               cv.boolean,    # DIsplay clock on panel
     vol.Optional(CONF_WEATHER, default=False):             cv.boolean,    # DIsplay weather on panel
     vol.Optional(CONF_HIDE_ALL_SENSORS, default=False):    cv.boolean,    # Show all sensors in group?
+    vol.Optional(CONF_HIDE_SIDEBAR, default=False):       cv.boolean,    # Show all sensors in group?
     #--------------------------PASSWORD ATTEMPTS--------------------------
     vol.Optional(CONF_PASSCODE_ATTEMPTS, default=-1):         vol.All(vol.Coerce(int), vol.Range(min=-1)),
     vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=-1): vol.All(vol.Coerce(int), vol.Range(min=-1)),
@@ -148,7 +153,8 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_PAYLOAD_ARM_AWAY, default='ARM_AWAY'):    cv.string,
     vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):    cv.string,
     vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):  cv.string,
-    vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):        cv.string
+    vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):        cv.string,
+    vol.Optional(CONF_OVERRIDE_CODE, default=False):            cv.boolean
     #//---------------------------END-----------------------------------//
 })
 
@@ -205,9 +211,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._override               = set(config.get(CONF_OVERRIDE, []))
         self._perimeter              = set(config.get(CONF_PERIMETER, []))
         self._allsensors             = self._immediate | self._delayed | self._ignore
+        self._opensensors            = None
 
         #------------------------------------PASSCODE RELATED-------------------------------------
-        self._code                   = config[CONF_CODE] if config[CONF_CODE] else None
+        self._code                   = config.get(CONF_CODE, None)
         self._panic_code             = config.get(CONF_PANIC_CODE, None)
         self._panel_locked           = False
         self._passcodeAttemptNo      = 0
@@ -218,6 +225,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._perimeter_mode         = config[CONF_PERIMETER_MODE]
         self._settings               = config[CONF_SETTINGS]
         self._hide_all_sensors       = config[CONF_HIDE_ALL_SENSORS]
+        self._hide_sidebar          = config[CONF_HIDE_SIDEBAR]
         self._clock                  = config[CONF_CLOCK]
         self._weather                = config[CONF_WEATHER]
 
@@ -240,6 +248,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._payload_arm_home       = config[CONF_PAYLOAD_ARM_HOME]
         self._payload_arm_away       = config[CONF_PAYLOAD_ARM_AWAY]
         self._payload_arm_night      = config[CONF_PAYLOAD_ARM_NIGHT]
+        self._override_code          = config[CONF_OVERRIDE_CODE]
 
         #------------------------------------SETTINGS----------------------------------------------------
         self._settings_list          = []
@@ -289,6 +298,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             'settings':           self._settings,
             'settings_list':      self._settings_list,
             'hide_all_sensors':   self._hide_all_sensors,
+            'hide_sidebar':      self._hide_sidebar,
             'panel_locked':       self._panel_locked,
             'passcode_attempt_timeout': self._passcodeAttemptTimeout,
             'supported_statuses_on': self._supported_statuses_on,
@@ -348,6 +358,11 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif eid in self.delayed:
                 self._lasttrigger = eid
                 self.process_event(Events.DelayedTrip)
+
+    def check_open_sensors(self):
+        for sensor in self._allsensors:    
+            if self._hass.states.get(sensor).state in self._supported_statuses_on:
+                _LOGGER.error(self._hass.states.get(sensor)) # do summit
 
     @property
     def code_format(self):
@@ -469,6 +484,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def _validate_code(self, code, state):
         """Validate given code."""
+        self.check_open_sensors()
         if ((self._passcodeAttemptAllowed == -1) or (self._passcodeAttemptNo <= self._passcodeAttemptAllowed)):
             check = self._code is None or code == self._code
             if check:
@@ -517,15 +533,19 @@ class BWAlarm(alarm.AlarmControlPanel):
         def message_received(topic, payload, qos):
             """Run when new MQTT message has been received."""
             #_LOGGER.warning("[ALARM] MQTT Topic: %s Payload: %s", topic, payload)
-            if payload == self._payload_disarm:
+            if payload.split(" ")[0] == self._payload_disarm:
                 #_LOGGER.warning("Disarming %s", payload)
-                self.alarm_disarm(self._code)
+                #TODO self._hass.states.get('binary_sensor.siren_sensor') #Use this method to relay open states
+                if (self._override_code):
+                    self.alarm_disarm(self._code)
+                else:
+                    self.alarm_disarm(payload.split(" ")[1])
             elif payload == self._payload_arm_home:
-                self.alarm_arm_home(self._code)
+                self.alarm_arm_home('')
             elif payload == self._payload_arm_away:
-                self.alarm_arm_away(self._code)
+                self.alarm_arm_away('')
             elif payload == self._payload_arm_night:
-                self.alarm_arm_night(self._code)
+                self.alarm_arm_night('')
             else:
                 _LOGGER.warning("[ALARM/MQTT] Received unexpected payload: %s", payload)
                 return

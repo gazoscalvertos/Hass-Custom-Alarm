@@ -11,9 +11,14 @@ Consider donating to this project to keep it going as anything contributed will 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
 ### Testing
-- Tested on HA v0.60.1
+- Tested on HA v0.61.1
 
 ### Changelog
+- (19/01/18) NEW FEATURE - MQTT now allows you to disarm your alarm using the your code. MQTT panels will need to support the format of the payload which is 'DISARM CODE' for example 'DISARM 0000'. To override this so that MQTT can disarm the alarm without passing across the code then set override_code: True in the alarm.yaml. Status feedback to MQTT coming soon...
+- (19/01/18) NEW FEATURE - The panel now allows you to hide the sidebar when the alarm is activated preventing in intruder to simply go to configuration and shut down HA. A suitable locked down browser will also be required to prevent the intruder simply changing the URL. You could check out kiosk on android. To activate this feature simply enable hide_sidebar: True in the alarm.yaml NOTE!! Ensure you copy alarm_scripts.js into the appropriate folder 'www/alarm'. This was a tricky feature to implement and future HA updates may break this. If anyone has a better idea on how to code this then be my guest.
+
+- (19/01/18) ADDITIONAL STATE - Added 'motion_detected' as a supported state
+
 - (15/01/18) NOTE!!!!!!! - There are a lot of changes, update all files to ensure everything works. (alarm.yaml, panels/alarm.html, custom_components/alarm_control_panel/bwalarm.py, www/lib/countdown360.js, www/lib/jquery-3.2.1.min.js, www/alarm/alarm.css) Also don't forget to clear your browser cache. Raise any issues you come across
 
 - (15/01/18) NEW FEATURE - Set a maximum number of Passcode attempts with a lockout period. See the alarm.yaml for setup.

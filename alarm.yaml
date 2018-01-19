@@ -1,84 +1,587 @@
-platform: bwalarm
-name: House
+<script src="/local/lib/jquery-3.2.1.min.js"></script>
+<script src="/local/lib/countdown360.js"></script>
+<style> 
+@font-face {
+	font-family: 'Lobster';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Lobster Regular'), local('Lobster-Regular'), url(https://fonts.gstatic.com/s/lobster/v20/cycBf3mfbGkh66G5NhszPQ.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2212, U+2215;
+}
+@import url('./local/alarm/alarm.css');
+</style>
 
-code: !secret alarm_code #Code, should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes
-panic_code: !secret panic_code #[OPTIONAL] Panic Code should consist of one or more digits ie '9876' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner. 
+<dom-module id='ha-panel-alarm'>  
+	<template>
+		<link rel="stylesheet" href="/local/alarm/alarm.css">  
+		<style include="ha-style iron-flex iron-flex-factors">
+	</style>
+	<app-header-layout has-scrolling-region>
+		<app-header slot="header" fixed>
+			<app-toolbar>
+				<template is='dom-if' if='[[isdisarmed(alarm)]]'>
+					<ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
+				</template>
+				<div id="main-title-bar">
+					<template is='dom-if' if='[[alarm.attributes.settings]]'>
+						<div></div>
+					</template>
 
-pending_time: 25 #Grace time in seconds to allow for exit and entry using Away mode
-trigger_time: 600
+					<div main-title id="main-title-text"><iron-icon icon='mdi:security-home'></iron-icon>&nbsp;&nbsp;House Alarm</div>
+					<template is='dom-if' if='[[alarm.attributes.settings]]'>
+						<div id="settings-icon"><iron-icon on-click='toggleSettings' icon='mdi:settings'></iron-icon></div>
+					</template>
+				</div>
+			</app-toolbar>
+		</app-header>
+		<div class='content'>
+			<div id='alarm-panel' >	
+				<div class='horizontal layout center-justified'>
+					<div class='box zone-card box-header'>
+						<ha-label-badge icon='[[computeIcon(alarm.state)]]' label='[[computeLabel(alarm.state)]]' description='[[alarm.entityDisplay]]'></ha-label-badge>
+					</div>
 
-alarm: automation.alarm_triggered
-warning: automation.alarm_warning
+					<div class='box zone-card box-header' >
+						<template is='dom-if' if='[[alarm.attributes.clock]]'>
+							<div id='time' class='time'>
+								<span id="hour">[[hours]]</span>
+								<span id="middle">:
+									<!-- <span id="meridiem">[[meridiem]]</span> -->
+								</span>
+								<span id="minute">[[minutes]]</span>
+							</div>
+						</template>
+						<div id='countdown' class='countdown-timer'></div>
+					</div>
 
-##[OPTIONAL SETTINGS] 
-clock: True  #[Optional] - False by default. True enables a clock in the center of the status bar
-perimeter_mode: True #[Optional] - False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
-weather: True #[Optional] - False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
-#settings: True #[NOT YET IMPLEMENTED, OPTIONAL] True/False. Enables a settings mode which allows you to define certain settings in the UI without the need to restart HA after certain config changes. This will be used for fluid settings such as enabling/disabling the screensaver mode once implmented. NOTE for this to work you will need to create a directory within your HA config directory named 'alarm_settings' this is where the settings file will be managed. Also ensure you have the appropriate permissions/ownership for the HA user to create/amend the file.
-#hide_all_sensors: True #[NOT YET IMPLEMENTED, Optional] - False by default. Setting this to True hides the 'All Sensors' box which displays every sensor when in disarmed mode.
 
-##[PASSCODE RELATED]
-#passcode_attempts: 3 #[Optional] Disabled if commented out. When a value equal or greater than 0 is set, the system will only allow the set amount of password attempts before timing out
-#passcode_attempts_timeout: 30 #[Optional] Default 30 seconds. When set with the password attempts option the panel will timeout for the amount of seconds set if the password is entered incorrectly as per the password_attempts option. The system will then reset the allowed password attempts
+					<div class='box zone-card box-header weather'>  
+						<template is='dom-if' if='[[alarm.attributes.weather]]'>
+							<div class='box'>  
+								<div class='weather-summary'>
+									<span>[[temp]] &#176;C</span>
+								</div>
+								<div id='weather-icon' class='weather-summary'>
+									<img src=[[weather.attributes.entity_picture]]></img>
+								</div>
+								<div class='weather-summary'>
+									<span>[[weather.state]]</span>
+								</div>
+							</div>
+						</template>
+					</div>
 
-##[MQTT RELATED]
-mqtt: True #[OPTIONAL] - False by default. Settings this to True will enable MQTT Mode. Uncomment options below to use See the README for guidance.
-#state_topic: home/alarm #[OPTIONAL] The MQTT topic HA will publish state updates to.
-#command_topic: home/alarm/set [OPTIONAL] The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.
-#aassqos: 0 #[OPTIONAL] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
-#payload_disarm: "DISARM" #[OPTIONAL] The payload to disarm this Alarm Panel. Default is “DISARM”.
-#payload_arm_home: "ARM_HOME" #[OPTIONAL] The payload to set armed-home mode on this Alarm Panel. Default is “ARM_HOME”.
-#payload_arm_away: "ARM_AWAY" #[OPTIONAL] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
-#payload_arm_night: "ARM_NIGHT" #[OPTIONAL] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
+				</div>
+				<template is='dom-if' if='[[isdisarmed(alarm)]]'>
+					<div class='statecard'>
+						<div class='title arm'>
+							<iron-label><iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;Alarm Deactivated</iron-label>
+						</div>
 
-############### COLOURS ###########  Use any HTML format
-warning_colour: 'orange'
-pending_colour: 'orange'
-disarmed_colour: '#03A9F4'
-armed_home_colour: 'black'
-armed_away_colour: 'black'
-triggered_colour: 'red'
+						<div class='vLayout box arm zone-card'>
+							<template is='dom-if' if='[[alarm.attributes.perimeter_mode]]'>
+								<paper-button id='arm-perimeter' on-click='callService' data-call='alarm_arm_night' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Perimeter Mode</paper-button> 
+							</template>
+							<paper-button id='arm-home' on-click='callService' data-call='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
+							<paper-button id='arm-away' on-click='callService' data-call='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
+						</div>
+					</div>
+				</template>
 
-############# SENSOR GROUPS ########################
-##Sensors in this group tigger the alarm immediately
-immediate:
-  - binary_sensor.top_floor_multi_sensor_sensor
-  - binary_sensor.lounge_multi_sensor_sensor
-  - binary_sensor.toilet_window_sensor
-  - binary_sensor.back_door_sensor
-  - binary_sensor.lounge_doors_sensor
-  - binary_sensor.kitchen_window_sensor
+				<div class='statecard'>
 
-##Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
-delayed:
-  - binary_sensor.kitchen_multi_sensor_sensor
-  - binary_sensor.hall_multi_sensor_sensor
-  - binary_sensor.toilet_multi_sensor_sensor
-  - binary_sensor.front_door_sensor
-  - binary_sensor.garage_door_sensor
+					<template is='dom-if' if='[[!isdisarmed(alarm)]]'> 
+						<div class='box-outer'>
+							<div class='title code'>
+								<template is='dom-if' if='[[alarm.attributes.panel_locked]]'> 
+									<iron-label>PANEL LOCKED OUT</iron-label>
+								</template>
+								<template is='dom-if' if='[[!alarm.attributes.panel_locked]]'> 
+									<iron-label>[[computeLabel(alarm.state)]] Mode Activated&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[code]]</iron-label>
+								</template>
+							</div>
+							<div id='codepanel' class$='horizontal layout center-justified {{getClass(panel_locked)}}'>
+								<div style='width:100%'>
+									<div class='digits horizontal layout center-justified'>
+										<paper-button on-click='callcode' data-digit=1 raised>1</paper-button>
+										<paper-button on-click='callcode' data-digit=2 raised>2</paper-button>
+										<paper-button on-click='callcode' data-digit=3 raised>3</paper-button>
+										<paper-button class='disarm' on-click='callService' data-call='alarm_disarm' raised>Disarm</paper-button>
+									</div>
+									<div class='digits horizontal layout center-justified'>
+										<paper-button on-click='callcode' data-digit=4 raised>4</paper-button>
+										<paper-button on-click='callcode' data-digit=5 raised>5</paper-button>
+										<paper-button on-click='callcode' data-digit=6 raised>6</paper-button>
+										<paper-button class='clear' on-click='callclearcode' raised>Clear</paper-button>
+									</div>
+									<div class='digits horizontal layout center-justified'>
+										<paper-button on-click='callcode' data-digit=7 raised>7</paper-button>
+										<paper-button on-click='callcode' data-digit=8 raised>8</paper-button>
+										<paper-button on-click='callcode' data-digit=9 raised>9</paper-button>
+										<paper-button on-click='callcode' data-digit=0 raised>0</paper-button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
+				</div>
+				<div class='statecard'>
 
-##Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility
-##Note sensors can exist in more than one group notice top_floor appears in two groups
-homemodeignore:
-  - binary_sensor.top_floor_multi_sensor_sensor
-##Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
-override:
-  - binary_sensor.hall_multi_sensor_sensor
+					<template is='dom-if' if='[[opencount]]'>
+						<div class='box-outer' style='max-width: 100%;' >
+							<div class='title' style=' background-color: orange;' >[[opencount]]x Open Sensors</div>
+							<div class='box-inner'>
+								<template is='dom-repeat' items='[[opensensors(alarm, allsensors)]]' as='entity'>
+									<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+								</template>
+							</div>
+						</div>
+					</template>
 
-##This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
-perimeter:
-  - binary_sensor.toilet_window_sensor
-  - binary_sensor.back_door_sensor
-  - binary_sensor.lounge_doors_sensor
-  - binary_sensor.kitchen_window_sensor
-  - binary_sensor.front_door_sensor
-  - binary_sensor.garage_door_sensor
 
-##[OPTIONAL] - CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. 
-##This is to be used when the state of the device is not recognised by the panel. Examples are provided below 
-#custom_supported_statuses_on:
-#  - running #EXAMPLE
-#  - flipped #EXAMPLE
-#custom_supported_statuses_off:
-#  - not_running #EXAMPLE
-#  - unflipped   #EXAMPLE
+					<div class='vLayout layout center-justified'>
+
+						<template is='dom-if' if='[[isperimeter(alarm)]]'>
+							<div class='box-outer box-sensors'>
+								<div class='title'>Immediate Sensors</div>
+								<div class='box-inner'>
+									<template is='dom-repeat' items='[[perimeter]]' as='entity'>
+										<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+									</template>
+								</div>
+							</div>
+
+
+						</template>
+
+
+
+						<template is='dom-if' if='[[!isperimeter(alarm)]]'>
+							<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+								<div class='box-outer box-sensors'>
+									<div class='title'>Delayed Sensors</div>
+									<div class='box-inner'>
+										<template is='dom-repeat' items='[[delayed]]' as='entity'>
+											<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+										</template>
+									</div>
+								</div>
+
+								<div class='box-outer box-sensors'>
+									<div class='title'>Immediate Sensors</div>
+									<div class='box-inner'>
+										<template is='dom-repeat' items='[[immediate]]' as='entity'>
+											<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+										</template>
+									</div>
+								</div>
+							</template>
+						</template>
+
+					</div>        
+
+					<template is='dom-if' if='[[isdisarmed(alarm)]]'>
+						<template is='dom-if' if='[[!alarm.attributes.hide_all_sensors]]'>
+							<div class='box-outer' style='max-width: 100%;' >
+								<div class='title'>All Sensors</div>
+								<div class='box-inner'>
+
+									<template is='dom-repeat' items='[[opensensors(alarm, allsensors)]]' as='entity'>
+										<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+
+									</template>
+									<template is='dom-repeat' items='[[closedsensors(alarm, allsensors)]]' as='entity'>
+										<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+									</template>			
+								</div>
+							</div>
+						</template>
+					</template>
+
+					<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+						<div class='box-outer' style='max-width: 100%;' >
+							<div class='title'>Inactive Sensors</div>
+							<div class='box-inner'>
+								<template is='dom-repeat' items='[[ignored]]' as='entity'>
+									<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+								</template>
+							</div>
+						</div>
+					</template>
+				</div>
+			</div>
+		</div>
+		<button id="disableSidebar" type="button" style="visibility: hidden;" onclick="disableSidebar()" /></button>
+		<button id="enableSidebar" type="button" style="visibility: hidden;" onclick="enableSidebar()" /></button>
+	</div>
+</app-header-layout>
+</template>
+</dom-module>
+
+<script>
+	function enableSidebar(){}
+	function disableSidebar(){}
+
+	Polymer({
+		is: 'ha-panel-alarm',
+		created() {
+		},
+		attached() {
+			var script = document.createElement('script');
+			script.setAttribute('src', '/local/alarm/alarm_scripts.js');
+			document.body.appendChild(script);
+		},
+		ready() {
+			if (this.alarm.attributes.clock) {
+				this.updateTime();
+			}
+			if (this.alarm.attributes.weather) {
+				this.getWeather();
+			}
+      //if (this.screensaver){
+      //     	 this.setupEyeCandy();
+      //     }
+  },
+  properties: {
+      // things that appear in all the other panels 
+      hass:     { type: Object },
+      panel:    { type: Object },
+      narrow:   { type: Boolean, value: false },
+      showMenu: { type: Boolean, value: false },
+      // things specific to this alarm panel
+      alarm:      { type: Object, observer: 'monitorAlarm' },
+      immediate:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.immediate)' },
+      delayed:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.delayed)' },
+      ignored:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
+      perimeter:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.perimeter)' },
+      allsensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)'},
+      overrideSensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.override)' },
+      weather:	  { type: String },
+      temp:	  { type: String },
+      code:       { type: String, value: '' },
+      opencount:  { type: Number, value: 0 },
+      timeoutID:  { type: Number },
+      hours:      { type: String, value: '??' },
+      minutes:    { type: String, value: '??' },
+      //     meridiem:   { type: String, value: '?M' },
+      // Hold our unobservers
+      cleanup:    { type: Array, value: [] },
+      attemptedArm:   { type: Boolean, value: false }, 
+      screensaver:    { type: Boolean, value: false },
+      settings:	      { type: Boolean, value: false },
+
+      //ENUMS USED FOR CSS CLASS SELECTION
+      panel_locked:  { type: Boolean, value: false },
+  },
+
+  monitorAlarm: function() {
+  	//-----HIDE THE SIDE BAR FROM THE SCREEN-------------
+  	if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#disableSidebar').click();
+
+  	var countdownTimerDiv = Polymer.dom(this.root).querySelector('#countdown360_countdown');
+  	if (countdownTimerDiv) countdownTimerDiv.remove();
+
+  	this.updateStyles({'--countdown-timer-display': 'none'});
+  	this.updateStyles({'--time-display': 'initial'});
+  	if (this.alarm.state == 'disarmed') {
+  		if (this.attemptedArm == true) { this.resetButtons(); }
+  		//-----DISPLAY THE SIDE BAR ON THE SCREEN-------------
+  		if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#enableSidebar').click();
+  		this.updateStyles({'--primary-color': this.alarm.attributes.disarmed_colour});
+  	} else if (this.alarm.state == 'armed_away') {
+  		this.updateStyles({'--primary-color': this.alarm.attributes.armed_away_colour});
+  	} else if ( this.alarm.state == 'armed_home') {
+  		this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour});
+  	} else if ( this.alarm.state == 'armed_perimeter') {
+	    this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour}); //SORT THIS OUT
+	} else if (this.alarm.state == 'pending') {
+		this.updateStyles({'--primary-color': this.alarm.attributes.pending_colour});
+		this.updateStyles({'--countdown-timer-display': 'initial'});
+		this.updateStyles({'--time-display': 'none'});
+		this.loadTimer(false, this.alarm.attributes.countdown_time);
+	} else if (this.alarm.state == 'warning') {
+		this.updateStyles({'--primary-color': this.alarm.attributes.warning_colour});
+		this.updateStyles({'--countdown-timer-display': 'initial'});
+		this.updateStyles({'--time-display': 'none'});
+		this.loadTimer(false, this.alarm.attributes.countdown_time);
+	} else if (this.alarm.state == 'triggered') {
+		this.updateStyles({'--primary-color': this.alarm.attributes.triggered_colour});
+	}
+	if (this.alarm.attributes.panel_locked == true) {
+		console.log("Panel locked");
+		this.updateStyles({'--primary-color': 'grey'}); //[TODO] Implement panel locked colour - this.alarm.attributes.panel_locked_colour});
+		this.updateStyles({'--countdown-timer-display': 'initial'});
+		this.updateStyles({'--time-display': 'none'});
+		this.loadTimer(true, this.alarm.attributes.passcode_attempt_timeout);
+		this.panel_locked = true;
+	}
+	else this.panel_locked = false;
+
+  },
+  getClass: function(cssClass) {
+  	return cssClass ? "slideup" : "slidedown";
+  },
+  loadTimer: function(locked, time) {
+
+  	var startColour = '#8ac575';
+  	var middleColour = 'orange';
+  	var endColour = 'red'
+
+  	if (locked == true) startColour = middleColour = endColour = 'red';
+
+  	var countdownDiv = Polymer.dom(this.root).querySelector('#countdown');
+  	$(countdownDiv).unbind().removeData();
+  	var countdown = $(countdownDiv).countdown360(
+  	{
+  		radius      : 50,
+  		fontColor   : '#FFFFFF',
+  		autostart   : false,
+  		label       : false,
+  		smooth      : true,
+  		seconds     : time,
+  		fillStyle_0to50: startColour,
+  		fillStyle_50to75: middleColour,
+  		fillStyle_75to100: endColour
+	});
+  	countdown.start();
+  },
+   //--------------------------------------------------------------//
+   //-----------------EYE CANDY FUNCTION---------------------------//
+   //--------------------------------------------------------------//
+   setupEyeCandy: function () {
+   	this.addEventListener("mousemove", this.resetTimer);
+   	this.addEventListener("mousedown", this.resetTimer);
+   	this.addEventListener("keypress", this.resetTimer);
+   	this.addEventListener("DOMMouseScroll", this.resetTimer);
+   	this.addEventListener("mousewheel", this.resetTimer);
+   	this.addEventListener("touchmove", this.resetTimer);
+   	this.addEventListener("MSPointerMove", this.resetTimer);
+
+   	this.startTimer();
+   },
+   startTimer: function() {
+   	this.timeoutID = this.async(this.goInactive,8000);
+   },
+   resetTimer: function () {
+   	clearTimeout(this.timeoutID);
+   	this.goActive();
+   },
+   goActive: function() {
+   	var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
+   	alarmContent.classList.remove('remove');
+   	var eyecandyContent = Polymer.dom(this.root).querySelector('#eyecandy');
+   	eyecandyContent.classList.add('remove');
+   	var appHeader = Polymer.dom(this.root).querySelector('app-header-layout');
+   	appHeader.classList.remove('hide-bar');
+      //var settingsContent = Polymer.dom(this.root).querySelector('#settings');
+      //settingsContent.classList.add('remove');
+    this.startTimer();
+  },
+  goInactive: function () {
+  	var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
+  	alarmContent.classList.add('remove');
+  	var eyecandyContent = Polymer.dom(this.root).querySelector('#eyecandy');
+  	eyecandyContent.classList.remove('remove');
+  	var appHeader = Polymer.dom(this.root).querySelector('app-header-layout');
+  	appHeader.classList.add('hide-bar');
+      //var settingsContent = Polymer.dom(this.root).querySelector('#settings');
+      //settingsContent.classList.remove('remove');
+  },
+   //--------------------------------------------------------------//
+   //-----------------EYE CANDY FUNCTION---------------------------//
+   //--------------------------------------------------------------//
+   getWeather: function() {
+   	this.weather = this.hass.states['sensor.dark_sky_summary'];
+   	this.temp = Math.ceil((this.hass.states['sensor.dark_sky_apparent_temperature']).state);
+   },
+   toggleSettings() {
+   	var settingsContent = Polymer.dom(this.root).querySelector('#settings');
+   	var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
+   	if (this.settings) {
+   		alarmContent.classList.remove('remove');
+   		settingsContent.classList.add('remove');
+   		this.settings = false;
+   	} else {
+   		alarmContent.classList.add('remove');
+   		settingsContent.classList.remove('remove');
+   		this.settings = true;
+   	}
+   },
+   updateTime: function() {
+   	var timeNow = new Date();
+   	var hours   = timeNow.getHours();
+   	var minutes = timeNow.getMinutes();
+      // var meridiem = (hours >= 12) ? " P.M" : " A.M";
+      this.hours = ("0" + hours).slice(-2);
+      this.minutes = ("0" + minutes).slice(-2);
+      //  this.meridiem = meridiem;
+      this.async(this.updateTime,1000);
+  },
+   // Polymer observers definition
+   observers: [ 'onPanelUpdate(hass, panel)' ],
+   wtf: function (e) { debugger; return e; },
+   // Helpers to figure out what to display 
+   isdisarmed:  function(alarm) { return alarm.state == "disarmed"; },
+   isperimeter:  function(alarm) { return alarm.state == "armed_perimeter"; },
+   issecure:    function(all)   { return this.opensensors(alarm, all).length == 0; },
+   opensensors: function(alarm, all)   { 
+   	if (all == false) {
+   		return false;
+   	} else {
+   		ret = all.filter(function (e) { return alarm.attributes.supported_statuses_on.indexOf(e.state.toLowerCase()) > -1; }); 
+   		this.opencount = ret.length;
+   		return ret;
+   	}
+   },
+   closedsensors: function(alarm, all)   {
+   	if (all == false) {
+   		return false;
+   	} else {
+   		ret = all.filter(function (e) { return alarm.attributes.supported_statuses_off.indexOf(e.state.toLowerCase()) > -1; });
+   		return ret;
+   	}
+   },
+   computeSensors: function(hass, ids) {
+   	if (ids == undefined) {
+	 // Control the exception when this.alarm is not ready
+	 return false;
+	} else {
+		return ids.map(function (key) { return hass.states[key]; }).filter(function (e) { return e != undefined; });
+	}
+},
+computeIcon: function (state) {
+	switch (state) {
+		case 'disarmed':        return 'mdi:shield-outline';
+		case 'armed_away':      return 'mdi:security-home';
+		case 'armed_home':      return 'mdi:security-home';
+		case 'pending':         return 'mdi:walk';
+		case 'warning':         return 'mdi:run';
+		case 'triggered':       return 'mdi:alert-circle';
+		case 'armed_perimeter': return 'mdi:security-home';
+	}
+	return 'mdi:help';
+},
+computeLabel: function (state) {
+	switch (state) {
+		case 'disarmed':   	 return 'disarmed';
+		case 'armed_away': 	 return 'away';
+		case 'armed_home': 	 return 'home';
+		case 'pending':    	 return 'leave';
+		case 'warning':    	 return 'warning';
+		case 'triggered':  	 return 'triggered';
+		case 'armed_perimeter': return 'perimeter';
+	}
+	return state;
+},
+   // Responding to user inputs
+   callcode: function(ev) {
+   	ev.stopPropagation();
+   	var digit = ev.target.getAttribute('data-digit');
+   	this.code = this.code + digit;
+      //console.log(this.code);
+  },
+  callclearcode: function(ev) {
+  	ev.stopPropagation();
+  	this.code = '';
+      //console.log('Code Cleared: ' + this.code);
+  },
+  callService: function(ev) {
+  	ev.stopPropagation();
+  	var call = ev.target.getAttribute('data-call');
+      if (call == 'cancel') { //cancel alarm set and return page to default settings
+      	this.resetButtons();
+      } else if (ev.target.getAttribute('data-override')) { //Override of open sensors has been pressed so activate alarm
+      	this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
+      } else if ((call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night') && this.checkOpenSensors(call)) { //Check if trying to activate home with open sensors. If so ping the warning message
+      	console.log('WARNING open sensors');
+      } else { //No open sensors or another service call
+      	this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
+      	this.code = '';
+      }
+  },
+  checkOpenSensors: function(call) {
+      if (this.opencount == 0) return false; //check to see how many open sensors there are, if none arm alarm
+
+      for (var sensor in this.allsensors) { //check to see if the open sensor is one to ignore, if so arm alarm
+	 //is it open?
+	 if (['on', 'open', 'true', 'detected', 'unlocked'].indexOf(this.allsensors[sensor].state.toLowerCase()) > -1) { //yes
+	    //is it in the override list?
+	    if (this.overrideSensors.indexOf(this.allsensors[sensor]) == -1) { //No: return so display message
+	       this.attemptedArm = true; //display the warning message and shake
+
+	       var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
+	       var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+
+	       if (this.alarm.attributes.perimeter_mode) {
+	       	var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+	       	btnArmPerimeter.classList.add('remove');
+	       }
+	       btnArmHome.classList.add('big');
+	       btnArmAway.classList.add('little');
+
+	       this.override = document.createAttribute("data-override");
+	       this.override.value = "true";
+	       btnArmHome.setAttributeNode(this.override);
+
+	       var arm_mode = document.createAttribute("data-call");
+	       arm_mode.value = call;
+	       btnArmHome.setAttributeNode(arm_mode);
+
+	       var arm_mode2 = document.createAttribute("data-call");
+	       arm_mode2.value = 'cancel';
+	       btnArmAway.setAttributeNode(arm_mode2);
+	       btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
+	       btnArmAway.innerHTML = 'Cancel Arm';
+
+	       var pageContent = Polymer.dom(this.root).querySelector('.content');
+	       pageContent.classList.add('shake');
+
+	       return true;
+
+	   }
+	}          
+}
+},
+resetButtons: function() {
+	this.attemptedArm = false;
+
+	var pageContent = Polymer.dom(this.root).querySelector('.content');
+	pageContent.classList.remove('shake');
+
+	var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
+	var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+	if (this.alarm.attributes.perimeter_mode) {
+		var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+		btnArmPerimeter.classList.remove('remove');
+	}
+	btnArmHome.classList.remove('big');
+	btnArmAway.classList.remove('little');
+
+      //var override = document.createAttribute("data-override");
+      btnArmHome.removeAttributeNode(this.override);
+
+      var arm_mode = document.createAttribute("data-call");
+      arm_mode.value = 'alarm_arm_home';
+      btnArmHome.setAttributeNode(arm_mode);
+
+      var arm_mode2 = document.createAttribute("data-call");
+      arm_mode2.value = 'alarm_arm_away';
+      btnArmAway.setAttributeNode(arm_mode2);
+
+      btnArmHome.innerHTML = "<iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode";
+      btnArmAway.innerHTML = "<iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode";
+
+  },
+  entityTapped: function (ev) {
+  	ev.stopPropagation();
+  	var entityId = ev.target.getAttribute('data-entity');
+  	this.fire('hass-more-info', { entityId: entityId });
+  },
+   // Observer: polymer gaurantees that this won't be called util hass and panel are both defined
+   onPanelUpdate: function(hass, panel) {
+      //console.log('onPanelUpdate');
+      this.alarm = hass.states[panel.config.alarmid];
+      //console.log('Alarm is ', this.alarm);
+  },
+});
+</script>

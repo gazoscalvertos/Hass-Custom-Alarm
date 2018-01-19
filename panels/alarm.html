@@ -211,20 +211,25 @@
 				</div>
 			</div>
 		</div>
+		<button id="disableSidebar" type="button" style="visibility: hidden;" onclick="disableSidebar()" /></button>
+		<button id="enableSidebar" type="button" style="visibility: hidden;" onclick="enableSidebar()" /></button>
 	</div>
 </app-header-layout>
 </template>
 </dom-module>
 
 <script>
+	function enableSidebar(){}
+	function disableSidebar(){}
+
 	Polymer({
 		is: 'ha-panel-alarm',
 		created() {
 		},
 		attached() {
-			//var script = document.createElement('script');
-			//script.setAttribute('src', '/local/alarm/alarm_test.js');
-			//document.body.appendChild(script);
+			var script = document.createElement('script');
+			script.setAttribute('src', '/local/alarm/alarm_scripts.js');
+			document.body.appendChild(script);
 		},
 		ready() {
 			if (this.alarm.attributes.clock) {
@@ -270,6 +275,8 @@
   },
 
   monitorAlarm: function() {
+  	//-----HIDE THE SIDE BAR FROM THE SCREEN-------------
+  	if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#disableSidebar').click();
 
   	var countdownTimerDiv = Polymer.dom(this.root).querySelector('#countdown360_countdown');
   	if (countdownTimerDiv) countdownTimerDiv.remove();
@@ -278,35 +285,30 @@
   	this.updateStyles({'--time-display': 'initial'});
   	if (this.alarm.state == 'disarmed') {
   		if (this.attemptedArm == true) { this.resetButtons(); }
+  		//-----DISPLAY THE SIDE BAR ON THE SCREEN-------------
+  		if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#enableSidebar').click();
   		this.updateStyles({'--primary-color': this.alarm.attributes.disarmed_colour});
   	} else if (this.alarm.state == 'armed_away') {
-  		//this.slideCodePanel();
   		this.updateStyles({'--primary-color': this.alarm.attributes.armed_away_colour});
   	} else if ( this.alarm.state == 'armed_home') {
-  		//this.slideCodePanel();
   		this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour});
   	} else if ( this.alarm.state == 'armed_perimeter') {
-
 	    this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour}); //SORT THIS OUT
 	} else if (this.alarm.state == 'pending') {
-		//this.slideCodePanel();
 		this.updateStyles({'--primary-color': this.alarm.attributes.pending_colour});
 		this.updateStyles({'--countdown-timer-display': 'initial'});
 		this.updateStyles({'--time-display': 'none'});
 		this.loadTimer(false, this.alarm.attributes.countdown_time);
 	} else if (this.alarm.state == 'warning') {
-		//this.slideCodePanel();
 		this.updateStyles({'--primary-color': this.alarm.attributes.warning_colour});
 		this.updateStyles({'--countdown-timer-display': 'initial'});
 		this.updateStyles({'--time-display': 'none'});
 		this.loadTimer(false, this.alarm.attributes.countdown_time);
 	} else if (this.alarm.state == 'triggered') {
-	//	this.slideCodePanel();
-	this.updateStyles({'--primary-color': this.alarm.attributes.triggered_colour});
-}
-
-if (this.alarm.attributes.panel_locked == true) {
-	console.log("Panel locked");
+		this.updateStyles({'--primary-color': this.alarm.attributes.triggered_colour});
+	}
+	if (this.alarm.attributes.panel_locked == true) {
+		console.log("Panel locked");
 		this.updateStyles({'--primary-color': 'grey'}); //[TODO] Implement panel locked colour - this.alarm.attributes.panel_locked_colour});
 		this.updateStyles({'--countdown-timer-display': 'initial'});
 		this.updateStyles({'--time-display': 'none'});
@@ -314,7 +316,7 @@ if (this.alarm.attributes.panel_locked == true) {
 		this.panel_locked = true;
 	}
 	else this.panel_locked = false;
-      //  this.opensensors(this.allsensors);
+
   },
   getClass: function(cssClass) {
   	return cssClass ? "slideup" : "slidedown";
