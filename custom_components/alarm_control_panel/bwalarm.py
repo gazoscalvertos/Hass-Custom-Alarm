@@ -82,6 +82,7 @@ CONF_CLOCK                   = 'clock'
 CONF_WEATHER                 = 'weather'
 CONF_SETTINGS                = 'settings'
 CONF_HIDE_ALL_SENSORS        = 'hide_all_sensors'
+CONF_HIDE_PASSCODE           = 'hide_passcode'
 CONF_HIDE_SIDEBAR            = 'hide_sidebar'
 
 #//-----------------------COLOURS------------------------------------
@@ -141,7 +142,8 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_CLOCK, default=False):               cv.boolean,    # DIsplay clock on panel
     vol.Optional(CONF_WEATHER, default=False):             cv.boolean,    # DIsplay weather on panel
     vol.Optional(CONF_HIDE_ALL_SENSORS, default=False):    cv.boolean,    # Show all sensors in group?
-    vol.Optional(CONF_HIDE_SIDEBAR, default=False):       cv.boolean,    # Show all sensors in group?
+    vol.Optional(CONF_HIDE_PASSCODE, default=True):        cv.boolean,    # Show passcode entry during disarm?
+    vol.Optional(CONF_HIDE_SIDEBAR, default=False):        cv.boolean,    # Show all sensors in group?
     #--------------------------PASSWORD ATTEMPTS--------------------------
     vol.Optional(CONF_PASSCODE_ATTEMPTS, default=-1):         vol.All(vol.Coerce(int), vol.Range(min=-1)),
     vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=-1): vol.All(vol.Coerce(int), vol.Range(min=-1)),
@@ -225,7 +227,8 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._perimeter_mode         = config[CONF_PERIMETER_MODE]
         self._settings               = config[CONF_SETTINGS]
         self._hide_all_sensors       = config[CONF_HIDE_ALL_SENSORS]
-        self._hide_sidebar          = config[CONF_HIDE_SIDEBAR]
+        self._hide_passcode          = config[CONF_HIDE_PASSCODE]
+        self._hide_sidebar           = config[CONF_HIDE_SIDEBAR]
         self._clock                  = config[CONF_CLOCK]
         self._weather                = config[CONF_WEATHER]
 
@@ -298,7 +301,8 @@ class BWAlarm(alarm.AlarmControlPanel):
             'settings':           self._settings,
             'settings_list':      self._settings_list,
             'hide_all_sensors':   self._hide_all_sensors,
-            'hide_sidebar':      self._hide_sidebar,
+            'hide_passcode':      self._hide_passcode,
+            'hide_sidebar':       self._hide_sidebar,
             'panel_locked':       self._panel_locked,
             'passcode_attempt_timeout': self._passcodeAttemptTimeout,
             'supported_statuses_on': self._supported_statuses_on,

@@ -97,7 +97,7 @@
 									<iron-label>PANEL LOCKED OUT</iron-label>
 								</template>
 								<template is='dom-if' if='[[!alarm.attributes.panel_locked]]'> 
-									<iron-label>[[computeLabel(alarm.state)]] Mode Activated&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[code]]</iron-label>
+									<iron-label>[[computeLabel(alarm.state)]] Mode Activated&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[display_code]]</iron-label>
 								</template>
 							</div>
 							<div id='codepanel' class$='horizontal layout center-justified {{getClass(panel_locked)}}'>
@@ -478,11 +478,17 @@ computeLabel: function (state) {
    	ev.stopPropagation();
    	var digit = ev.target.getAttribute('data-digit');
    	this.code = this.code + digit;
+   	var display_digit = digit;
+   	if (this.alarm.attributes.hide_passcode) {
+   	  display_digit = '*';
+   	}
+   	this.display_code = this.display_code + display_digit;
       //console.log(this.code);
   },
   callclearcode: function(ev) {
   	ev.stopPropagation();
   	this.code = '';
+  	this.display_code = '';
       //console.log('Code Cleared: ' + this.code);
   },
   callService: function(ev) {
@@ -497,6 +503,7 @@ computeLabel: function (state) {
       } else { //No open sensors or another service call
       	this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
       	this.code = '';
+      	this.display_code = '';
       }
   },
   checkOpenSensors: function(call) {
