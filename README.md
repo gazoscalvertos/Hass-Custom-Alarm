@@ -106,10 +106,10 @@ Thanks to the community for all the input into this.
 
 Consider supporting this project and donate! All funds will go towards bringing new features, hardware support and bug squashing!!
 
-BTC Address: 1NFeyzpKKiKbBYSmCLQZQLxBqJbhSbqmwd
-LTC Address: LTUViN3QUESkQk3mG2hvTzhLRQPVAd269f
-XRP Address: rwuMp76ht6dmGvipxwKr5ZE6VpF7ZKC7qs
-ETH Address: 0xCbeD2D2cf0434370c1ca126707009b876b736609
+- BTC Address: 1NFeyzpKKiKbBYSmCLQZQLxBqJbhSbqmwd
+- LTC Address: LTUViN3QUESkQk3mG2hvTzhLRQPVAd269f
+- XRP Address: rwuMp76ht6dmGvipxwKr5ZE6VpF7ZKC7qs
+- ETH Address: 0xCbeD2D2cf0434370c1ca126707009b876b736609
 
 ## Credits
 [A great countdown JS that I have slightly modded](https://github.com/johnschult/jquery.countdown360)
