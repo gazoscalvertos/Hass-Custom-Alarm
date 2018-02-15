@@ -14,6 +14,8 @@ This is very much a community project so if you wish to chip in then please do!!
 - Tested on HA v0.61.1
 
 ### Changelog
+- (15/02/18) BUG FIX - Fixed the code disarm issue.
+
 - (19/01/18) NEW FEATURE - MQTT now allows you to disarm your alarm using the your code. MQTT panels will need to support the format of the payload which is 'DISARM CODE' for example 'DISARM 0000'. To override this so that MQTT can disarm the alarm without passing across the code then set override_code: True in the alarm.yaml. Status feedback to MQTT coming soon...
 - (19/01/18) NEW FEATURE - The panel now allows you to hide the sidebar when the alarm is activated preventing in intruder to simply go to configuration and shut down HA. A suitable locked down browser will also be required to prevent the intruder simply changing the URL. You could check out kiosk on android. To activate this feature simply enable hide_sidebar: True in the alarm.yaml NOTE!! Ensure you copy alarm_scripts.js into the appropriate folder 'www/alarm'. This was a tricky feature to implement and future HA updates may break this. If anyone has a better idea on how to code this then be my guest.
 

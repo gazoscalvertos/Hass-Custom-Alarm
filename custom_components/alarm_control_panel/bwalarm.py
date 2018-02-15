@@ -346,23 +346,26 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def state_change_listener(self, event):
         """ Something changed, we only care about things turning on at this point """
-        new = event.data.get('new_state', None)
-        if new is None:
-            return
+        if self._state != STATE_ALARM_DISARMED:
+            new = event.data.get('new_state', None)
+            if new is None:
+                return
 
-        if new.state.lower() in self._supported_statuses_on:
-            eid = event.data['entity_id']
-            if eid in self.immediate:
-                self._lasttrigger = eid
-                self.process_event(Events.ImmediateTrip)
-            elif eid in self.delayed:
-                self._lasttrigger = eid
-                self.process_event(Events.DelayedTrip)
+            if new.state != None:
+                if new.state.lower() in self._supported_statuses_on:
+                    eid = event.data['entity_id']
+                    if eid in self.immediate:
+                        self._lasttrigger = eid
+                        self.process_event(Events.ImmediateTrip)
+                    elif eid in self.delayed:
+                        self._lasttrigger = eid
+                        self.process_event(Events.DelayedTrip)
 
     def check_open_sensors(self):
         for sensor in self._allsensors:    
-            if self._hass.states.get(sensor).state in self._supported_statuses_on:
-                _LOGGER.error(self._hass.states.get(sensor)) # do summit
+            if self._hass.states.get(sensor).state != None:
+                if self._hass.states.get(sensor).state in self._supported_statuses_on:
+                    _LOGGER.error(self._hass.states.get(sensor)) # do summit
 
     @property
     def code_format(self):
@@ -484,7 +487,6 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def _validate_code(self, code, state):
         """Validate given code."""
-        self.check_open_sensors()
         if ((self._passcodeAttemptAllowed == -1) or (self._passcodeAttemptNo <= self._passcodeAttemptAllowed)):
             check = self._code is None or code == self._code
             if check:
