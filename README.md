@@ -1,6 +1,6 @@
 # Home Assistant - Custom Alarm Interface!
 ## Intro :-)
-<img align="right" width="502" height="600" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
+<img align="right" width="376.5" height="450" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
 
 Welcome my fellow modders, tinkerers, home assistant wizards!!
 
