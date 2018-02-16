@@ -84,6 +84,8 @@ panel_custom: !include panel_custom.yaml
 ```
 ### Features:
 - MQTT Integration (NEW)
+- Alarm State Persistence on reboots/power restore
+- Lockout of HA sidebar when armed
 - Passcode Attemps/Lockout (NEW)
 - Support for custom device states (NEW)
 - Code panel 0-9 on disarm only
@@ -100,7 +102,6 @@ panel_custom: !include panel_custom.yaml
 - Settings page to adjust non-critical features (colours/information)
 - Debug Mode available in settings
 - Screensaver
-- Lockout of HA sidebar when armed
 - delayed and immediate mode 'per' alarm activation (home/away/perimeter?)
 - Customisable Themes
   - Time Based themes (Dark at Night - Light during day)
