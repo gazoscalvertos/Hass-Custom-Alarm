@@ -1,6 +1,6 @@
 # Home Assistant - Custom Alarm Interface!
 ## Intro :-)
-<img align="right" width="300" height="300" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
+<img align="right" width="502" height="600" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
 
 Welcome my fellow modders, tinkerers, home assistant wizards!!
 
@@ -11,7 +11,7 @@ Consider donating to this project to keep it going as anything contributed will 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
 ### Testing
-- Tested on HA v0.61.1
+- Tested on HA v0.63.2
 
 ### Changelog
 
