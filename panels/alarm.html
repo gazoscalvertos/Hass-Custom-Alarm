@@ -224,7 +224,7 @@
 	    width: 100%;">
 			<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="sensors" />Toggle Sensors</paper-button>
 			<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="custom" />Toggle Custom</paper-button>
-		</div> -->
+		</div>  -->
 	</div>
 </app-header-layout>
 </dom-module>
@@ -246,6 +246,10 @@
 			document.body.appendChild(script);
 		},
 		ready() {
+
+			this.hideSensors = this.alarm.attributes.hide_sensor_groups
+			this.hideCustom  = this.alarm.attributes.hide_custom_panel
+
 			if (this.alarm.attributes.clock) {
 				this.updateTime();
 			}
@@ -292,16 +296,14 @@
       //ENUMS USED FOR CSS CLASS SELECTION
       panel_locked:    { type: Boolean, value: false },
 
-      hideSensors:     { type: Boolean, value: 'computeValue(alarm.attributes.hide_sensor_groups)' },
-      hideCustom:      { type: Boolean, value: 'computeValue(alarm.attributes.hide_custom_panel)' },
+      hideSensors:     { type: Boolean, value: true },
+      hideCustom:      { type: Boolean, value: true },
   },
 
 	computeValue: function(entity) {
 	   	if (entity == undefined) {
-		    // Control the exception when this.alarm is not ready
 		    return false;
 		} else {
-			console.log(entity);
 		    return entity;
 		}
 	},
@@ -309,7 +311,6 @@
   toggleCSS: function(ev) {
   	ev.stopPropagation();
 	var css = ev.target.getAttribute('data-css');
-	console.log(css);
   	switch (css) {
 		case 'sensors': this.hideSensors = !this.hideSensors;
 			break;
