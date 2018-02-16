@@ -1,5 +1,6 @@
 <script src="/local/lib/jquery-3.2.1.min.js"></script>
 <script src="/local/lib/countdown360.js"></script>
+<link rel="import" href="/local/alarm/custom-element.html">
 <style> 
 @font-face {
 	font-family: 'Lobster';
@@ -29,6 +30,7 @@
 
 					<div main-title id="main-title-text"><iron-icon icon='mdi:security-home'></iron-icon>&nbsp;&nbsp;House Alarm</div>
 					<template is='dom-if' if='[[alarm.attributes.settings]]'>
+
 						<div id="settings-icon"><iron-icon on-click='toggleSettings' icon='mdi:settings'></iron-icon></div>
 					</template>
 				</div>
@@ -43,12 +45,8 @@
 
 					<div class='box zone-card box-header' >
 						<template is='dom-if' if='[[alarm.attributes.clock]]'>
-							<div id='time' class='time'>
-								<span id="hour">[[hours]]</span>
-								<span id="middle">:
-									<!-- <span id="meridiem">[[meridiem]]</span> -->
-								</span>
-								<span id="minute">[[minutes]]</span>
+							<div id='time' class='time hours'>
+								<span>[[time.state]]</span>
 							</div>
 						</template>
 						<div id='countdown' class='countdown-timer'></div>
@@ -97,7 +95,8 @@
 									<iron-label>PANEL LOCKED OUT</iron-label>
 								</template>
 								<template is='dom-if' if='[[!alarm.attributes.panel_locked]]'> 
-									<iron-label>[[computeLabel(alarm.state)]] Mode Activated&nbsp;<iron-icon icon='mdi:key'></iron-icon>&nbsp;&nbsp;[[code]]</iron-label>
+									<iron-label>[[computeLabel(alarm.state)]] Mode Activated</iron-label>
+									<div id='code-display'>[[display_code]]</div>
 								</template>
 							</div>
 							<div id='codepanel' class$='horizontal layout center-justified {{getClass(panel_locked)}}'>
@@ -142,7 +141,7 @@
 					<div class='vLayout layout center-justified'>
 
 						<template is='dom-if' if='[[isperimeter(alarm)]]'>
-							<div class='box-outer box-sensors'>
+							<div class='box-outer box-sensors' hidden$="{{hideSensors}}">
 								<div class='title'>Immediate Sensors</div>
 								<div class='box-inner'>
 									<template is='dom-repeat' items='[[perimeter]]' as='entity'>
@@ -158,7 +157,7 @@
 
 						<template is='dom-if' if='[[!isperimeter(alarm)]]'>
 							<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-								<div class='box-outer box-sensors'>
+								<div class='box-outer box-sensors' hidden$="{{hideSensors}}">
 									<div class='title'>Delayed Sensors</div>
 									<div class='box-inner'>
 										<template is='dom-repeat' items='[[delayed]]' as='entity'>
@@ -167,7 +166,7 @@
 									</div>
 								</div>
 
-								<div class='box-outer box-sensors'>
+								<div class='box-outer box-sensors' hidden$="{{hideSensors}}">
 									<div class='title'>Immediate Sensors</div>
 									<div class='box-inner'>
 										<template is='dom-repeat' items='[[immediate]]' as='entity'>
@@ -181,9 +180,9 @@
 					</div>        
 
 					<template is='dom-if' if='[[isdisarmed(alarm)]]'>
-						<template is='dom-if' if='[[!alarm.attributes.hide_all_sensors]]'>
-							<div class='box-outer' style='max-width: 100%;' >
-								<div class='title'>All Sensors</div>
+						<!-- <template is='dom-if' if='[[!alarm.attributes.hide_sensor_groups]]'> -->
+							<div class='box-outer' hidden$="{{hideSensors}}" style='max-width: 100%;' >
+								<div class='title' on-click='hideSensors'>All Sensors</div>
 								<div class='box-inner'>
 
 									<template is='dom-repeat' items='[[opensensors(alarm, allsensors)]]' as='entity'>
@@ -195,11 +194,11 @@
 									</template>			
 								</div>
 							</div>
-						</template>
+						<!-- </template> -->
 					</template>
 
 					<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-						<div class='box-outer' style='max-width: 100%;' >
+						<div class='box-outer' hidden$="{{hideSensors}}" style='max-width: 100%;' >
 							<div class='title'>Inactive Sensors</div>
 							<div class='box-inner'>
 								<template is='dom-repeat' items='[[ignored]]' as='entity'>
@@ -211,12 +210,27 @@
 				</div>
 			</div>
 		</div>
+
+		<div hidden$="{{hideCustom}}">
+			<custom-element is-panel></custom-element>
+		</div>
+
 		<button id="disableSidebar" type="button" style="visibility: hidden;" onclick="disableSidebar()" /></button>
-		<button id="enableSidebar" type="button" style="visibility: hidden;" onclick="enableSidebar()" /></button>
+		<button id="enableSidebar" type="button" style="visibility: hidden;"  onclick="enableSidebar()" /></button>
+
+		<!-- DEBUG <div id="footer" style="    
+		position: fixed;
+	    bottom: 0;
+	    width: 100%;">
+			<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="sensors" />Toggle Sensors</paper-button>
+			<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="custom" />Toggle Custom</paper-button>
+		</div> -->
 	</div>
 </app-header-layout>
-</template>
 </dom-module>
+
+</template>
+
 
 <script>
 	function enableSidebar(){}
@@ -238,40 +252,78 @@
 			if (this.alarm.attributes.weather) {
 				this.getWeather();
 			}
+			this.async(this.toggleSiderbar,100);
       //if (this.screensaver){
       //     	 this.setupEyeCandy();
       //     }
   },
   properties: {
-      // things that appear in all the other panels 
-      hass:     { type: Object },
-      panel:    { type: Object },
-      narrow:   { type: Boolean, value: false },
-      showMenu: { type: Boolean, value: false },
-      // things specific to this alarm panel
-      alarm:      { type: Object, observer: 'monitorAlarm' },
-      immediate:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.immediate)' },
-      delayed:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.delayed)' },
-      ignored:    { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
-      perimeter:  { type: Array, computed: 'computeSensors(hass, alarm.attributes.perimeter)' },
-      allsensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)'},
+      hass:            { type: Object },
+      panel:           { type: Object },
+      narrow:          { type: Boolean, value: false },
+      showMenu:        { type: Boolean, value: false },
+
+      alarm:           { type: Object, observer: 'monitorAlarm' },
+
+      // Sensor Groups
+      immediate:       { type: Array, computed: 'computeSensors(hass, alarm.attributes.immediate)' },
+      delayed:         { type: Array, computed: 'computeSensors(hass, alarm.attributes.delayed)' },
+      ignored:         { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
+      perimeter:       { type: Array, computed: 'computeSensors(hass, alarm.attributes.perimeter)' },
+      allsensors:      { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)'},
       overrideSensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.override)' },
-      weather:	  { type: String },
-      temp:	  { type: String },
-      code:       { type: String, value: '' },
-      opencount:  { type: Number, value: 0 },
-      timeoutID:  { type: Number },
-      hours:      { type: String, value: '??' },
-      minutes:    { type: String, value: '??' },
-      //     meridiem:   { type: String, value: '?M' },
-      // Hold our unobservers
-      cleanup:    { type: Array, value: [] },
-      attemptedArm:   { type: Boolean, value: false }, 
-      screensaver:    { type: Boolean, value: false },
-      settings:	      { type: Boolean, value: false },
+
+      opencount:       { type: Number, value: 0 },
+
+      time:            { type: Object },
+      weather:	       { type: Object },
+      temp:	           { type: String },
+
+      code:            { type: String, value: '' },
+      display_code:    { type: String, value: '' },
+
+      timeoutID:       { type: Number },
+
+      cleanup:         { type: Array, value: [] },
+      attemptedArm:    { type: Boolean, value: false }, 
+      screensaver:     { type: Boolean, value: false },
+      settings:	       { type: Boolean, value: false },
 
       //ENUMS USED FOR CSS CLASS SELECTION
-      panel_locked:  { type: Boolean, value: false },
+      panel_locked:    { type: Boolean, value: false },
+
+      hideSensors:     { type: Boolean, value: 'computeValue(alarm.attributes.hide_sensor_groups)' },
+      hideCustom:      { type: Boolean, value: 'computeValue(alarm.attributes.hide_custom_panel)' },
+  },
+
+	computeValue: function(entity) {
+	   	if (entity == undefined) {
+		    // Control the exception when this.alarm is not ready
+		    return false;
+		} else {
+			console.log(entity);
+		    return entity;
+		}
+	},
+
+  toggleCSS: function(ev) {
+  	ev.stopPropagation();
+	var css = ev.target.getAttribute('data-css');
+	console.log(css);
+  	switch (css) {
+		case 'sensors': this.hideSensors = !this.hideSensors;
+			break;
+		case 'custom': this.hideCustom = !this.hideCustom;
+			break;
+	}
+  },
+
+  toggleSiderbar: function() {
+	if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#disableSidebar').click();
+	if (this.alarm.state == 'disarmed') {
+  		//-----DISPLAY THE SIDE BAR ON THE SCREEN-------------
+  		if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#enableSidebar').click();
+  	}
   },
 
   monitorAlarm: function() {
@@ -348,7 +400,7 @@
    //--------------------------------------------------------------//
    //-----------------EYE CANDY FUNCTION---------------------------//
    //--------------------------------------------------------------//
-   setupEyeCandy: function () {
+/*   setupEyeCandy: function () {
    	this.addEventListener("mousemove", this.resetTimer);
    	this.addEventListener("mousedown", this.resetTimer);
    	this.addEventListener("keypress", this.resetTimer);
@@ -386,7 +438,7 @@
   	appHeader.classList.add('hide-bar');
       //var settingsContent = Polymer.dom(this.root).querySelector('#settings');
       //settingsContent.classList.remove('remove');
-  },
+  },*/
    //--------------------------------------------------------------//
    //-----------------EYE CANDY FUNCTION---------------------------//
    //--------------------------------------------------------------//
@@ -408,14 +460,8 @@
    	}
    },
    updateTime: function() {
-   	var timeNow = new Date();
-   	var hours   = timeNow.getHours();
-   	var minutes = timeNow.getMinutes();
-      // var meridiem = (hours >= 12) ? " P.M" : " A.M";
-      this.hours = ("0" + hours).slice(-2);
-      this.minutes = ("0" + minutes).slice(-2);
-      //  this.meridiem = meridiem;
-      this.async(this.updateTime,1000);
+   	this.time = this.hass.states['sensor.time'];
+    this.async(this.updateTime,1000);
   },
    // Polymer observers definition
    observers: [ 'onPanelUpdate(hass, panel)' ],
@@ -478,12 +524,16 @@ computeLabel: function (state) {
    	ev.stopPropagation();
    	var digit = ev.target.getAttribute('data-digit');
    	this.code = this.code + digit;
-      //console.log(this.code);
+   	var display_digit = digit;
+   	if (this.alarm.attributes.hide_passcode) {
+   	  display_digit = '*';
+   	}
+   	this.display_code = this.display_code + display_digit;
   },
   callclearcode: function(ev) {
   	ev.stopPropagation();
   	this.code = '';
-      //console.log('Code Cleared: ' + this.code);
+  	this.display_code = '';
   },
   callService: function(ev) {
   	ev.stopPropagation();
@@ -497,6 +547,7 @@ computeLabel: function (state) {
       } else { //No open sensors or another service call
       	this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
       	this.code = '';
+      	this.display_code = '';
       }
   },
   checkOpenSensors: function(call) {
@@ -537,7 +588,6 @@ computeLabel: function (state) {
 	       pageContent.classList.add('shake');
 
 	       return true;
-
 	   }
 	}          
 }

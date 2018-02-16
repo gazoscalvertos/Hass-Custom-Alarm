@@ -1,7 +1,7 @@
 :host {
    --countdown-timer-display: none;
    --time-display: initial;
-}	
+}  
 app-header-layout {
    background-color: var(--primary-background-color);
 }
@@ -45,9 +45,15 @@ ha-label-badge {
 .box {
    padding-top: 10px;
    padding-bottom: 10px;
+   display: -webkit-box;
+   display: -ms-flexbox;
    display: flex;
-   justify-content: center; /* align horizontal */
-   align-items: center; /* align vertical */
+   -webkit-box-pack: center;
+       -ms-flex-pack: center;
+           justify-content: center; /* align horizontal */
+   -webkit-box-align: center;
+       -ms-flex-align: center;
+           align-items: center; /* align vertical */
 }
 .box-outer {
    margin-bottom: 10px;
@@ -93,12 +99,24 @@ ha-label-badge {
       width: 40px;
    }
    .weather {
-      justify-content: center;
-      flex-direction: column;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      display: -webkit-box;
+      display: -ms-flexbox;
       display: flex;
    }
    .vLayout {
-      flex-direction: column;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      display: -webkit-box;
+      display: -ms-flexbox;
       display: flex;
    }
    div.arm paper-button {
@@ -110,9 +128,6 @@ ha-label-badge {
 @media screen and (min-width: 768px) {
    .sign {
       font-size: xx-large;
-   }
-   #hour, #minute, #middle {
-      font-size: -webkit-xxx-large;
    }
    #meridiem {
       font-size: small;
@@ -126,7 +141,12 @@ ha-label-badge {
       margin-right: 5px;
    }
    .vLayout {
-      flex-direction: row;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+          -ms-flex-direction: row;
+              flex-direction: row;
+      display: -webkit-box;
+      display: -ms-flexbox;
       display: flex;
    }
 }
@@ -139,7 +159,7 @@ ha-label-badge {
 @media screen and (min-width: 1200px) {
 }
 .sign {
-   margin-left: -20px;	
+   margin-left: -20px;  
 }
 .ok {
    color: green;
@@ -162,6 +182,12 @@ div.countdown-timer {
 
 div.code {
    text-transform: capitalize;
+   padding-top: 23px;
+}
+#code-display {
+   margin-top: 15px;
+   font-size: xx-large;
+   letter-spacing: 5px;
 }
 
 div.code iron-label {
@@ -203,10 +229,11 @@ div.options paper-button{
    margin-top: 2px;
    font-size: 1.2em;
 }
-.time {
+#time {
    color: var( --primary-color);
    text-shadow: 1px 1px #6b8d9b;
    display: var(--time-display);
+   font-size: xx-large;
 }
 #middle {
    text-align: center;
@@ -243,10 +270,18 @@ div.options paper-button{
 
 }
 #main-title-bar{
+   display: -webkit-box;
+   display: -ms-flexbox;
    display: flex;                  /* establish flex container */
-   flex-direction: row;            /* default value; can be omitted */
-   flex-wrap: nowrap;              /* default value; can be omitted */
-   justify-content: space-between; /* switched from default (flex-start, see below) */
+   -webkit-box-orient: horizontal;
+   -webkit-box-direction: normal;
+       -ms-flex-direction: row;
+           flex-direction: row;            /* default value; can be omitted */
+   -ms-flex-wrap: nowrap;
+       flex-wrap: nowrap;              /* default value; can be omitted */
+   -webkit-box-pack: justify;
+       -ms-flex-pack: justify;
+           justify-content: space-between; /* switched from default (flex-start, see below) */
    width: 100%;
 }
 #main-title-bar div{
@@ -254,19 +289,27 @@ div.options paper-button{
 #main-title-text{
    width: 100%;
    /* position: absolute; */
-   /* margin-left: -25px; */
+   margin-left: -35px; 
 }
 #settings-icon{
-   width: 5%;	
+   width: 5%;  
 }
 #settings-icon button {
 }
 #settings{
    height: calc(100vh - 64px);
+   display: -webkit-box;
+   display: -ms-flexbox;
    display: flex;
-   flex-direction: row;
-   flex-wrap: nowrap;
-   justify-content: space-between;
+   -webkit-box-orient: horizontal;
+   -webkit-box-direction: normal;
+       -ms-flex-direction: row;
+           flex-direction: row;
+   -ms-flex-wrap: nowrap;
+       flex-wrap: nowrap;
+   -webkit-box-pack: justify;
+       -ms-flex-pack: justify;
+           justify-content: space-between;
    width: 100%;
    text-align: center;
 }
@@ -295,12 +338,15 @@ div.options paper-button{
 }
 .onoffswitch-inner {
    display: block; width: 200%; margin-left: -100%;
+   -webkit-transition: margin 0.3s ease-in 0s;
+   -o-transition: margin 0.3s ease-in 0s;
    transition: margin 0.3s ease-in 0s;
 }
 .onoffswitch-inner:before, .onoffswitch-inner:after {
    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
-   box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+           box-sizing: border-box;
 }
 .onoffswitch-inner:before {
    content: "ON";
@@ -320,6 +366,8 @@ div.options paper-button{
    position: absolute; top: 0; bottom: 0;
    right: 56px;
    border: 2px solid #999999; border-radius: 20px;
+   -webkit-transition: all 0.3s ease-in 0s;
+   -o-transition: all 0.3s ease-in 0s;
    transition: all 0.3s ease-in 0s; 
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
@@ -429,11 +477,22 @@ button {
    overflow: hidden;
 }
 #codepanel.slidedown {
-   animation: slideout 1.75s;
+   -webkit-animation: slideout 1.75s;
+           animation: slideout 1.75s;
 }
 #codepanel.slideup {
-   animation: slidein 1.75s;
+   -webkit-animation: slidein 1.75s;
+           animation: slidein 1.75s;
    max-height: 0px;
+}
+
+@-webkit-keyframes slideout{
+    from{
+        max-height:0;
+    }
+    to{
+        max-height: 320px;
+    }
 }
 
 @keyframes slideout{
@@ -442,6 +501,14 @@ button {
     }
     to{
         max-height: 320px;
+    }
+}
+@-webkit-keyframes slidein{
+    from{
+        max-height: 320px;
+    }
+    to{
+        max-height: 0px;
     }
 }
 @keyframes slidein{
@@ -453,55 +520,110 @@ button {
     }
 }
 
-@keyframes shake{
+@-webkit-keyframes shake{
    0% {
-      transform:  translate(0px,0px)  ;
+      -webkit-transform:  translate(0px,0px)  ;
+              transform:  translate(0px,0px)  ;
    }
    10% {
-      transform:  translate(-10px,0px)  ;
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
    }
    20% {
-      transform:  translate(10px,0px)  ;
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
    }
    30% {
-      transform:  translate(-10px,0px)  ;
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
    }
    40% {
-      transform:  translate(10px,0px)  ;
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
    }
    50% {
-      transform:  translate(-10px,0px)  ;
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
    }
    60% {
-      transform:  translate(10px,0px)  ;
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
    }
    70% {
-      transform:  translate(-10px,0px)  ;
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
    }
    80% {
-      transform:  translate(10px,0px)  ;
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
    }
    90% {
-      transform:  translate(-10px,0px)  ;
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
    }
    100% {
-      transform:  translate(0px,0px)  ;
+      -webkit-transform:  translate(0px,0px)  ;
+              transform:  translate(0px,0px)  ;
+   }
+}
+
+@keyframes shake{
+   0% {
+      -webkit-transform:  translate(0px,0px)  ;
+              transform:  translate(0px,0px)  ;
+   }
+   10% {
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
+   }
+   20% {
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
+   }
+   30% {
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
+   }
+   40% {
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
+   }
+   50% {
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
+   }
+   60% {
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
+   }
+   70% {
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
+   }
+   80% {
+      -webkit-transform:  translate(10px,0px)  ;
+              transform:  translate(10px,0px)  ;
+   }
+   90% {
+      -webkit-transform:  translate(-10px,0px)  ;
+              transform:  translate(-10px,0px)  ;
+   }
+   100% {
+      -webkit-transform:  translate(0px,0px)  ;
+              transform:  translate(0px,0px)  ;
    }
 }
 #eyecandy {
    height: 100vh;
+   background: -webkit-gradient(linear, right top, left top, from(#050505), color-stop(#15305d), to(#4f5258));
+   background: -webkit-linear-gradient(right, #050505, #15305d, #4f5258);
+   background: -o-linear-gradient(right, #050505, #15305d, #4f5258);
    background: linear-gradient(270deg, #050505, #15305d, #4f5258);
    background-size: 400% 400%;
    -webkit-animation: backgroundAnimation 30s ease infinite;
-   -moz-animation: backgroundAnimation 30s ease infinite;
    animation: backgroundAnimation 30s ease infinite;
 }
 @-webkit-keyframes backgroundAnimation {
-   0%{background-position:0% 50%}
-   50%{background-position:100% 50%}
-   100%{background-position:0% 50%}
-}
-@-moz-keyframes backgroundAnimation {
    0%{background-position:0% 50%}
    50%{background-position:100% 50%}
    100%{background-position:0% 50%}
@@ -556,4 +678,3 @@ button {
 .remove {
    display: none !important;
 }
-

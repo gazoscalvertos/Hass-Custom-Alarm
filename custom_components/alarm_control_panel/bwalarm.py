@@ -81,7 +81,9 @@ CONF_MQTT                    = 'mqtt'
 CONF_CLOCK                   = 'clock'
 CONF_WEATHER                 = 'weather'
 CONF_SETTINGS                = 'settings'
-CONF_HIDE_ALL_SENSORS        = 'hide_all_sensors'
+CONF_HIDE_SENSOR_GROUPS      = 'hide_sensor_groups'
+CONF_HIDE_CUSTOM_PANEL       = 'hide_custom_panel'
+CONF_HIDE_PASSCODE           = 'hide_passcode'
 CONF_HIDE_SIDEBAR            = 'hide_sidebar'
 
 #//-----------------------COLOURS------------------------------------
@@ -138,10 +140,12 @@ PLATFORM_SCHEMA = vol.Schema({
     #---------------------------OPTIONAL MODES---------------------------
     vol.Optional(CONF_PERIMETER_MODE, default=False):      cv.boolean,    # Enable perimeter mode?
     vol.Optional(CONF_SETTINGS, default=False):            cv.boolean,    # Allow settings mode to become active and allow saving of settings config file
-    vol.Optional(CONF_CLOCK, default=False):               cv.boolean,    # DIsplay clock on panel
-    vol.Optional(CONF_WEATHER, default=False):             cv.boolean,    # DIsplay weather on panel
-    vol.Optional(CONF_HIDE_ALL_SENSORS, default=False):    cv.boolean,    # Show all sensors in group?
-    vol.Optional(CONF_HIDE_SIDEBAR, default=False):       cv.boolean,    # Show all sensors in group?
+    vol.Optional(CONF_CLOCK, default=False):               cv.boolean,    # Display clock on panel
+    vol.Optional(CONF_WEATHER, default=False):             cv.boolean,    # Display weather on panel
+    vol.Optional(CONF_HIDE_SENSOR_GROUPS, default=False):  cv.boolean,    # Show sensor groups?
+    vol.Optional(CONF_HIDE_CUSTOM_PANEL, default=True):    cv.boolean,    # Hides custom panel?
+    vol.Optional(CONF_HIDE_PASSCODE, default=True):        cv.boolean,    # Show passcode entry during disarm?
+    vol.Optional(CONF_HIDE_SIDEBAR, default=False):        cv.boolean,    # Show all sensors in group?
     #--------------------------PASSWORD ATTEMPTS--------------------------
     vol.Optional(CONF_PASSCODE_ATTEMPTS, default=-1):         vol.All(vol.Coerce(int), vol.Range(min=-1)),
     vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=-1): vol.All(vol.Coerce(int), vol.Range(min=-1)),
@@ -224,8 +228,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         #------------------------------------OPTIONAL MODES---------------------------------------
         self._perimeter_mode         = config[CONF_PERIMETER_MODE]
         self._settings               = config[CONF_SETTINGS]
-        self._hide_all_sensors       = config[CONF_HIDE_ALL_SENSORS]
-        self._hide_sidebar          = config[CONF_HIDE_SIDEBAR]
+        self._hide_sensor_groups     = config[CONF_HIDE_SENSOR_GROUPS]
+        self._hide_custom_panel      = config[CONF_HIDE_CUSTOM_PANEL]
+        self._hide_passcode          = config[CONF_HIDE_PASSCODE]
+        self._hide_sidebar           = config[CONF_HIDE_SIDEBAR]
         self._clock                  = config[CONF_CLOCK]
         self._weather                = config[CONF_WEATHER]
 
@@ -277,32 +283,34 @@ class BWAlarm(alarm.AlarmControlPanel):
     @property
     def device_state_attributes(self):
         return {
-            'immediate':          sorted(list(self.immediate)),
-            'delayed':            sorted(list(self.delayed)),
-            'override':           sorted(list(self._override)),
-            'ignored':            sorted(list(self.ignored)),
-            'allsensors':         sorted(list(self._allsensors)),
-            'perimeter':          sorted(list(self._perimeter)),
-            'perimeter_mode':     self._perimeter_mode,
-            'changedby':          self.changed_by,
-            'warning_colour':     self._warning_colour,
-            'pending_colour':     self._pending_colour,
-            'disarmed_colour':    self._disarmed_colour,
-            'triggered_colour':   self._triggered_colour,
-            'armed_home_colour':  self._armed_home_colour,
-            'armed_away_colour':  self._armed_away_colour,
-            'panic_mode':         self._panic_mode,
-            'countdown_time':     self._countdown_time,
-            'clock':              self._clock,
-            'weather':            self._weather,
-            'settings':           self._settings,
-            'settings_list':      self._settings_list,
-            'hide_all_sensors':   self._hide_all_sensors,
-            'hide_sidebar':      self._hide_sidebar,
-            'panel_locked':       self._panel_locked,
+            'immediate':                sorted(list(self.immediate)),
+            'delayed':                  sorted(list(self.delayed)),
+            'override':                 sorted(list(self._override)),
+            'ignored':                  sorted(list(self.ignored)),
+            'allsensors':               sorted(list(self._allsensors)),
+            'perimeter':                sorted(list(self._perimeter)),
+            'perimeter_mode':           self._perimeter_mode,
+            'changedby':                self.changed_by,
+            'warning_colour':           self._warning_colour,
+            'pending_colour':           self._pending_colour,
+            'disarmed_colour':          self._disarmed_colour,
+            'triggered_colour':         self._triggered_colour,
+            'armed_home_colour':        self._armed_home_colour,
+            'armed_away_colour':        self._armed_away_colour,
+            'panic_mode':               self._panic_mode,
+            'countdown_time':           self._countdown_time,
+            'clock':                    self._clock,
+            'weather':                  self._weather,
+            'settings':                 self._settings,
+            'settings_list':            self._settings_list,
+            'hide_sensor_groups':       self._hide_sensor_groups,
+            'hide_custom_panel':        self._hide_custom_panel,
+            'hide_passcode':            self._hide_passcode,
+            'hide_sidebar':             self._hide_sidebar,
+            'panel_locked':             self._panel_locked,
             'passcode_attempt_timeout': self._passcodeAttemptTimeout,
-            'supported_statuses_on': self._supported_statuses_on,
-            'supported_statuses_off': self._supported_statuses_off
+            'supported_statuses_on':    self._supported_statuses_on,
+            'supported_statuses_off':   self._supported_statuses_off
         }
     #def settings_test(self, settings=None):
     #    _LOGGER.error("[ALARM] test triggered %s", settings)
