@@ -15,20 +15,17 @@ This is very much a community project so if you wish to chip in then please do!!
 
 ### Changelog
 
-- (16/02/18) NEW FEATURE - Custom Panel allowing custom html/polymer code!!!!!! Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the <template> tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!
+- (16/02/18) NEW FEATURE - Custom Panel allowing custom html/polymer code!!!!!! Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the template tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!
 - (16/02/18) NEW FEATURE - Added the ability to hide the sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear on the display. (hide_sensor_groups:True) see alarm.yaml for details.
 - (16/02/18) NEW FEATURE - Added the ability to mask the passcode during diasarm. The feature will be enabled by deault. See the alarm.yaml for extra information. Credit @mikefero
 
 - (16/02/18) BUG FIX - Added further code to force the sidebar to hide when the alarm is armed. This prevents a simple refresh showing the sidebar.
 - (16/02/18) BUG FIX - Given the time label has caused folk issues I have decided to drop the javascript implementation and use the time derived from HA. Ensure you have a time sensor setup in your sensors.yaml:
-
-
 ```
   - platform: time_date
     display_options:
       - 'time'
 ```
-
 - (15/02/18) BUG FIX - Fixed the code disarm issue.
 
 - (19/01/18) NEW FEATURE - MQTT now allows you to disarm your alarm using the your code. MQTT panels will need to support the format of the payload which is 'DISARM CODE' for example 'DISARM 0000'. To override this so that MQTT can disarm the alarm without passing across the code then set override_code: True in the alarm.yaml. Status feedback to MQTT coming soon...
