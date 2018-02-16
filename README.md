@@ -72,10 +72,12 @@ panel_custom: !include panel_custom.yaml
 - hide_passcode: True **#[OPTIONAL, Boolean] True by default. This is a security feature when enabled hides the passcode while entering disarm code.**
 - hide_sidebar: True **#[OPTIONAL, Boolean] False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.**
 - hide_sensor_groups: True **#[OPTIONAL, Boolean] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear**
-hide_custom_panel: True **#[OPTIONAL, Boolean] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the <template> tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!**
+-hide_custom_panel: True **#[OPTIONAL, Boolean] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the template tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!**
+
 ### [PASSCODE RELATED]
 - passcode_attempts: 3 #[OPTIONAL, number] Disabled if commented out. When a value equal or greater than 0 is set, the system will only allow the set amount of password attempts before timing out
 - passcode_attempts_timeout: 30 #[OPTIONAL, number] Default 30 seconds. When set with the password attempts option the panel will timeout for the amount of seconds set if the password is entered incorrectly as per the password_attempts option. The system will then reset the allowed password attempts
+
 ### [MQTT RELATED]
 - mqtt: True #[OPTIONAL, boolean] False by default. Settings this to True will enable MQTT Mode. Uncomment options below to use See the README for guidance.
 - override_code: True #[OPTIONAL, boolean] False by default. if true allows MQTT commands to disarm the alarm without a valid code.
@@ -86,6 +88,7 @@ hide_custom_panel: True **#[OPTIONAL, Boolean] - True by default. Setting this t
 - payload_arm_home: "ARM_HOME" #[OPTIONAL, string] The payload to set armed-home mode on this Alarm Panel. Default is “ARM_HOME”.
 - payload_arm_away: "ARM_AWAY" #[OPTIONAL, string] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
 - payload_arm_night: "ARM_NIGHT" #[OPTIONAL, string] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
+
 ### [COLOURS]  Use any HTML format
 - warning_colour: 'orange' #[OPTIONAL, string]
 - pending_colour: 'orange' #[OPTIONAL, string]
@@ -93,6 +96,7 @@ hide_custom_panel: True **#[OPTIONAL, Boolean] - True by default. Setting this t
 - armed_home_colour: 'black' #[OPTIONAL, string]
 - armed_away_colour: 'black' #[OPTIONAL, string]
 - triggered_colour: 'red' #[OPTIONAL, string]
+
 ### [SENSOR GROUPS]
 - immediate: #[OPTIONAL, list of entities] Sensors in this group tigger the alarm immediately
 -- binary_sensor.top_floor_multi_sensor_sensor #EXAMPLE
@@ -106,11 +110,13 @@ hide_custom_panel: True **#[OPTIONAL, Boolean] - True by default. Setting this t
 -- binary_sensor.hall_multi_sensor_sensor #EXAMPLE
 - perimeter: #[OPTIONAL, list of entities] This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
 -- binary_sensor.toilet_window_sensor #EXAMPLE
+
 ### [CUSTOM STATUSES]
 -custom_supported_statuses_on: #[OPTIONAL, list of strings] CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. This is to be used when the state of the device is not recognised by the panel. Examples are provided below 
 -- 'running' #EXAMPLE
 -custom_supported_statuses_off:
 -- 'not_running' #EXAMPLE
+
 ### Testing
 - Tested on HA v0.63.2
 ### Changelog
