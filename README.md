@@ -22,6 +22,7 @@ This is very much a community project so if you wish to chip in then please do!!
 - (16/02/18) BUG FIX - Added further code to force the sidebar to hide when the alarm is armed. This prevents a simple refresh showing the sidebar.
 - (16/02/18) BUG FIX - Given the time label has caused folk issues I have decided to drop the javascript implementation and use the time derived from HA. Ensure you have a time sensor setup in your sensors.yaml:
 
+
 ```
   - platform: time_date
     display_options:
