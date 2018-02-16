@@ -1,6 +1,6 @@
 # Home Assistant - Custom Alarm Interface!
 ## Intro :-)
-<img align="right" width="376.5" height="450" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
+<img align="right" width="376.5" height="525" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
 
 Welcome my fellow modders, tinkerers, home assistant wizards!!
 
@@ -122,6 +122,7 @@ Consider supporting this project and donate! All funds will go towards bringing 
 - LTC Address: LTUViN3QUESkQk3mG2hvTzhLRQPVAd269f
 - XRP Address: rwuMp76ht6dmGvipxwKr5ZE6VpF7ZKC7qs
 - ETH Address: 0xCbeD2D2cf0434370c1ca126707009b876b736609
+- Paypal: ha.custom.alarm@gmail.com
 
 ## Credits
 [A great countdown JS that I have slightly modded](https://github.com/johnschult/jquery.countdown360)
