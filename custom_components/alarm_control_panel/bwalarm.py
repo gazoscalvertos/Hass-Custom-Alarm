@@ -21,6 +21,7 @@ from homeassistant.const import (
 
 from homeassistant.core          import callback
 from homeassistant.util.dt       import utcnow                       as now
+from homeassistant.loader 		 import bind_hass
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.util          import sanitize_filename
@@ -60,8 +61,10 @@ SUPPORTED_STATUSES_ON              = [STATE_ON, STATE_TRUE, STATE_UNLOCKED, STAT
 SUPPORTED_STATUSES_OFF             = [STATE_OFF, STATE_FALSE, STATE_LOCKED, STATE_CLOSED, STATE_UNDETECTED, STATE_NO_MOTION, STATE_STANDBY]
 
 #//-----------------YAML CONFIG OPTIONS----------------------------
-CONF_PANIC_CODE              = 'panic_code'
-CONF_PASSCODE_ATTEMPTS       = 'passcode_attempts'
+CONF_CODES                     = 'codes'
+CONF_NAME                      = 'name'
+CONF_PANIC_CODE                = 'panic_code'
+CONF_PASSCODE_ATTEMPTS         = 'passcode_attempts'
 CONF_PASSCODE_ATTEMPTS_TIMEOUT = 'passcode_attempts_timeout'
 
 #//-------------------SENSOR GROUPS--------------------------------
@@ -114,7 +117,14 @@ class Events(enum.Enum):
     Disarm                   = 6
     Trigger                  = 7
     ArmPerimeter             = 8
-    
+
+_CODES_SCHEMA = vol.All(
+    vol.Schema({
+        vol.Required(CONF_NAME): 							cv.string,
+        vol.Required(CONF_CODE): 							cv.string
+    })
+)
+
 PLATFORM_SCHEMA = vol.Schema({
     vol.Required(CONF_PLATFORM):                           'bwalarm',
     vol.Required(CONF_NAME, default='House'):              cv.string,
@@ -125,6 +135,7 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_CUSTOM_SUPPORTED_STATUSES_ON):       vol.Schema([cv.string]),
     vol.Optional(CONF_CUSTOM_SUPPORTED_STATUSES_OFF):      vol.Schema([cv.string]),
     vol.Optional(CONF_CODE):                               cv.string,
+    vol.Optional(CONF_CODES):                              vol.Schema([_CODES_SCHEMA]), # Schema to hold the list of names with codes allowed to disarm the alarm
     vol.Optional(CONF_PANIC_CODE):                         cv.string,
     vol.Optional(CONF_IMMEDIATE):                          cv.entity_ids, # things that cause an immediate alarm
     vol.Optional(CONF_DELAYED):                            cv.entity_ids, # things that allow a delay before alarm
@@ -176,15 +187,7 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.passcode_timeout_listener)
     async_add_devices([alarm])
-
-    # @callback
-    # def alarm_persistence_save(service, persistence=None):
-    #     alarm._persistence_save(persistence)
-     
-    # hass.services.async_register(DOMAIN, 'ALARM_persistence_SAVE', alarm_persistence_save)
-    
-    return True
-   
+  
 class BWAlarm(alarm.AlarmControlPanel):
 
     def __init__(self, hass, config, mqtt):
@@ -220,6 +223,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         #------------------------------------PASSCODE RELATED-------------------------------------
         self._code                   = config.get(CONF_CODE, None)
+        #self._codes                  = set(config.get
         self._panic_code             = config.get(CONF_PANIC_CODE, None)
         self._panel_locked           = False
         self._passcodeAttemptNo      = 0
@@ -410,7 +414,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.process_event(Events.ArmHome)
 
     def alarm_arm_away(self, code=None):
-        self.process_event(Events.ArmAway)
+        if code == "-1":
+            self.process_event(Events.ArmAway, True)
+        else:
+            self.process_event(Events.ArmAway)
 
     def alarm_arm_night(self, code=None):
         self.process_event(Events.ArmPerimeter)
@@ -440,7 +447,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.ignored = self._allsensors.copy()
         self._timeoutat = None
 
-    def process_event(self, event):
+    def process_event(self, event, override_pending_time=False):
         old = self._state
         # Update state if applicable
         if event == Events.Disarm:
@@ -449,7 +456,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._state = STATE_ALARM_TRIGGERED 
         elif old == STATE_ALARM_DISARMED:
             if   event == Events.ArmHome:       self._state = STATE_ALARM_ARMED_HOME
-            elif event == Events.ArmAway:       self._state = STATE_ALARM_PENDING
+            elif event == Events.ArmAway:       self._state = STATE_ALARM_PENDING if override_pending_time == False else STATE_ALARM_ARMED_AWAY
             elif event == Events.ArmPerimeter:  self._state = STATE_ALARM_ARMED_PERIMETER
         elif old == STATE_ALARM_PENDING:
             if   event == Events.Timeout:       self._state = STATE_ALARM_ARMED_AWAY

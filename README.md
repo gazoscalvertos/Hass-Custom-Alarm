@@ -14,6 +14,7 @@ This is very much a community project so if you wish to chip in then please do!!
 - MQTT Integration
 - Alarm State Persistence on reboots/power restore (NEW)
 - Lockout of HA sidebar when armed (NEW)
+- Custom Panel allowing your own html to display whatever you choose (Cameras, Sliding Images etc) (NEW)
 - Passcode Attemps/Lockout
 - Support for custom device states
 - Code panel 0-9 on disarm only
@@ -119,7 +120,20 @@ panel_custom: !include panel_custom.yaml
 
 ### Testing
 - Tested on HA v0.63.2
+
 ### Changelog
+- (23/02/18) NEW FEATURE - Override the pending time when arming away mode so that the alarm arms instantly. To do this pass a code parameter of '-1' to the service, this could be in the form of an automation such as:
+```
+  alias: '[Alarm] Instantly Arm Away Mode'
+  trigger:
+  ... place your trigger here ...
+  action:
+  - service: alarm_control_panel.alarm_arm_away
+    entity_id: alarm_control_panel.house
+    data:
+      code: '-1'
+``` 
+
 - (16/02/18) NEW FEATURE - PERSISTENCE!!!!!!!! Enabling persistence in the alarm.yaml file allows this component to save the alarm state everytime it changes. This means if there is a power outage or server crash/failure then upon restart HA will auto load the previous alarm state. This has not been tested in windows but in theory should work. Ensure HA has permission to write to the config folder as this creates a new file named alarm.json.
 - (16/02/18) NEW FEATURE - Custom Panel allowing custom html/polymer code!!!!!! Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the template tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!
 - (16/02/18) NEW FEATURE - Added the ability to hide the sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear on the display. (hide_sensor_groups:True) see alarm.yaml for details.
