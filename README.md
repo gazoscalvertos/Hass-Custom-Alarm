@@ -122,6 +122,9 @@ panel_custom: !include panel_custom.yaml
 - Tested on HA v0.63.2
 
 ### Changelog
+
+- (06/03/18) NEW Feature - Pending and Trigger time can be determined per state. For example arming the alarm in away mode can be set to 60 seconds pending time, yet arming in home mode can be set to 30 seconds. This can also be overriden as per the feature below which has been expanded to include home/perimiter. See guidance here [INSERT  LINK]
+
 - (23/02/18) NEW FEATURE - Override the pending time when arming away mode so that the alarm arms instantly. To do this pass a code parameter of '-1' to the service, this could be in the form of an automation such as:
 ```
   alias: '[Alarm] Instantly Arm Away Mode'

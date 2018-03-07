@@ -4,8 +4,13 @@ name: House
 code: !secret alarm_code #Code, should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes
 panic_code: !secret panic_code #[OPTIONAL] Panic Code should consist of one or more digits ie '9876' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner. 
 
-pending_time: 25 #Grace time in seconds to allow for exit and entry using Away mode
-trigger_time: 600
+pending_time: 25 #Default grace time in seconds to allow for exit and entry using Away mode
+trigger_time: 600 #Default time in seconds the alarm triggers before returning to its previous armed state
+
+##[Pending/Trigger State Specific]
+#armed_home: #This can either be armed_home/armed_away/armed_perimeter
+###pending_time: 10
+###trigger_time: 300
 
 alarm: automation.alarm_triggered
 warning: automation.alarm_warning
@@ -16,8 +21,8 @@ perimeter_mode: True #[Optional] - False by default. True enables perimeter mode
 weather: True #[Optional] - False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
 persistence: False #[OPTIONAL] False by Default. Allows this custom component to save the state of the alarm to file then reinstate it in the event of power loss.
 hide_passcode: True #[OPTIONAL] - True by default. This is a security feature when enabled hides the passcode while entering disarm code.
-hide_sidebar: True #[OPTIONAL] - False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.
-hide_sensor_groups: True #[Optional] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear
+hide_sidebar: False #[OPTIONAL] - False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.
+hide_sensor_groups: False #[Optional] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear
 hide_custom_panel: True #[Optional] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the <template> tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!
 
 ##[PASSCODE RELATED]

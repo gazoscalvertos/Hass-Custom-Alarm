@@ -2,6 +2,7 @@
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 """
 import asyncio
+import copy
 import datetime
 import logging
 import enum
@@ -16,7 +17,7 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_DISARMED,
     STATE_ALARM_PENDING, STATE_ALARM_TRIGGERED, CONF_PLATFORM, CONF_NAME,
     CONF_CODE, CONF_PENDING_TIME, CONF_TRIGGER_TIME, CONF_DISARM_AFTER_TRIGGER,
-    EVENT_STATE_CHANGED, EVENT_TIME_CHANGED, 
+    CONF_DELAY_TIME, EVENT_STATE_CHANGED, EVENT_TIME_CHANGED, 
     STATE_ON, STATE_OFF)
 
 from homeassistant.core          import callback
@@ -30,14 +31,15 @@ import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
-DOMAIN                       = 'alarm_control_panel'
+DOMAIN                      = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
-STATE_ALARM_WARNING          = 'warning'
-STATE_ALARM_ARMED_PERIMETER  = 'armed_perimeter'
-SUPPORTED_STATES             = [STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME,
-                                STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
-                                STATE_ALARM_TRIGGERED, STATE_ALARM_WARNING,
-                                STATE_ALARM_ARMED_PERIMETER]
+STATE_ALARM_WARNING         = 'warning'
+STATE_ALARM_ARMED_PERIMETER = 'armed_perimeter'
+SUPPORTED_STATES            = [STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
+                                STATE_ALARM_TRIGGERED, STATE_ALARM_WARNING, STATE_ALARM_ARMED_PERIMETER]
+
+#SUPPORTED_PRETRIGGER_STATES = [state for state in SUPPORTED_STATES if state != STATE_ALARM_TRIGGERED]
+SUPPORTED_PENDING_STATES    = [STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_PERIMETER]
 
 #//-------------------STATES TO CHECK------------------------------
 STATE_TRUE                         = 'true'
@@ -57,6 +59,7 @@ STATE_STANDBY                      = 'standby'
 
 CONF_CUSTOM_SUPPORTED_STATUSES_ON  = 'custom_supported_statuses_on'
 CONF_CUSTOM_SUPPORTED_STATUSES_OFF = 'custom_supported_statuses_off'
+
 SUPPORTED_STATUSES_ON              = [STATE_ON, STATE_TRUE, STATE_UNLOCKED, STATE_OPEN, STATE_DETECTED, STATE_MOTION, STATE_MOTION_DETECTED, STATE_MOTION_DETECTED2]
 SUPPORTED_STATUSES_OFF             = [STATE_OFF, STATE_FALSE, STATE_LOCKED, STATE_CLOSED, STATE_UNDETECTED, STATE_NO_MOTION, STATE_STANDBY]
 
@@ -125,11 +128,32 @@ _CODES_SCHEMA = vol.All(
     })
 )
 
-PLATFORM_SCHEMA = vol.Schema({
-    vol.Required(CONF_PLATFORM):                           'bwalarm',
-    vol.Required(CONF_NAME, default='House'):              cv.string,
-    vol.Required(CONF_PENDING_TIME):                       vol.All(vol.Coerce(int), vol.Range(min=0)),
-    vol.Required(CONF_TRIGGER_TIME):                       vol.All(vol.Coerce(int), vol.Range(min=1)),
+DEFAULT_STATE_PENDING_TIME = 0
+DEFAULT_TRIGGER_TIME = 600 #Ten Minutes
+
+def _state_validator(config): #Place a default value in that timers if there isnt specific ones set
+    """Validate the state."""
+    config = copy.deepcopy(config)
+    for state in SUPPORTED_PENDING_STATES:
+        if CONF_TRIGGER_TIME not in config[state]:
+            config[state][CONF_TRIGGER_TIME] = config[CONF_TRIGGER_TIME]
+        if CONF_PENDING_TIME not in config[state]:
+            config[state][CONF_PENDING_TIME] = DEFAULT_STATE_PENDING_TIME if state != STATE_ALARM_ARMED_AWAY else config[CONF_PENDING_TIME]
+    return config
+
+def _state_schema(state):
+    """Validate the state."""
+    schema = {}
+    if state in SUPPORTED_PENDING_STATES:
+        schema[vol.Optional(CONF_TRIGGER_TIME)] = vol.All(vol.Coerce(int), vol.Range(min=1))
+        schema[vol.Optional(CONF_PENDING_TIME)] = vol.All(vol.Coerce(int), vol.Range(min=0))
+    return vol.Schema(schema)
+
+PLATFORM_SCHEMA = vol.Schema(vol.All({
+    vol.Required(CONF_PLATFORM):                                   'bwalarm',
+    vol.Required(CONF_NAME, default='House'):                      cv.string,
+    vol.Required(CONF_PENDING_TIME, default=25):                   vol.All(vol.Coerce(int), vol.Range(min=0)),
+    vol.Required(CONF_TRIGGER_TIME, default=DEFAULT_TRIGGER_TIME): vol.All(vol.Coerce(int), vol.Range(min=1)),
     vol.Required(CONF_ALARM):                              cv.entity_id,  # switch/group to turn on when alarming [TODO]
     vol.Required(CONF_WARNING):                            cv.entity_id,  # switch/group to turn on when warning [TODO]
     vol.Optional(CONF_CUSTOM_SUPPORTED_STATUSES_ON):       vol.Schema([cv.string]),
@@ -143,6 +167,13 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_NOTATHOME):                          cv.entity_ids, # things that we ignore when at home BACKWARDS COMPAT
     vol.Optional(CONF_OVERRIDE):                           cv.entity_ids, # sensors that can be ignored if open when trying to set alarm in away mode
     vol.Optional(CONF_PERIMETER):                          cv.entity_ids, # things monitored under perimeter mode
+    #------------------------------STATE RELATED-------------------------
+    vol.Optional(STATE_ALARM_ARMED_AWAY, default={}):      _state_schema(STATE_ALARM_ARMED_AWAY),  #state specific times
+    vol.Optional(STATE_ALARM_ARMED_HOME, default={}):      _state_schema(STATE_ALARM_ARMED_HOME),  #state specific times
+    vol.Optional(STATE_ALARM_ARMED_PERIMETER, default={}): _state_schema(STATE_ALARM_ARMED_PERIMETER), #state specific times
+    vol.Optional(STATE_ALARM_DISARMED, default={}):        _state_schema(STATE_ALARM_DISARMED),    #state specific times
+    vol.Optional(STATE_ALARM_TRIGGERED, default={}):       _state_schema(STATE_ALARM_TRIGGERED),   #state specific times
+    #------------------------------GUI-----------------------------------
     vol.Optional(CONF_WARNING_COLOUR, default='orange'):   cv.string,     # Custom colour of warning display
     vol.Optional(CONF_PENDING_COLOUR, default='orange'):   cv.string,     # Custom colour of pending display
     vol.Optional(CONF_DISARMED_COLOUR, default='#03A9F4'): cv.string,     # Custom colour of disarmed display
@@ -161,7 +192,7 @@ PLATFORM_SCHEMA = vol.Schema({
     #--------------------------PASSWORD ATTEMPTS--------------------------
     vol.Optional(CONF_PASSCODE_ATTEMPTS, default=-1):         vol.All(vol.Coerce(int), vol.Range(min=-1)),
     vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=-1): vol.All(vol.Coerce(int), vol.Range(min=-1)),
-    #//------------------------MQTT RELATED----------------------------//
+    #---------------------------MQTT RELATED------------------------------
     vol.Optional(CONF_MQTT, default=False):                     cv.boolean, # Allows MQTT functionality
     vol.Optional(CONF_QOS, default=0):                          vol.All(vol.Coerce(int), vol.Range(min=0)),
     vol.Optional(CONF_STATE_TOPIC, default='home/alarm'):       cv.string,
@@ -170,9 +201,9 @@ PLATFORM_SCHEMA = vol.Schema({
     vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):    cv.string,
     vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):  cv.string,
     vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):        cv.string,
-    vol.Optional(CONF_OVERRIDE_CODE, default=False):            cv.boolean
-    #//---------------------------END-----------------------------------//
-})
+    vol.Optional(CONF_OVERRIDE_CODE, default=False):            cv.boolean,
+    #-----------------------------END------------------------------------
+}, _state_validator))
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -199,13 +230,17 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._warning                = config[CONF_WARNING]
         self._panic_mode             = 'deactivated'
 
-        self._countdown_time         = config[CONF_PENDING_TIME]
-        self._pending_time           = datetime.timedelta(seconds=config[CONF_PENDING_TIME])
-        self._trigger_time           = datetime.timedelta(seconds=config[CONF_TRIGGER_TIME])
+        self._countdown_time         = config[CONF_PENDING_TIME] #TODO: Modify this
+        # self._pending_time           = datetime.timedelta(seconds=config[CONF_PENDING_TIME])
+        # self._trigger_time           = datetime.timedelta(seconds=config[CONF_TRIGGER_TIME])
+
+        self._trigger_time_by_state = {state: datetime.timedelta(seconds=config[state][CONF_TRIGGER_TIME]) for state in SUPPORTED_PENDING_STATES}
+        self._pending_time_by_state = {state: datetime.timedelta(seconds=config[state][CONF_PENDING_TIME]) for state in SUPPORTED_PENDING_STATES}
 
         self._lasttrigger            = ""
         self._state                  = STATE_ALARM_DISARMED
         self._returnto               = STATE_ALARM_DISARMED
+        self._armstate              = STATE_ALARM_DISARMED
         self._timeoutat              = None
         self._passcode_timeoutat     = None
 
@@ -221,7 +256,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._allsensors             = self._immediate | self._delayed | self._ignore
         self._opensensors            = None
 
-        #------------------------------------PASSCODE RELATED-------------------------------------
+        #------------------------------------PASSCODE RELATED------------------------------------- 
         self._code                   = config.get(CONF_CODE, None)
         #self._codes                  = set(config.get
         self._panic_code             = config.get(CONF_PANIC_CODE, None)
@@ -265,12 +300,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._persistence_list  = []
         if (self._persistence):
            persistence_path     = hass.config.path() #"alarm_persistence"
-
-           # If path is relative, we assume relative to HASS config dir
-          # if not os.path.isabs(persistence_path):
-          #    persistence_path          = hass.config.path("/")
-          # else:
-          #    persistence_path          = hass.config.path()
 
            if not os.path.isdir(persistence_path):
               _LOGGER.error("[ALARM] Persistence path %s does not exist.", persistence_path)
@@ -411,7 +440,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         return 'DISARMED'
 
     def alarm_arm_home(self, code=None):
-        self.process_event(Events.ArmHome)
+        if code == "-1":
+            self.process_event(Events.ArmHome, True)
+        else:
+            self.process_event(Events.ArmHome)
 
     def alarm_arm_away(self, code=None):
         if code == "-1":
@@ -420,8 +452,10 @@ class BWAlarm(alarm.AlarmControlPanel):
             self.process_event(Events.ArmAway)
 
     def alarm_arm_night(self, code=None):
-        self.process_event(Events.ArmPerimeter)
-        return 'ARMED PERIMETER'
+        if code == "-1":
+            self.process_event(Events.ArmPerimeter, True)
+        else:
+            self.process_event(Events.ArmPerimeter)
 
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
@@ -442,70 +476,99 @@ class BWAlarm(alarm.AlarmControlPanel):
     def clearsignals(self):
         """ Clear all our signals, we aren't listening anymore """
         self._panic_mode = "deactivated"
+        self._armstate = STATE_ALARM_DISARMED
         self.immediate = set()
         self.delayed = set()
         self.ignored = self._allsensors.copy()
         self._timeoutat = None
 
     def process_event(self, event, override_pending_time=False):
-        old = self._state
-        # Update state if applicable
+        old_state = self._state
+        
+        #Update the state of the alarm panel
         if event == Events.Disarm:
             self._state = STATE_ALARM_DISARMED
+
         elif event == Events.Trigger:
             self._state = STATE_ALARM_TRIGGERED 
-        elif old == STATE_ALARM_DISARMED:
-            if   event == Events.ArmHome:       self._state = STATE_ALARM_ARMED_HOME
-            elif event == Events.ArmAway:       self._state = STATE_ALARM_PENDING if override_pending_time == False else STATE_ALARM_ARMED_AWAY
-            elif event == Events.ArmPerimeter:  self._state = STATE_ALARM_ARMED_PERIMETER
-        elif old == STATE_ALARM_PENDING:
-            if   event == Events.Timeout:       self._state = STATE_ALARM_ARMED_AWAY
-        elif old == STATE_ALARM_ARMED_HOME or \
-             old == STATE_ALARM_ARMED_AWAY or \
-             old == STATE_ALARM_ARMED_PERIMETER:
+
+        #If there is a pending time set in either of the state configs then drop into pending mode else simply arm the alarm
+        elif old_state == STATE_ALARM_DISARMED:
+            if   event == Events.ArmHome:       
+                if (self._pending_time_by_state[STATE_ALARM_ARMED_HOME] and override_pending_time == False):
+                    self._state = STATE_ALARM_PENDING
+                else:
+                    self._state = STATE_ALARM_ARMED_HOME
+                self._armstate = STATE_ALARM_ARMED_HOME
+            
+            elif event == Events.ArmAway:       
+                if (self._pending_time_by_state[STATE_ALARM_ARMED_AWAY] and override_pending_time == False):
+                    self._armstate = STATE_ALARM_ARMED_AWAY
+                    self._state = STATE_ALARM_PENDING
+                else:
+                    self._state = STATE_ALARM_ARMED_AWAY
+                self._armstate = STATE_ALARM_ARMED_AWAY
+
+            elif event == Events.ArmPerimeter:  
+                if (self._pending_time_by_state[STATE_ALARM_ARMED_PERIMETER] and override_pending_time == False):
+                    self._armstate = STATE_ALARM_ARMED_PERIMETER
+                    self._state = STATE_ALARM_PENDING
+                else:
+                    self._state = STATE_ALARM_ARMED_PERIMETER
+                self._armstate = STATE_ALARM_ARMED_PERIMETER
+
+        elif old_state == STATE_ALARM_PENDING:
+            if   event == Events.Timeout:       self._state = self._armstate
+
+        elif old_state == STATE_ALARM_ARMED_HOME or \
+             old_state == STATE_ALARM_ARMED_AWAY or \
+             old_state == STATE_ALARM_ARMED_PERIMETER:
             if   event == Events.ImmediateTrip: self._state = STATE_ALARM_TRIGGERED
             elif event == Events.DelayedTrip:   self._state = STATE_ALARM_WARNING
-        elif old == STATE_ALARM_WARNING:
+
+        elif old_state == STATE_ALARM_WARNING:
             if   event == Events.Timeout:       self._state = STATE_ALARM_TRIGGERED
-        elif old == STATE_ALARM_TRIGGERED:
+
+        elif old_state == STATE_ALARM_TRIGGERED:
             if   event == Events.Timeout:       self._state = self._returnto
 
-        new = self._state
-        if old != new: 
-            _LOGGER.debug("[ALARM] Alarm changing from {} to {}".format(old, new))
+        new_state = self._state
+        if old_state != new_state: 
+            _LOGGER.debug("[ALARM] Alarm changing from {} to {}".format(old_state, new_state))
             # Things to do on entering state
-            if new == STATE_ALARM_WARNING:
+            if new_state == STATE_ALARM_WARNING:
                 _LOGGER.debug("[ALARM] Turning on warning")
                 switch.turn_on(self._hass, self._warning)
-                self._timeoutat = now() + self._pending_time
-            elif new == STATE_ALARM_TRIGGERED:
+                self._timeoutat = now() +  self._pending_time_by_state[self._armstate]
+            elif new_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning on alarm")
                 switch.turn_on(self._hass, self._alarm)
-                self._timeoutat = now() + self._trigger_time
-            elif new == STATE_ALARM_PENDING:
+                self._timeoutat = now() + self._trigger_time_by_state[self._armstate]
+            elif new_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Pending user leaving house")
                 switch.turn_on(self._hass, self._warning)
-                self._timeoutat = now() + self._pending_time
-                self._returnto = STATE_ALARM_ARMED_AWAY
-                self.setsignals(Events.ArmAway)
-            elif new == STATE_ALARM_ARMED_HOME:
-                self._returnto = new
+                self._timeoutat = now() + self._pending_time_by_state[self._armstate]
+                #self._returnto = STATE_ALARM_ARMED_AWAY
+                self.setsignals(event)
+            elif new_state == STATE_ALARM_ARMED_HOME:
+                self._returnto = new_state
                 self.setsignals(Events.ArmHome)
-            elif new == STATE_ALARM_ARMED_AWAY:
-                self._returnto = new
+            elif new_state == STATE_ALARM_ARMED_AWAY:
+                self._returnto = new_state
                 self.setsignals(Events.ArmAway)
-            elif new == STATE_ALARM_ARMED_PERIMETER:
-                self._returnto = new
+            elif new_state == STATE_ALARM_ARMED_PERIMETER:
+                self._returnto = new_state
                 self.setsignals(Events.ArmPerimeter)
-            elif new == STATE_ALARM_DISARMED:
-                self._returnto = new
+            elif new_state == STATE_ALARM_DISARMED:
+                self._returnto = new_state
                 self.clearsignals()
   
             # Things to do on leaving state
-            if old == STATE_ALARM_WARNING or old == STATE_ALARM_PENDING:
+            if old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Turning off warning")
                 switch.turn_off(self._hass, self._warning)
-            elif old == STATE_ALARM_TRIGGERED:
+                
+            elif old_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning off alarm")
                 switch.turn_off(self._hass, self._alarm)
 
