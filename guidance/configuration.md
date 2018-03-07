@@ -31,9 +31,9 @@ panel_custom: !include panel_custom.yaml
 -hide_custom_panel: True **#[OPTIONAL, Boolean] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the template tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!**
 
 ## Timings
-- **pending_time:** 25 #[REQUIRED, Number] Grace time in seconds to allow for exit and entry using Away mode. Default 25
-- **trigger_time:** 600 #[REQUIRED, Number] The time in seconds of the trigger time in which the alarm is firing.  before returning previous set alarm state. Default 600 (10 minutes)
-- **armed_home:** #This can either be armed_home/armed_away/armed_perimeter
+- **pending_time:** 25 #[OPTIONAL, Number, default 25] Grace time in seconds to allow for exit and entry using Away mode.
+- **trigger_time:** 600 #[OPTIONAL, Number, default 600] The time in seconds of the trigger time in which the alarm is firing.  before returning previous set alarm state.
+- **armed_home:** #[OPTIONAL, armed_home/armed_away/armed_perimeter]
   - **pending_time:** 10 #State specific setting
   - **trigger_time:** 300 #State specific setting
 
