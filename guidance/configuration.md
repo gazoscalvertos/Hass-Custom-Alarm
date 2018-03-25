@@ -33,9 +33,46 @@ panel_custom: !include panel_custom.yaml
 ## Timings
 - **pending_time:** 25 #[OPTIONAL, Number, default 25] Grace time in seconds to allow for exit and entry using Away mode.
 - **trigger_time:** 600 #[OPTIONAL, Number, default 600] The time in seconds of the trigger time in which the alarm is firing.  before returning previous set alarm state.
-- **armed_home:** #[OPTIONAL, armed_home/armed_away/armed_perimeter]
-  - **pending_time:** 10 #State specific setting
-  - **trigger_time:** 300 #State specific setting
+
+### [STATES]
+- **armed_perimeter:** #[OPTIONAL]
+    **pending_time:** 10 #[OPTIONAL] State specific setting if not defined inherits from above top level time
+    **trigger_time:** 300 #[OPTIONAL] State specific setting if not defined inherits from above top level time
+    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+    immediate:
+      - binary_sensor.your_sensors
+    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+    delayed:
+      - binary_sensor.your_sensors
+    #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
+    override:
+    - binary_sensor.your_sensor
+
+- **armed_home:** #[REQUIRED]
+    **pending_time:** 10 #[OPTIONAL] State specific setting if not defined inherits from above top level time
+    **trigger_time:** 300 #[OPTIONAL] State specific setting if not defined inherits from above top level time
+    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+    immediate:
+      - binary_sensor.your_sensors
+    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+    delayed:
+      - binary_sensor.your_sensors
+    #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
+    override:
+    - binary_sensor.your_sensor
+
+- **armed_away:** #[REQUIRED]
+    **pending_time:** 25 #[OPTIONAL] State specific setting if not defined inherits from above top level time
+    **trigger_time:** 600 #[OPTIONAL] State specific setting if not defined inherits from above top level time
+    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+    immediate:
+      - binary_sensor.your_sensors
+    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+    delayed:
+      - binary_sensor.your_sensors
+    #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
+    override:
+    - binary_sensor.your_sensor
 
 ### [PASSCODE RELATED]
 - passcode_attempts: 3 #[OPTIONAL, number] Disabled if commented out. When a value equal or greater than 0 is set, the system will only allow the set amount of password attempts before timing out
@@ -60,25 +97,8 @@ panel_custom: !include panel_custom.yaml
 - armed_away_colour: 'black' #[OPTIONAL, string]
 - triggered_colour: 'red' #[OPTIONAL, string]
 
-### [SENSOR GROUPS]
-- immediate: #[OPTIONAL, list of entities] Sensors in this group tigger the alarm immediately
-  - binary_sensor.top_floor_multi_sensor_sensor #EXAMPLE
-  - binary_sensor.lounge_multi_sensor_sensor #EXAMPLE
-- delayed: #[OPTIONAL, list of entities] Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
-  - binary_sensor.kitchen_multi_sensor_sensor #EXAMPLE
-  - binary_sensor.hall_multi_sensor_sensor #EXAMPLE
-- homemodeignore: #[OPTIONAL, list of entities], Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility, Note sensors can exist in more than one group notice top_floor appears in two groups
-  - binary_sensor.top_floor_multi_sensor_sensor #EXAMPLE
-- override: #[OPTIONAL, list of entities] Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
-  - binary_sensor.hall_multi_sensor_sensor #EXAMPLE
-- perimeter: #[OPTIONAL, list of entities] This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
-  - binary_sensor.toilet_window_sensor #EXAMPLE
-
 ### [CUSTOM STATUSES]
 -custom_supported_statuses_on: #[OPTIONAL, list of strings] CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. This is to be used when the state of the device is not recognised by the panel. Examples are provided below 
   - 'running' #EXAMPLE
 -custom_supported_statuses_off:
   - 'not_running' #EXAMPLE
-
-### Testing
-- Tested on HA v0.63.2

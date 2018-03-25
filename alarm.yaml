@@ -1,28 +1,69 @@
 platform: bwalarm
 name: House
 
-code: !secret alarm_code #Code, should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes
-panic_code: !secret panic_code #[OPTIONAL] Panic Code should consist of one or more digits ie '9876' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner. 
-
-pending_time: 25 #Default grace time in seconds to allow for exit and entry using Away mode
-trigger_time: 600 #Default time in seconds the alarm triggers before returning to its previous armed state
-
-##[Pending/Trigger State Specific]
-#armed_home: #This can either be armed_home/armed_away/armed_perimeter
-###pending_time: 10
-###trigger_time: 300
-
 alarm: automation.alarm_triggered
 warning: automation.alarm_warning
 
-##[OPTIONAL SETTINGS] 
+code: '1234' #Master Code, should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes
+#panic_code: '9876' #[OPTIONAL] Panic Code should consist of one or more digits ie '9876' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner. 
+
+# codes: #[OPTIONAL, list of names/codes] User specific codes.
+#   - name: gazos
+#     code: '6576'
+#   - name: enzo
+#     code: '8734'
+
+pending_time: 25  #[DEFAULT] Grace time in seconds to allow for exit and entry using Away mode
+trigger_time: 300 #[DEFAULT] The amount of time the alarm stays triggered before returning to its previous state
+
+armed_perimeter: #[OPTIONAL]
+  ##[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+  immediate:
+    - binary_sensor.garage_door
+    - binary_sensor.back_door
+    - binary_sensor.kitchen_motion
+
+armed_home: #[REQUIRED]
+  pending_time: 10
+  trigger_time: 300 #[OPTIONAL] State specific overrides default time above
+  ##[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+  immediate:
+    - binary_sensor.garage_door
+    - binary_sensor.back_door
+    - binary_sensor.kitchen_motion
+    - binary_sensor.front_door
+    - binary_sensor.hall_motion
+  ##[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+  delayed:
+    - binary_sensor.first_floor_motion
+
+armed_away: #[REQUIRED]
+  trigger_time: 600  #[OPTIONAL] State specific overrides default time above
+  ##[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+  immediate:
+    - binary_sensor.garage_door
+    - binary_sensor.back_door
+    - binary_sensor.kitchen_motion
+    - binary_sensor.first_floor_motion
+    - binary_sensor.second_floor_motion
+  ##[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+  delayed:
+    - binary_sensor.front_door
+    - binary_sensor.hall_motion
+  #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
+  override:
+    - binary_sensor.front_door
+    - binary_sensor.hall_motion
+
+
+##[INTERFACE OPTIONAL SETTINGS] 
 clock: True  #[Optional] - False by default. True enables a clock in the center of the status bar
 perimeter_mode: True #[Optional] - False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
 weather: True #[Optional] - False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
 persistence: False #[OPTIONAL] False by Default. Allows this custom component to save the state of the alarm to file then reinstate it in the event of power loss.
 hide_passcode: True #[OPTIONAL] - True by default. This is a security feature when enabled hides the passcode while entering disarm code.
-hide_sidebar: False #[OPTIONAL] - False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.
-hide_sensor_groups: False #[Optional] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear
+hide_sidebar: True #[OPTIONAL] - False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.
+#hide_sensor_groups: True #[Optional] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear
 hide_custom_panel: True #[Optional] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the <template> tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!
 
 ##[PASSCODE RELATED]
@@ -40,7 +81,7 @@ hide_custom_panel: True #[Optional] - True by default. Setting this to False ena
 #payload_arm_away: "ARM_AWAY" #[OPTIONAL] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
 #payload_arm_night: "ARM_NIGHT" #[OPTIONAL] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
 
-############### COLOURS ###########  Use any HTML format
+## [COLOURS] Use any HTML format
 warning_colour: 'orange'
 pending_colour: 'orange'
 disarmed_colour: '#03A9F4'
@@ -48,43 +89,39 @@ armed_home_colour: 'black'
 armed_away_colour: 'black'
 triggered_colour: 'red'
 
-############# SENSOR GROUPS ########################
+#############REMOVE#######################################
+## [SENSOR GROUPS]
 ##Sensors in this group tigger the alarm immediately
-immediate:
-  - binary_sensor.top_floor_multi_sensor_sensor
-  - binary_sensor.lounge_multi_sensor_sensor
-  - binary_sensor.toilet_window_sensor
-  - binary_sensor.back_door_sensor
-  - binary_sensor.lounge_doors_sensor
-  - binary_sensor.kitchen_window_sensor
+# immediate:
+#   - binary_sensor.back_door
+#   - binary_sensor.kitchen_window
 
-##Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
-delayed:
-  - binary_sensor.kitchen_multi_sensor_sensor
-  - binary_sensor.hall_multi_sensor_sensor
-  - binary_sensor.toilet_multi_sensor_sensor
-  - binary_sensor.front_door_sensor
-  - binary_sensor.garage_door_sensor
+# ##Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
+# delayed:
+#   - binary_sensor.kitchen_motion
+#   - binary_sensor.hall_motion
+#   - binary_sensor.front_door
+#   - binary_sensor.garage_door
 
-##Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility
-##Note sensors can exist in more than one group notice top_floor appears in two groups
-homemodeignore:
-  - binary_sensor.top_floor_multi_sensor_sensor
-##Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
-override:
-  - binary_sensor.hall_multi_sensor_sensor
+# ##Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility
+# ##Note sensors can exist in more than one group notice top_floor appears in two groups
+# homemodeignore:
+#   - binary_sensor.hall_motion
+# ##Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
+# override:
+#   - binary_sensor.hall_motion
+#   - binary_sensor.front_door
 
-##This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
-perimeter:
-  - binary_sensor.toilet_window_sensor
-  - binary_sensor.back_door_sensor
-  - binary_sensor.lounge_doors_sensor
-  - binary_sensor.kitchen_window_sensor
-  - binary_sensor.front_door_sensor
-  - binary_sensor.garage_door_sensor
+# ##This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
+# perimeter:
+#   - binary_sensor.front_door
+#   - binary_sensor.back_door
+#   - binary_sensor.garage_door
+###########################################################
 
-##[OPTIONAL] - CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. 
-##This is to be used when the state of the device is not recognised by the panel. Examples are provided below 
+## [CUSTOM SENSOR STATUSES]
+## These settings allow devices which are not natively supported by this panel to be used. 
+## This is to be used when the state of the device is not recognised by the panel. Examples are provided below 
 #custom_supported_statuses_on:
 #  - 'running' #EXAMPLE
 #  - flipped #EXAMPLE

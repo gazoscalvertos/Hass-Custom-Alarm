@@ -1,3 +1,9 @@
+<!-- CUSTOM ALARM COMPONENT PANEL
+	https://github.com/gazoscalvertos/Hass-Custom-Alarm
+	VERSION:  1.0.0
+	MODIFIED: 21/03/18
+-->
+
 <script src="/local/lib/jquery-3.2.1.min.js"></script>
 <script src="/local/lib/countdown360.js"></script>
 <link rel="import" href="/local/alarm/custom-element.html">
@@ -126,6 +132,7 @@
 				</div>
 				<div class='statecard'>
 
+					<!-- ###########################################OPEN SENSORS############################################### -->
 					<template is='dom-if' if='[[opencount]]'>
 						<div class='box-outer' style='max-width: 100%;' >
 							<div class='title' style=' background-color: orange;' >[[opencount]]x Open Sensors</div>
@@ -135,28 +142,13 @@
 								</template>
 							</div>
 						</div>
-					</template>
+					</template>		
 
+					<!-- ###########################################ARMED############################################## -->
+					<template is='dom-if' if='[[!isdisarmed(alarm)]]'> <!-- is not disarmed -->
 
-					<div class='vLayout layout center-justified'>
-
-						<template is='dom-if' if='[[isperimeter(alarm)]]'>
-							<div class='box-outer box-sensors' hidden$="{{hideSensors}}">
-								<div class='title'>Immediate Sensors</div>
-								<div class='box-inner'>
-									<template is='dom-repeat' items='[[perimeter]]' as='entity'>
-										<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-									</template>
-								</div>
-							</div>
-
-
-						</template>
-
-
-
-						<template is='dom-if' if='[[!isperimeter(alarm)]]'>
-							<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+						<div class='vLayout layout center-justified'>
+							<template is='dom-if' if='[[computeArray(delayed)]]'>
 								<div class='box-outer box-sensors' hidden$="{{hideSensors}}">
 									<div class='title'>Delayed Sensors</div>
 									<div class='box-inner'>
@@ -165,7 +157,9 @@
 										</template>
 									</div>
 								</div>
+							</template>
 
+                            <template is='dom-if' if='[[computeArray(immediate)]'>
 								<div class='box-outer box-sensors' hidden$="{{hideSensors}}">
 									<div class='title'>Immediate Sensors</div>
 									<div class='box-inner'>
@@ -175,75 +169,103 @@
 									</div>
 								</div>
 							</template>
-						</template>
-
-					</div>        
-
-					<template is='dom-if' if='[[isdisarmed(alarm)]]'>
-						<!-- <template is='dom-if' if='[[!alarm.attributes.hide_sensor_groups]]'> -->
-							<div class='box-outer' hidden$="{{hideSensors}}" style='max-width: 100%;' >
-								<div class='title' on-click='hideSensors'>All Sensors</div>
-								<div class='box-inner'>
-
-									<template is='dom-repeat' items='[[opensensors(alarm, allsensors)]]' as='entity'>
-										<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-
-									</template>
-									<template is='dom-repeat' items='[[closedsensors(alarm, allsensors)]]' as='entity'>
-										<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
-									</template>			
-								</div>
-							</div>
-						<!-- </template> -->
-					</template>
-
-					<template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-						<div class='box-outer' hidden$="{{hideSensors}}" style='max-width: 100%;' >
+						</div>
+						
+<!-- 						<div class='box-outer' hidden$="{{hideSensors}}" style='max-width: 100%;' >
 							<div class='title'>Inactive Sensors</div>
 							<div class='box-inner'>
 								<template is='dom-repeat' items='[[ignored]]' as='entity'>
 									<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
 								</template>
 							</div>
+						</div> -->
+					</template>      
+
+					<!-- ###########################################DISARMED############################################### -->
+					<template is='dom-if' if='[[isdisarmed(alarm)]]'>
+						<div class='box-outer' hidden$="{{hideSensors}}" style='max-width: 100%;' >
+							<div class='title' on-click='hideSensors'>All Sensors</div>
+							<div class='box-inner'>
+
+								<template is='dom-repeat' items='[[opensensors(alarm, allsensors)]]' as='entity'>
+									<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+
+								</template>
+								<template is='dom-repeat' items='[[closedsensors(alarm, allsensors)]]' as='entity'>
+									<state-card-display state-obj="[[entity]]" hass='[[hass]]'></state-card-display>
+								</template>			
+							</div>
 						</div>
 					</template>
+
 				</div>
 			</div>
 		</div>
 
-		<div hidden$="{{hideCustom}}">
-			<custom-element is-panel></custom-element>
-		</div>
+				<div hidden$="{{hideCustom}}">
+					<custom-element is-panel></custom-element>
+				</div>
+<!-- 
+				<button id="disableSidebar" type="button" style="visibility: hidden;" onclick="disableSidebar()" /></button>
+				<button id="enableSidebar" type="button" style="visibility: hidden;"  onclick="enableSidebar()" /></button> -->
 
-		<button id="disableSidebar" type="button" style="visibility: hidden;" onclick="disableSidebar()" /></button>
-		<button id="enableSidebar" type="button" style="visibility: hidden;"  onclick="enableSidebar()" /></button>
+				<!-- DEBUG <div id="footer" style="    
+				position: fixed;
+			    bottom: 0;
+			    width: 100%;">
+					<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="sensors" />Toggle Sensors</paper-button>
+					<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="custom" />Toggle Custom</paper-button>
+				</div>  -->
 
-		<!-- DEBUG <div id="footer" style="    
-		position: fixed;
-	    bottom: 0;
-	    width: 100%;">
-			<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="sensors" />Toggle Sensors</paper-button>
-			<paper-button type="button" style="height: 50px; width: 50px;" on-click="toggleCSS" data-css="custom" />Toggle Custom</paper-button>
-		</div>  -->
-	</div>
-</app-header-layout>
-</dom-module>
 
+				<div id="info">
+					<paper-icon-button type="button" on-click="toggleCSS" data-css="notification" icon='mdi:information-outline'></paper-icon-button>
+				</div>
+
+				<div id="notification" class$="notification animated {{notificationAnim}}">
+					<template is='dom-if' if='[[errors]]'>
+						<h1>ISSUES:</h1>
+						<div style="text-align: center;">
+							<template is='dom-repeat' items='[[errors]]' as='entity'>
+								<p>&#8226;  [[entity]]</p>
+							</template>
+						</div>
+						<hr>
+					</template>
+					<h1>INFO:</h1>
+					<div style="float: left; margin-left: 10%; text-align: left;">
+						<p>HA: v[[hass.config.core.version]]</p>
+						<p>THIS PANEL: v[[version]]</p>
+					</div>
+					<div style="float: right; margin-right: 10%; text-align: left;">
+						<p>BWALARM: v[[alarm.attributes.bwalarm_version]]</p>
+						<p>PYTHON: v([[alarm.attributes.py_version]])</p>
+					</div>
+					<paper-button type="button" on-click="toggleCSS" data-css="notification" />Ok</paper-button>
+				</div>
+			</div>
+		</app-header-layout>
+	</dom-module>
 </template>
 
-
 <script>
-	function enableSidebar(){}
-	function disableSidebar(){}
+
+/*	function enableSidebar(){}
+	function disableSidebar(){}*/
 
 	Polymer({
 		is: 'ha-panel-alarm',
 		created() {
 		},
 		attached() {
-			var script = document.createElement('script');
-			script.setAttribute('src', '/local/alarm/alarm_scripts.js');
-			document.body.appendChild(script);
+/*			var script = document.createElement('script');
+			if (this.hass.config.core.version.split('.')[1] > 64) { //Backwards compatability for those still on HA versions below 0.65
+				script.setAttribute('src', '/local/alarm/alarm_scripts_65.js'); //New script
+			}
+			else {
+				script.setAttribute('src', '/local/alarm/alarm_scripts.js'); //Old Script
+			}
+			document.body.appendChild(script);*/
 		},
 		ready() {
 
@@ -256,148 +278,402 @@
 			if (this.alarm.attributes.weather) {
 				this.getWeather();
 			}
-			this.async(this.toggleSiderbar,100);
-      //if (this.screensaver){
-      //     	 this.setupEyeCandy();
-      //     }
-  },
-  properties: {
-      hass:            { type: Object },
-      panel:           { type: Object },
-      narrow:          { type: Boolean, value: false },
-      showMenu:        { type: Boolean, value: false },
+			this.async(this.toggleSiderbar, 100);
+			this.errors = [];
 
-      alarm:           { type: Object, observer: 'monitorAlarm' },
+			//if (this.screensaver){
+			//     	 this.setupEyeCandy();
+			//     }
+  		},
+  		properties: {
+			hass:            { type: Object },
+			panel:           { type: Object },
+			narrow:          { type: Boolean, value: false },
+			showMenu:        { type: Boolean, value: false },
 
-      // Sensor Groups
-      immediate:       { type: Array, computed: 'computeSensors(hass, alarm.attributes.immediate)' },
-      delayed:         { type: Array, computed: 'computeSensors(hass, alarm.attributes.delayed)' },
-      ignored:         { type: Array, computed: 'computeSensors(hass, alarm.attributes.ignored)' },
-      perimeter:       { type: Array, computed: 'computeSensors(hass, alarm.attributes.perimeter)' },
-      allsensors:      { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)'},
-      overrideSensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.override)' },
+			alarm:           { type: Object, observer: 'monitorAlarm' },
 
-      opencount:       { type: Number, value: 0 },
+			// Sensor Groups
+			immediate:       { type: Array, computed: 'computeSensors(hass, alarm.attributes.immediate)' },
+			delayed:         { type: Array, computed: 'computeSensors(hass, alarm.attributes.delayed)' },
+			allsensors:      { type: Array, computed: 'computeSensors(hass, alarm.attributes.allsensors)'},
+			overrideSensors: { type: Array, computed: 'computeSensors(hass, alarm.attributes.override)' },
 
-      time:            { type: Object },
-      weather:	       { type: Object },
-      temp:	           { type: String },
+			opencount:       { type: Number, value: 0 },
 
-      code:            { type: String, value: '' },
-      display_code:    { type: String, value: '' },
+			time:            { type: Object },
+			weather:	     { type: Object },
+			temp:	         { type: String },
 
-      timeoutID:       { type: Number },
+			code:            { type: String, value: '' },
+			display_code:    { type: String, value: '' },
 
-      cleanup:         { type: Array, value: [] },
-      attemptedArm:    { type: Boolean, value: false }, 
-      screensaver:     { type: Boolean, value: false },
-      settings:	       { type: Boolean, value: false },
+			timeoutID:       { type: Number },
 
-      //ENUMS USED FOR CSS CLASS SELECTION
-      panel_locked:    { type: Boolean, value: false },
+			cleanup:         { type: Array, value: [] },
+			attemptedArm:    { type: Boolean, value: false }, 
+			screensaver:     { type: Boolean, value: false },
+			settings:	     { type: Boolean, value: false },
 
-      hideSensors:     { type: Boolean, value: true },
-      hideCustom:      { type: Boolean, value: true },
-  },
+			//ENUMS USED FOR CSS CLASS SELECTION
+			panel_locked:    { type: Boolean, value: false },
 
-	computeValue: function(entity) {
-	   	if (entity == undefined) {
-		    return false;
-		} else {
-		    return entity;
-		}
-	},
+			hideSensors:     { type: Boolean, value: true },
+			hideCustom:      { type: Boolean, value: true },
+			notificationAnim: { type: String, value: 'remove' },
 
-  toggleCSS: function(ev) {
-  	ev.stopPropagation();
-	var css = ev.target.getAttribute('data-css');
-  	switch (css) {
-		case 'sensors': this.hideSensors = !this.hideSensors;
-			break;
-		case 'custom': this.hideCustom = !this.hideCustom;
-			break;
-	}
-  },
+			errors:          { type: Array, value: [] }, 
+			version:         { type: String, value: '1.0.0'}, 
+  		},
 
-  toggleSiderbar: function() {
-	if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#disableSidebar').click();
-	if (this.alarm.state == 'disarmed') {
-  		//-----DISPLAY THE SIDE BAR ON THE SCREEN-------------
-  		if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#enableSidebar').click();
-  	}
-  },
+		// Polymer observers definition
+		observers: [ 'onPanelUpdate(hass, panel)' ],
 
-  monitorAlarm: function() {
-  	//-----HIDE THE SIDE BAR FROM THE SCREEN-------------
-  	if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#disableSidebar').click();
+		error: function(message) {
+			this.errors.push(message);
+			console.log(message);
+		},
 
-  	var countdownTimerDiv = Polymer.dom(this.root).querySelector('#countdown360_countdown');
-  	if (countdownTimerDiv) countdownTimerDiv.remove();
+		computeValue: function(entity) {
+		   	if (entity == undefined) {
+			    return false;
+			} else {
+			    return entity;
+			}
+		},
 
-  	this.updateStyles({'--countdown-timer-display': 'none'});
-  	this.updateStyles({'--time-display': 'initial'});
-  	if (this.alarm.state == 'disarmed') {
-  		if (this.attemptedArm == true) { this.resetButtons(); }
-  		//-----DISPLAY THE SIDE BAR ON THE SCREEN-------------
-  		if (this.alarm.attributes.hide_sidebar == true) Polymer.dom(this.root).querySelector('#enableSidebar').click();
-  		this.updateStyles({'--primary-color': this.alarm.attributes.disarmed_colour});
-  	} else if (this.alarm.state == 'armed_away') {
-  		this.updateStyles({'--primary-color': this.alarm.attributes.armed_away_colour});
-  	} else if ( this.alarm.state == 'armed_home') {
-  		this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour});
-  	} else if ( this.alarm.state == 'armed_perimeter') {
-	    this.updateStyles({'--primary-color': this.alarm.attributes.armed_home_colour}); //SORT THIS OUT
-	} else if (this.alarm.state == 'pending') {
-		this.updateStyles({'--primary-color': this.alarm.attributes.pending_colour});
-		this.updateStyles({'--countdown-timer-display': 'initial'});
-		this.updateStyles({'--time-display': 'none'});
-		this.loadTimer(false, this.alarm.attributes.countdown_time);
-	} else if (this.alarm.state == 'warning') {
-		this.updateStyles({'--primary-color': this.alarm.attributes.warning_colour});
-		this.updateStyles({'--countdown-timer-display': 'initial'});
-		this.updateStyles({'--time-display': 'none'});
-		this.loadTimer(false, this.alarm.attributes.countdown_time);
-	} else if (this.alarm.state == 'triggered') {
-		this.updateStyles({'--primary-color': this.alarm.attributes.triggered_colour});
-	}
-	if (this.alarm.attributes.panel_locked == true) {
-		console.log("Panel locked");
-		this.updateStyles({'--primary-color': 'grey'}); //[TODO] Implement panel locked colour - this.alarm.attributes.panel_locked_colour});
-		this.updateStyles({'--countdown-timer-display': 'initial'});
-		this.updateStyles({'--time-display': 'none'});
-		this.loadTimer(true, this.alarm.attributes.passcode_attempt_timeout);
-		this.panel_locked = true;
-	}
-	else this.panel_locked = false;
+		toggleCSS: function(ev) {
+			ev.stopPropagation();
+			var css = ev.target.getAttribute('data-css');
+				switch (css) {
+				case 'sensors': this.hideSensors = !this.hideSensors;
+					break;
+				case 'custom': this.hideCustom = !this.hideCustom;
+					break;
+				case 'notification': 
+					if (this.notificationAnim == "zoomIn"){
+						this.notificationAnim = "zoomOut remove";
+					}
+					else this.notificationAnim = "zoomIn";
+					break;
+			}
+		},
 
-  },
-  getClass: function(cssClass) {
-  	return cssClass ? "slideup" : "slidedown";
-  },
-  loadTimer: function(locked, time) {
+		toggleSiderbar: function() {
+			if (this.alarm.attributes.hide_sidebar == true) {
+				this.fire('hass-close-menu');
+				if (this.alarm.state == 'disarmed') this.fire('hass-open-menu');
+			}
+			this.async(this.toggleSiderbar, 100);
+		},
 
-  	var startColour = '#8ac575';
-  	var middleColour = 'orange';
-  	var endColour = 'red'
+		monitorAlarm: function() {
+			var countdownTimerDiv = Polymer.dom(this.root).querySelector('#countdown360_countdown');
+			if (countdownTimerDiv) countdownTimerDiv.remove();
 
-  	if (locked == true) startColour = middleColour = endColour = 'red';
+			this.updateStyles({'--countdown-timer-display': 'none'});
+			this.updateStyles({'--time-display': 'initial'});
+			if (this.alarm.state == 'disarmed') {
+				if (this.attemptedArm == true) { this.resetButtons(); }
+				this.updateStyles({'--primary-color': this.alarm.attributes.colours["disarmed"]});
+			} else if (this.alarm.state == 'armed_away') {
+				this.updateStyles({'--primary-color': this.alarm.attributes.colours["armed_away"]});
+			} else if ( this.alarm.state == 'armed_home') {
+				this.updateStyles({'--primary-color': this.alarm.attributes.colours["armed_home"]});
+			} else if ( this.alarm.state == 'armed_perimeter') {
+		    	this.updateStyles({'--primary-color': this.alarm.attributes.colours["perimeter"]}); //SORT THIS OUT
+			} else if (this.alarm.state == 'pending') {
+				this.updateStyles({'--primary-color': this.alarm.attributes.colours["pending"]});
+				this.updateStyles({'--countdown-timer-display': 'initial'});
+				this.updateStyles({'--time-display': 'none'});
+				this.loadTimer(false, this.alarm.attributes.pending_time_by_state[this.alarm.attributes.arm_state]);
+			} else if (this.alarm.state == 'warning') {
+				this.updateStyles({'--primary-color': this.alarm.attributes.colours["warning"]});
+				this.updateStyles({'--countdown-timer-display': 'initial'});
+				this.updateStyles({'--time-display': 'none'});
+				this.loadTimer(false, this.alarm.attributes.pending_time_by_state[this.alarm.attributes.arm_state]);
+			} else if (this.alarm.state == 'triggered') {
+				this.updateStyles({'--primary-color': this.alarm.attributes.colours["triggered"]});
+			}
+			if (this.alarm.attributes.panel_locked == true) {
+				console.log("Panel locked");
+				this.updateStyles({'--primary-color': 'grey'}); //[TODO] Implement panel locked colour - this.alarm.attributes.colours["panel_locked});
+				this.updateStyles({'--countdown-timer-display': 'initial'});
+				this.updateStyles({'--time-display': 'none'});
+				this.loadTimer(true, this.alarm.attributes.passcode_attempt_timeout);
+				this.panel_locked = true;
+			}
+			else this.panel_locked = false;
+		},
 
-  	var countdownDiv = Polymer.dom(this.root).querySelector('#countdown');
-  	$(countdownDiv).unbind().removeData();
-  	var countdown = $(countdownDiv).countdown360(
-  	{
-  		radius      : 50,
-  		fontColor   : '#FFFFFF',
-  		autostart   : false,
-  		label       : false,
-  		smooth      : true,
-  		seconds     : time,
-  		fillStyle_0to50: startColour,
-  		fillStyle_50to75: middleColour,
-  		fillStyle_75to100: endColour
-	});
-  	countdown.start();
-  },
+		getClass: function(cssClass) {
+			return cssClass ? "slideup" : "slidedown";
+		},
+
+		loadTimer: function(locked, time) {
+
+			var startColour = '#8ac575';
+			var middleColour = 'orange';
+			var endColour = 'red'
+
+			if (locked == true) startColour = middleColour = endColour = 'red';
+
+			var countdownDiv = Polymer.dom(this.root).querySelector('#countdown');
+			$(countdownDiv).unbind().removeData();
+			var countdown = $(countdownDiv).countdown360(
+			{
+				radius      : 50,
+				fontColor   : '#FFFFFF',
+				autostart   : false,
+				label       : false,
+				smooth      : true,
+				seconds     : time,
+				fillStyle_0to50: startColour,
+				fillStyle_50to75: middleColour,
+				fillStyle_75to100: endColour
+			});
+			countdown.start();
+		},
+
+	    getWeather: function() {
+			this.weather = this.hass.states['sensor.weather_summary'];
+			//if the above sensor can't be found then try dark_sky
+			if (this.weather == null){
+				this.weather = this.hass.states['sensor.dark_sky_summary'];
+			} 
+			//No weather entity found display error
+			if (this.weather == null){ 
+				this.error("Weather entity not found in HA");
+			} 
+
+			//set weather temperature
+			if (this.hass.states['sensor.weather_temperature']) {
+				this.temp = Math.ceil((this.hass.states['sensor.weather_temperature']).state);
+			}
+			//if the above sensor is not found look for the dark sky one
+			else if (this.hass.states['sensor.dark_sky_temperature']) {
+				this.temp = Math.ceil((this.hass.states['sensor.dark_sky_temperature']).state);
+			}
+			//if either isn't found show an error
+			else {
+				this.error("Weather temperature entity not found in HA");
+			}
+	    },
+
+		updateTime: function() {
+			this.time = this.hass.states['sensor.time'];
+
+			if (this.time) {
+				this.async(this.updateTime,1000);
+			}
+			//if time isn't found show an error
+			else this.error("Time Sensor (sensor.time) not found in HA");
+		},
+
+		isdisarmed:  function(alarm) { 
+			return alarm.state == "disarmed"; 
+		},
+	    
+	    isperimeter:  function(alarm) { 
+	    	return alarm.state == "armed_perimeter"; 
+	    },
+	   
+	    issecure: function(all) { 
+	    	return this.opensensors(alarm, all).length == 0; 
+	    },
+
+		opensensors: function(alarm, all)   { 
+			if (all == false) {
+				return false;
+			} else {
+				ret = all.filter(function (e) { return alarm.attributes.supported_statuses_on.indexOf(e.state.toLowerCase()) > -1; }); 
+				this.opencount = ret.length;
+				return ret;
+			}
+		},
+
+		closedsensors: function(alarm, all)   {
+			if (all == false) {
+				return false;
+			} else {
+				ret = all.filter(function (e) { return alarm.attributes.supported_statuses_off.indexOf(e.state.toLowerCase()) > -1; });
+				return ret;
+			}
+		},
+
+		computeSensors: function(hass, ids) {
+			if (ids == undefined) {
+			// Control the exception when this.alarm is not ready
+				return false;
+			} else {
+				return ids.map(function (key) { return hass.states[key]; }).filter(function (e) { return e != undefined; });
+			}
+		},
+
+		computeArray: function(array) {
+			if (array.length > 0) {
+				return true;
+			}
+			return false;
+		},
+
+		computeIcon: function (state) {
+			switch (state) {
+				case 'disarmed':        return 'mdi:shield-outline';
+				case 'armed_away':      return 'mdi:security-home';
+				case 'armed_home':      return 'mdi:security-home';
+				case 'pending':         return 'mdi:walk';
+				case 'warning':         return 'mdi:run';
+				case 'triggered':       return 'mdi:alert-circle';
+				case 'armed_perimeter': return 'mdi:security-home';
+			}
+			return 'mdi:help';
+		},
+
+		computeLabel: function (state) {
+			switch (state) {
+				case 'disarmed':   	 return 'disarmed';
+				case 'armed_away': 	 return 'away';
+				case 'armed_home': 	 return 'home';
+				case 'pending':    	 return 'leave';
+				case 'warning':    	 return 'warning';
+				case 'triggered':  	 return 'triggered';
+				case 'armed_perimeter': return 'perimeter';
+			}
+			return state;
+		},
+
+		callcode: function(ev) {
+			ev.stopPropagation();
+			var digit = ev.target.getAttribute('data-digit');
+			this.code = this.code + digit;
+			var display_digit = digit;
+			if (this.alarm.attributes.hide_passcode) {
+			  display_digit = '*';
+			}
+			this.display_code = this.display_code + display_digit;
+		},
+
+		callclearcode: function(ev) {
+			ev.stopPropagation();
+			this.code = '';
+			this.display_code = '';
+		},
+
+		callService: function(ev) {
+			ev.stopPropagation();
+			var call = ev.target.getAttribute('data-call');
+			if (call == 'cancel') { //cancel alarm set and return page to default settings
+				this.resetButtons();
+			} else if (ev.target.getAttribute('data-override')) { //Override of open sensors has been pressed so activate alarm
+				this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
+			} else if ((call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night') && this.checkOpenSensors(call)) { //Check if trying to activate home with open sensors. If so ping the warning message
+				console.log('WARNING open sensors');
+			} else { //No open sensors or another service call
+				this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code });
+				this.code = '';
+				this.display_code = '';
+			}
+		},
+
+		checkOpenSensors: function(call) {
+			if (this.opencount == 0) return false; //check to see how many open sensors there are, if none arm alarm
+
+			for (var sensor in this.allsensors) { //check to see if the open sensor is one to ignore, if so arm alarm
+				//is it open?
+				if (['on', 'open', 'true', 'detected', 'unlocked'].indexOf(this.allsensors[sensor].state.toLowerCase()) > -1) { //yes
+				//is it in the override list?
+					if (this.overrideSensors.indexOf(this.allsensors[sensor]) == -1) { //No: return so display message
+						this.attemptedArm = true; //display the warning message and shake
+
+						var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
+						var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+
+						if (this.alarm.attributes.perimeter_mode) {
+							var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+							btnArmPerimeter.classList.add('remove');
+						}
+						btnArmHome.classList.add('big');
+						btnArmAway.classList.add('little');
+
+						this.override = document.createAttribute("data-override");
+						this.override.value = "true";
+						btnArmHome.setAttributeNode(this.override);
+
+						var arm_mode = document.createAttribute("data-call");
+						arm_mode.value = call;
+						btnArmHome.setAttributeNode(arm_mode);
+
+						var arm_mode2 = document.createAttribute("data-call");
+						arm_mode2.value = 'cancel';
+						btnArmAway.setAttributeNode(arm_mode2);
+						btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
+						btnArmAway.innerHTML = 'Cancel Arm';
+
+						var pageContent = Polymer.dom(this.root).querySelector('.content');
+						pageContent.classList.add('shake');
+
+						return true;
+					}
+				}          
+			}
+		},
+
+		resetButtons: function() {
+			this.attemptedArm = false;
+
+			var pageContent = Polymer.dom(this.root).querySelector('.content');
+			pageContent.classList.remove('shake');
+
+			var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
+			var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+			if (this.alarm.attributes.perimeter_mode) {
+				var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+				btnArmPerimeter.classList.remove('remove');
+			}
+			btnArmHome.classList.remove('big');
+			btnArmAway.classList.remove('little');
+
+			//var override = document.createAttribute("data-override");
+			btnArmHome.removeAttributeNode(this.override);
+
+			var arm_mode = document.createAttribute("data-call");
+			arm_mode.value = 'alarm_arm_home';
+			btnArmHome.setAttributeNode(arm_mode);
+
+			var arm_mode2 = document.createAttribute("data-call");
+			arm_mode2.value = 'alarm_arm_away';
+			btnArmAway.setAttributeNode(arm_mode2);
+
+			btnArmHome.innerHTML = "<iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode";
+			btnArmAway.innerHTML = "<iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode";
+		},
+
+		entityTapped: function (ev) {
+			ev.stopPropagation();
+			var entityId = ev.target.getAttribute('data-entity');
+			this.fire('hass-more-info', { entityId: entityId });
+		},
+
+		// Observer: polymer gaurantees that this won't be called util hass and panel are both defined
+		onPanelUpdate: function(hass, panel) {
+			this.alarm = hass.states[panel.config.alarmid];
+		},
+
+/*   toggleSettings() {
+   	var settingsContent = Polymer.dom(this.root).querySelector('#settings');
+   	var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
+   	if (this.settings) {
+   		alarmContent.classList.remove('remove');
+   		settingsContent.classList.add('remove');
+   		this.settings = false;
+   	} else {
+   		alarmContent.classList.add('remove');
+   		settingsContent.classList.remove('remove');
+   		this.settings = true;
+   	}
+   },*/
+
    //--------------------------------------------------------------//
    //-----------------EYE CANDY FUNCTION---------------------------//
    //--------------------------------------------------------------//
@@ -443,196 +719,6 @@
    //--------------------------------------------------------------//
    //-----------------EYE CANDY FUNCTION---------------------------//
    //--------------------------------------------------------------//
-   getWeather: function() {
-   	this.weather = this.hass.states['sensor.dark_sky_summary'];
-   	this.temp = Math.ceil((this.hass.states['sensor.dark_sky_apparent_temperature']).state);
-   },
-   toggleSettings() {
-   	var settingsContent = Polymer.dom(this.root).querySelector('#settings');
-   	var alarmContent = Polymer.dom(this.root).querySelector('#alarm-panel');
-   	if (this.settings) {
-   		alarmContent.classList.remove('remove');
-   		settingsContent.classList.add('remove');
-   		this.settings = false;
-   	} else {
-   		alarmContent.classList.add('remove');
-   		settingsContent.classList.remove('remove');
-   		this.settings = true;
-   	}
-   },
-   updateTime: function() {
-   	this.time = this.hass.states['sensor.time'];
-    this.async(this.updateTime,1000);
-  },
-   // Polymer observers definition
-   observers: [ 'onPanelUpdate(hass, panel)' ],
-   wtf: function (e) { debugger; return e; },
-   // Helpers to figure out what to display 
-   isdisarmed:  function(alarm) { return alarm.state == "disarmed"; },
-   isperimeter:  function(alarm) { return alarm.state == "armed_perimeter"; },
-   issecure:    function(all)   { return this.opensensors(alarm, all).length == 0; },
-   opensensors: function(alarm, all)   { 
-   	if (all == false) {
-   		return false;
-   	} else {
-   		ret = all.filter(function (e) { return alarm.attributes.supported_statuses_on.indexOf(e.state.toLowerCase()) > -1; }); 
-   		this.opencount = ret.length;
-   		return ret;
-   	}
-   },
-   closedsensors: function(alarm, all)   {
-   	if (all == false) {
-   		return false;
-   	} else {
-   		ret = all.filter(function (e) { return alarm.attributes.supported_statuses_off.indexOf(e.state.toLowerCase()) > -1; });
-   		return ret;
-   	}
-   },
-   computeSensors: function(hass, ids) {
-   	if (ids == undefined) {
-	 // Control the exception when this.alarm is not ready
-	 return false;
-	} else {
-		return ids.map(function (key) { return hass.states[key]; }).filter(function (e) { return e != undefined; });
-	}
-},
-computeIcon: function (state) {
-	switch (state) {
-		case 'disarmed':        return 'mdi:shield-outline';
-		case 'armed_away':      return 'mdi:security-home';
-		case 'armed_home':      return 'mdi:security-home';
-		case 'pending':         return 'mdi:walk';
-		case 'warning':         return 'mdi:run';
-		case 'triggered':       return 'mdi:alert-circle';
-		case 'armed_perimeter': return 'mdi:security-home';
-	}
-	return 'mdi:help';
-},
-computeLabel: function (state) {
-	switch (state) {
-		case 'disarmed':   	 return 'disarmed';
-		case 'armed_away': 	 return 'away';
-		case 'armed_home': 	 return 'home';
-		case 'pending':    	 return 'leave';
-		case 'warning':    	 return 'warning';
-		case 'triggered':  	 return 'triggered';
-		case 'armed_perimeter': return 'perimeter';
-	}
-	return state;
-},
-   // Responding to user inputs
-   callcode: function(ev) {
-   	ev.stopPropagation();
-   	var digit = ev.target.getAttribute('data-digit');
-   	this.code = this.code + digit;
-   	var display_digit = digit;
-   	if (this.alarm.attributes.hide_passcode) {
-   	  display_digit = '*';
-   	}
-   	this.display_code = this.display_code + display_digit;
-  },
-  callclearcode: function(ev) {
-  	ev.stopPropagation();
-  	this.code = '';
-  	this.display_code = '';
-  },
-  callService: function(ev) {
-  	ev.stopPropagation();
-  	var call = ev.target.getAttribute('data-call');
-      if (call == 'cancel') { //cancel alarm set and return page to default settings
-      	this.resetButtons();
-      } else if (ev.target.getAttribute('data-override')) { //Override of open sensors has been pressed so activate alarm
-      	this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
-      } else if ((call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night') && this.checkOpenSensors(call)) { //Check if trying to activate home with open sensors. If so ping the warning message
-      	console.log('WARNING open sensors');
-      } else { //No open sensors or another service call
-      	this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
-      	this.code = '';
-      	this.display_code = '';
-      }
-  },
-  checkOpenSensors: function(call) {
-      if (this.opencount == 0) return false; //check to see how many open sensors there are, if none arm alarm
 
-      for (var sensor in this.allsensors) { //check to see if the open sensor is one to ignore, if so arm alarm
-	 //is it open?
-	 if (['on', 'open', 'true', 'detected', 'unlocked'].indexOf(this.allsensors[sensor].state.toLowerCase()) > -1) { //yes
-	    //is it in the override list?
-	    if (this.overrideSensors.indexOf(this.allsensors[sensor]) == -1) { //No: return so display message
-	       this.attemptedArm = true; //display the warning message and shake
-
-	       var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
-	       var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
-
-	       if (this.alarm.attributes.perimeter_mode) {
-	       	var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
-	       	btnArmPerimeter.classList.add('remove');
-	       }
-	       btnArmHome.classList.add('big');
-	       btnArmAway.classList.add('little');
-
-	       this.override = document.createAttribute("data-override");
-	       this.override.value = "true";
-	       btnArmHome.setAttributeNode(this.override);
-
-	       var arm_mode = document.createAttribute("data-call");
-	       arm_mode.value = call;
-	       btnArmHome.setAttributeNode(arm_mode);
-
-	       var arm_mode2 = document.createAttribute("data-call");
-	       arm_mode2.value = 'cancel';
-	       btnArmAway.setAttributeNode(arm_mode2);
-	       btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
-	       btnArmAway.innerHTML = 'Cancel Arm';
-
-	       var pageContent = Polymer.dom(this.root).querySelector('.content');
-	       pageContent.classList.add('shake');
-
-	       return true;
-	   }
-	}          
-}
-},
-resetButtons: function() {
-	this.attemptedArm = false;
-
-	var pageContent = Polymer.dom(this.root).querySelector('.content');
-	pageContent.classList.remove('shake');
-
-	var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
-	var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
-	if (this.alarm.attributes.perimeter_mode) {
-		var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
-		btnArmPerimeter.classList.remove('remove');
-	}
-	btnArmHome.classList.remove('big');
-	btnArmAway.classList.remove('little');
-
-      //var override = document.createAttribute("data-override");
-      btnArmHome.removeAttributeNode(this.override);
-
-      var arm_mode = document.createAttribute("data-call");
-      arm_mode.value = 'alarm_arm_home';
-      btnArmHome.setAttributeNode(arm_mode);
-
-      var arm_mode2 = document.createAttribute("data-call");
-      arm_mode2.value = 'alarm_arm_away';
-      btnArmAway.setAttributeNode(arm_mode2);
-
-      btnArmHome.innerHTML = "<iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode";
-      btnArmAway.innerHTML = "<iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode";
-
-  },
-  entityTapped: function (ev) {
-  	ev.stopPropagation();
-  	var entityId = ev.target.getAttribute('data-entity');
-  	this.fire('hass-more-info', { entityId: entityId });
-  },
-   // Observer: polymer gaurantees that this won't be called util hass and panel are both defined
-   onPanelUpdate: function(hass, panel) {
-      //console.log('onPanelUpdate');
-      this.alarm = hass.states[panel.config.alarmid];
-      //console.log('Alarm is ', this.alarm);
-  },
-});
+	});
 </script>

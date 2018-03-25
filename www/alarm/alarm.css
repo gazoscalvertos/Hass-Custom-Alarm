@@ -1,3 +1,9 @@
+/* CUSTOM ALARM COMPONENT PANEL CSS
+  https://github.com/gazoscalvertos/Hass-Custom-Alarm
+  VERSION:  1.0.0
+  MODIFIED: 21/03/18
+*/
+
 :host {
    --countdown-timer-display: none;
    --time-display: initial;
@@ -677,4 +683,134 @@ button {
 }
 .remove {
    display: none !important;
+}
+
+#info{
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  bottom: 15px;
+  right: 15px;
+}
+#info paper-icon-button[type="button"] {
+  color: #6b8d9c;
+  height: 50px; 
+  width: 50px;
+}
+.notification {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 300px;
+  background: #666;
+  text-align: center;
+  padding: 10px;
+  color: white;
+  font-family: sans-serif;
+  border-radius: 15px;
+  box-shadow: 3px 4px 5px rgba(102, 102, 102, 0.3);
+  
+  }
+
+.animated {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes zoomIn {
+  from {
+    opacity: 0;
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    display: none;
+    opacity: 0;
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+
+  50% {
+    opacity: 1;
+    display: block;
+  }
+}
+
+.zoomIn {
+  -webkit-animation-name: zoomIn;
+  animation-name: zoomIn;
+}
+
+@-webkit-keyframes zoomOut {
+  from {
+    opacity: 1;
+    display: block;
+  }
+
+  50% {
+    opacity: 0;
+    display: none;
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes zoomOut {
+  from {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.zoomOut {
+  -webkit-animation-name: zoomOut;
+  animation-name: zoomOut;
+}
+
+/* Text styling */
+.notification h3 {
+  margin: 20px 0 0 0;
+}
+.notification p {
+  margin: 0;
+  font-size: 0.8em;
+}
+
+/* Button styling */
+.notification paper-button[type="button"] {
+  padding: 8px 60px;
+  background: var(--primary-color);
+  border: 0px;
+  border-radius: 10px;
+  font-size: 1.4em;
+  color: #333;
+  margin: 20px;
+  font-weight: 600;
+  letter-spacing: 2px;
+ }
+.notification paper-button[type="button"]:hover {
+  background: #fff;
+  transition: background 0.15s ease-in;
 }
