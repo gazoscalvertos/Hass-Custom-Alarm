@@ -1,8 +1,8 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.0.1
-  MODIFIED: 25/03/18
+  VERSION:  1.0.2
+  MODIFIED: 26/03/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 """
 import asyncio
@@ -36,7 +36,7 @@ import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
-VERSION                     = '1.0.1'
+VERSION                     = '1.0.2'
 
 DOMAIN                      = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
@@ -99,6 +99,7 @@ CONF_HIDE_SENSOR_GROUPS      = 'hide_sensor_groups'
 CONF_HIDE_CUSTOM_PANEL       = 'hide_custom_panel'
 CONF_HIDE_PASSCODE           = 'hide_passcode'
 CONF_HIDE_SIDEBAR            = 'hide_sidebar'
+CONF_LANGUAGE                = 'language'
 
 #//-----------------------COLOURS------------------------------------
 CONF_WARNING_COLOUR          = 'warning_colour'
@@ -195,6 +196,7 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(CONF_HIDE_CUSTOM_PANEL, default=True):    cv.boolean,    # Hides custom panel?
     vol.Optional(CONF_HIDE_PASSCODE, default=True):        cv.boolean,    # Show passcode entry during disarm?
     vol.Optional(CONF_HIDE_SIDEBAR, default=False):        cv.boolean,    # Show all sensors in group?
+    vol.Optional(CONF_LANGUAGE, default='english'):        cv.string,     # GUI Language
     #--------------------------PASSWORD ATTEMPTS--------------------------
     vol.Optional(CONF_PASSCODE_ATTEMPTS, default=-1):         vol.All(vol.Coerce(int), vol.Range(min=-1)),
     vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=-1): vol.All(vol.Coerce(int), vol.Range(min=-1)),
@@ -289,6 +291,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._hide_sidebar           = config[CONF_HIDE_SIDEBAR]
         self._clock                  = config[CONF_CLOCK]
         self._weather                = config[CONF_WEATHER]
+        self._language               = config[CONF_LANGUAGE]
 
         #--------------------------------------GUI RELATED----------------------------------------       
         self._warning_colour         = config[CONF_WARNING_COLOUR]
@@ -357,6 +360,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             'clock':                    self._clock,
             'weather':                  self._weather,
+            'language':                 self._language,
 
             'colours':                  {'warning':    self._warning_colour, 
                                          'pending':    self._pending_colour,
@@ -601,7 +605,7 @@ class BWAlarm(alarm.AlarmControlPanel):
     def _validate_code(self, code, state):
         """Validate given code."""
         if ((self._passcodeAttemptAllowed == -1) or (self._passcodeAttemptNo <= self._passcodeAttemptAllowed)):
-            check = self._code is None or code == self._code or code in self._codes
+            check = self._code is None or code == self._code# or code in self._codes
             if check:
                 self._passcodeAttemptNo = 0
             else:
