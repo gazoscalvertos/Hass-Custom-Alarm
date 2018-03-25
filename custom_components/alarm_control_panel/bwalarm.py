@@ -1,8 +1,8 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.0.0
-  MODIFIED: 21/03/18
+  VERSION:  1.0.1
+  MODIFIED: 25/03/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 """
 import asyncio
@@ -36,7 +36,7 @@ import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
-VERSION                     = '1.0.0'
+VERSION                     = '1.0.1'
 
 DOMAIN                      = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
@@ -341,10 +341,10 @@ class BWAlarm(alarm.AlarmControlPanel):
     @property
     def device_state_attributes(self):
         return {
-            'immediate':                sorted(list(self.immediate)),
-            'delayed':                  sorted(list(self.delayed)),
-            #'override':                 sorted(list(self.override)),
-            'allsensors':               sorted(list(self._allsensors)),
+            'immediate':                self.immediate,
+            'delayed':                  self.delayed,
+            'override':                 self.override,
+            'allsensors':               self._allsensors,
 
             'panel_locked':             self._panel_locked,
             'passcode_attempt_timeout': self._passcodeAttemptTimeout,
@@ -492,6 +492,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.immediate = self._immediate_by_state[alarmMode].copy()
         self.delayed   = self._delayed_by_state[alarmMode].copy()
         self.override  = self._override_by_state[alarmMode].copy()
+        _LOGGER.error(self.override)
 
     def clearsignals(self):
         """ Clear all our signals, we aren't listening anymore """

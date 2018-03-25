@@ -1,7 +1,7 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
 	https://github.com/gazoscalvertos/Hass-Custom-Alarm
-	VERSION:  1.0.0
-	MODIFIED: 21/03/18
+	VERSION:  1.0.1
+	MODIFIED: 25/03/18
 -->
 
 <script src="/local/lib/jquery-3.2.1.min.js"></script>
@@ -323,7 +323,7 @@
 			notificationAnim: { type: String, value: 'remove' },
 
 			errors:          { type: Array, value: [] }, 
-			version:         { type: String, value: '1.0.0'}, 
+			version:         { type: String, value: '1.0.1'}, 
   		},
 
 		// Polymer observers definition
@@ -360,10 +360,7 @@
 		},
 
 		toggleSiderbar: function() {
-			if (this.alarm.attributes.hide_sidebar == true) {
-				this.fire('hass-close-menu');
-				if (this.alarm.state == 'disarmed') this.fire('hass-open-menu');
-			}
+			if (this.alarm.attributes.hide_sidebar == true & this.alarm.state != 'disarmed') this.fire('hass-close-menu');
 			this.async(this.toggleSiderbar, 100);
 		},
 
@@ -583,7 +580,7 @@
 				//is it open?
 				if (['on', 'open', 'true', 'detected', 'unlocked'].indexOf(this.allsensors[sensor].state.toLowerCase()) > -1) { //yes
 				//is it in the override list?
-					if (this.overrideSensors.indexOf(this.allsensors[sensor]) == -1) { //No: return so display message
+					if (this.ovverideSensors == null || this.overrideSensors.indexOf(this.allsensors[sensor]) == -1) { //No: return so display message
 						this.attemptedArm = true; //display the warning message and shake
 
 						var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');

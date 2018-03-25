@@ -48,6 +48,9 @@ This is very much a community project so if you wish to chip in then please do!!
 - Tested on HA v0.65.5
 
 ### Recent Changelog
+
+- (25/03/18) BUG FIX - Fix to resolve slidebar constantly opening when using mobile devices (Panel 1.0.1 / Bwalarm 1.0.1)
+
 - (24/03/18) A Massive Thanks to those that have donated!!! IT is very much appreciated and helps to keep this project alive. Also keep the suggestions flowing and lets make this the best alarm system ever!!!!!!!!!!!!!!!
 - (24/03/18) MAJOR UPDATE! - State specific groups/times. Each state must! configure it's own groups. Home and Away are mandatory with Perimeter mode optional. The top level groups have been dropped so you will need to remove these from your alarm.yaml. You will need to update your alarm.yaml!. The ignore/notathome groups have been dropped from the setup. Please see the default alarm.yaml to inform your own setup. An example of the configuration below (if you get stuck then post an issue or ask in the forum):
 ```
