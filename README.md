@@ -11,7 +11,6 @@ Consider donating to this project to keep it going as anything contributed will 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
 ### Features:
-- Multi Language Support (NEW)
 - State specific groups and times (NEW)
 - Panic Mode
 - MQTT Integration
