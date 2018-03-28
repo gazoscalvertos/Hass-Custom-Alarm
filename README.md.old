@@ -49,15 +49,8 @@ This is very much a community project so if you wish to chip in then please do!!
 - Tested on HA v0.65.5 and below.
 
 ### Recent Changelog
-- (28/03/18) Major Update - Moved the entire codebase of the panel (alarm.html v1.1.0) over to Polymer2 so that translations can be included and the panel can be integrated into the HA codebase at some point once its ready. Please note that depending on your browser you will likely need to set the javascript version to the latest version using the config below. I don't know how this will effect older browsers but this has been tested on a Samsung Galaxy Tab 10 (Original), S7 Edge, Iphone 6, Firefox, Chrome
-```
-#CONFIGURATION.YAML
-frontend:
-  javascript_version: latest
-```
-- (28/03/18) BUG FIX - MQTT issue not working resolved (bwalarm 1.0.2)
-- (28/03/18) BUG FIX - Re-included ignored sensors (Panel 1.0.1), (Bwalarm 1.0.2)
-- (28/03/18) UPDATES - Began to clean up panel css file to enhance firefox/opera support. Let me know if there are still issues. A browser cache wipe will be required (alarm.css 1.0.1)
+- (26/03/18) FEATURE - Multi Language Support!!! English and Portuguese options are available out of the box however you can add your own translations by adding in your own translation file. SO technically you could translated the English GUI to say Esperanto! English is the default. This options is set in your alarm.yaml (language: 'portuguese'). Setting this option prompts the front end panel to look for a json styled translation file with the name of your chosen language saved in www/alarm/language/[your language].json The file must exist and use the json 'style' formatted as seen in the example portuguese file. Each english word in the panel will be translated into a matched translated word. See the portuguese json file as an example.
+
 - (25/03/18) BUG FIX - Moved comments line above the actual config to resolve the hassio issues
 - (25/03/18) BUG FIX - Fix to resolve slidebar constantly opening when using mobile devices (Panel 1.0.1 / Bwalarm 1.0.1)
 

@@ -8,6 +8,13 @@ To get this running add the files (alarm.yaml, panels/alarm.html, custom_compone
 alarm_control_panel: !include alarm.yaml
 panel_custom: !include panel_custom.yaml
 ```
+
+**NOTE:** If you experience issues with the page not displaying then add the following:
+```
+#CONFIGURATION.YAML
+frontend:
+  javascript_version: latest
+```
 ## Configuration variables:
 
 **Alarm.yaml configuration settings:**

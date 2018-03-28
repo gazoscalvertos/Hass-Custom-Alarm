@@ -1,31 +1,42 @@
+##########################################################
+## CUSTOM ALARM COMPONENT ALARM.YAML
+## https://github.com/gazoscalvertos/Hass-Custom-Alarm
+## VERSION:  1.0.1
+## MODIFIED: 28/03/18
+##########################################################
+
 platform: bwalarm
 name: House
 
 alarm: automation.alarm_triggered
 warning: automation.alarm_warning
 
-code: '1234' #Master Code, should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes
-#panic_code: '9876' #[OPTIONAL] Panic Code should consist of one or more digits ie '9876' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner. 
+##[CODE RELATED]
+#[REQUIRED] Master Code, should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes
+code: '1234' 
+#[OPTIONAL] Panic Code should consist of one or more digits ie '9876' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner. 
+panic_code: '9876' 
 
-# codes: #[OPTIONAL, list of names/codes] User specific codes.
-#   - name: gazos
-#     code: '6576'
-#   - name: enzo
-#     code: '8734'
+#[DEFAULT] Grace time in seconds to allow for exit and entry using Away mode
+pending_time: 25  
+#[DEFAULT] The amount of time the alarm stays triggered before returning to its previous state
+trigger_time: 300 
 
-pending_time: 25  #[DEFAULT] Grace time in seconds to allow for exit and entry using Away mode
-trigger_time: 300 #[DEFAULT] The amount of time the alarm stays triggered before returning to its previous state
-
-armed_perimeter: #[OPTIONAL]
+##[STATE RELATED]
+#[OPTIONAL]
+armed_perimeter: 
   ##[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
   immediate:
     - binary_sensor.garage_door
     - binary_sensor.back_door
     - binary_sensor.kitchen_motion
 
-armed_home: #[REQUIRED]
+#[REQUIRED]
+armed_home: 
+  #[OPTIONAL] State specific overrides default time above
   pending_time: 10
-  trigger_time: 300 #[OPTIONAL] State specific overrides default time above
+  #[OPTIONAL] State specific overrides default time above
+  trigger_time: 300 
   ##[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
   immediate:
     - binary_sensor.garage_door
@@ -37,8 +48,10 @@ armed_home: #[REQUIRED]
   delayed:
     - binary_sensor.first_floor_motion
 
-armed_away: #[REQUIRED]
-  trigger_time: 600  #[OPTIONAL] State specific overrides default time above
+#[REQUIRED]
+armed_away: 
+  #[OPTIONAL] State specific overrides default time above
+  trigger_time: 600  
   ##[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
   immediate:
     - binary_sensor.garage_door
@@ -55,31 +68,49 @@ armed_away: #[REQUIRED]
     - binary_sensor.front_door
     - binary_sensor.hall_motion
 
-
 ##[INTERFACE OPTIONAL SETTINGS] 
-clock: True  #[Optional] - False by default. True enables a clock in the center of the status bar
-perimeter_mode: True #[Optional] - False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
-weather: True #[Optional] - False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
-persistence: False #[OPTIONAL] False by Default. Allows this custom component to save the state of the alarm to file then reinstate it in the event of power loss.
-hide_passcode: True #[OPTIONAL] - True by default. This is a security feature when enabled hides the passcode while entering disarm code.
-hide_sidebar: True #[OPTIONAL] - False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.
-#hide_sensor_groups: True #[Optional] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear
-hide_custom_panel: True #[Optional] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the <template> tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!
+#[OPTIONAL] - False by default. True enables a clock in the center of the status bar
+clock: True  
+#[OPTIONAL] - False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors
+perimeter_mode: True 
+#[OPTIONAL] - False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary
+weather: True 
+#[OPTIONAL] False by Default. Allows this custom component to save the state of the alarm to file then reinstate it in the event of power loss.
+persistence: False 
+#[OPTIONAL] - True by default. This is a security feature when enabled hides the passcode while entering disarm code.
+hide_passcode: True 
+#[OPTIONAL] - False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.
+hide_sidebar: True 
+#[OPTIONAL] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear
+hide_sensor_groups: False 
+#[OPTIONAL] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the <template> tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!
+hide_custom_panel: True 
 
 ##[PASSCODE RELATED]
-#passcode_attempts: 3 #[Optional] Disabled if commented out. When a value equal or greater than 0 is set, the system will only allow the set amount of password attempts before timing out
-#passcode_attempts_timeout: 30 #[Optional] Default 30 seconds. When set with the password attempts option the panel will timeout for the amount of seconds set if the password is entered incorrectly as per the password_attempts option. The system will then reset the allowed password attempts
+#[OPTIONAL] Disabled if commented out. When a value equal or greater than 0 is set, the system will only allow the set amount of password attempts before timing out
+#passcode_attempts: 3 
+#[OPTIONAL] Default 30 seconds. When set with the password attempts option the panel will timeout for the amount of seconds set if the password is entered incorrectly as per the password_attempts option. The system will then reset the allowed password attempts
+#passcode_attempts_timeout: 30 
 
 ##[MQTT RELATED]
-#mqtt: True #[OPTIONAL] - False by default. Settings this to True will enable MQTT Mode. Uncomment options below to use See the README for guidance.
-#override_code: True #[OPTIONAL] False by default. if true allows MQTT commands to disarm the alarm without a valid code.
-#state_topic: 'home/alarm' #[OPTIONAL] The MQTT topic HA will publish state updates to.
-#command_topic: 'home/alarm/set' #[OPTIONAL] The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.
-#qos: 0 #[OPTIONAL] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
-#payload_disarm: "DISARM" #[OPTIONAL] The payload to disarm this Alarm Panel. Default is “DISARM”.
-#payload_arm_home: "ARM_HOME" #[OPTIONAL] The payload to set armed-home mode on this Alarm Panel. Default is “ARM_HOME”.
-#payload_arm_away: "ARM_AWAY" #[OPTIONAL] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
-#payload_arm_night: "ARM_NIGHT" #[OPTIONAL] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
+#[OPTIONAL] - False by default. Settings this to True will enable MQTT Mode. Uncomment options below to use See the README for guidance.
+#mqtt: True 
+#[OPTIONAL] False by default. if true allows MQTT commands to disarm the alarm without a valid code.
+#override_code: True 
+#[OPTIONAL] The MQTT topic HA will publish state updates to.
+#state_topic: 'home/alarm' 
+#[OPTIONAL] The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.
+#command_topic: 'home/alarm/set' 
+#[OPTIONAL] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
+#qos: 0 
+#[OPTIONAL] The payload to disarm this Alarm Panel. Default is “DISARM”.
+#payload_disarm: "DISARM" 
+#[OPTIONAL] The payload to set armed-home mode on this Alarm Panel. Default is “ARM_HOME”.
+#payload_arm_home: "ARM_HOME" 
+#[OPTIONAL] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
+#payload_arm_away: "ARM_AWAY" 
+#[OPTIONAL] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
+#payload_arm_night: "ARM_NIGHT" 
 
 ## [COLOURS] Use any HTML format
 warning_colour: 'orange'
@@ -88,36 +119,6 @@ disarmed_colour: '#03A9F4'
 armed_home_colour: 'black'
 armed_away_colour: 'black'
 triggered_colour: 'red'
-
-#############REMOVE#######################################
-## [SENSOR GROUPS]
-##Sensors in this group tigger the alarm immediately
-# immediate:
-#   - binary_sensor.back_door
-#   - binary_sensor.kitchen_window
-
-# ##Sensors in this group start the clock (pending_time) when tripped before the alarm is activated in 'Away' mode
-# delayed:
-#   - binary_sensor.kitchen_motion
-#   - binary_sensor.hall_motion
-#   - binary_sensor.front_door
-#   - binary_sensor.garage_door
-
-# ##Same as notathome but hopefully the title is more self explanatory. Can still use notathome for backwards compatibility
-# ##Note sensors can exist in more than one group notice top_floor appears in two groups
-# homemodeignore:
-#   - binary_sensor.hall_motion
-# ##Use this group to automatically override the warning message on open sensors when setting 'away' mode. (I use this as I have a motion sensor at the front door)
-# override:
-#   - binary_sensor.hall_motion
-#   - binary_sensor.front_door
-
-# ##This group is special and only effects 'perimeter mode'. If perimeter_mode is enabled then any sensor in this group will trigger the alarm immediately if arm perimeter is set. There is no delayed group for this mode (unless requested as a feature of course!)
-# perimeter:
-#   - binary_sensor.front_door
-#   - binary_sensor.back_door
-#   - binary_sensor.garage_door
-###########################################################
 
 ## [CUSTOM SENSOR STATUSES]
 ## These settings allow devices which are not natively supported by this panel to be used. 

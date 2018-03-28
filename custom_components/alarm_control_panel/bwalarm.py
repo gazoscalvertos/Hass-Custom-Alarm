@@ -2,7 +2,7 @@
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
   VERSION:  1.0.2
-  MODIFIED: 26/03/18
+  MODIFIED: 28/03/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 """
 import asyncio
@@ -45,7 +45,6 @@ STATE_ALARM_ARMED_PERIMETER = 'armed_perimeter'
 SUPPORTED_STATES            = [STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
                                 STATE_ALARM_TRIGGERED, STATE_ALARM_WARNING, STATE_ALARM_ARMED_PERIMETER]
 
-#SUPPORTED_PRETRIGGER_STATES = [state for state in SUPPORTED_STATES if state != STATE_ALARM_TRIGGERED]
 SUPPORTED_PENDING_STATES    = [STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_PERIMETER]
 
 #//-------------------STATES TO CHECK------------------------------
@@ -219,8 +218,8 @@ _LOGGER = logging.getLogger(__name__)
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     #Setup MQTT if enabled
     mqtt = None
-    #if (config[CONF_MQTT]):
-    #    import homeassistant.components.mqtt as mqtt
+    if (config[CONF_MQTT]):
+        import homeassistant.components.mqtt as mqtt
     alarm = BWAlarm(hass, config, mqtt)
     hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
@@ -348,6 +347,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             'delayed':                  self.delayed,
             'override':                 self.override,
             'allsensors':               self._allsensors,
+            'ignored':                  self.ignored,
 
             'panel_locked':             self._panel_locked,
             'passcode_attempt_timeout': self._passcodeAttemptTimeout,
@@ -496,7 +496,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.immediate = self._immediate_by_state[alarmMode].copy()
         self.delayed   = self._delayed_by_state[alarmMode].copy()
         self.override  = self._override_by_state[alarmMode].copy()
-        _LOGGER.error(self.override)
+        self.ignored   = set(self._allsensors) - (set(self.immediate) | set(self.delayed))
 
     def clearsignals(self):
         """ Clear all our signals, we aren't listening anymore """
@@ -504,7 +504,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._armstate = STATE_ALARM_DISARMED
         self.immediate = set()
         self.delayed = set()
-        #self.ignored = self._allsensors.copy()
+        self.ignored = self._allsensors.copy()
         self._timeoutat = None
 
     def process_event(self, event, override_pending_time=False):
