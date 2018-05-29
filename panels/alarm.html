@@ -1,7 +1,10 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
 	https://github.com/gazoscalvertos/Hass-Custom-Alarm
-	VERSION:  1.1.0
-	MODIFIED: 25/03/18
+	VERSION:  1.1.1
+	MODIFIED: 29/05/18
+
+	CHANGELOG:
+	-Update for 0.70 compatibility
 -->
 
 <script src="/local/lib/jquery-3.2.1.min.js"></script>
@@ -41,8 +44,8 @@
 					</div>
 				</app-toolbar>
 			</app-header>
-			<div class='content'>
-				<div id='alarm-panel' >	
+			<div id='content'>
+				<div id='alarm_panel' >	
 					<div class='horizontal layout center-justified'>
 						<div class='box zone-card box-header'>
 							<ha-label-badge icon='[[computeIcon(alarm.state)]]' label='[[computeLabel(alarm.state)]]' description='[[alarm.entityDisplay]]'></ha-label-badge>
@@ -81,11 +84,17 @@
 							</div>
 
 							<div class='vLayout box arm zone-card'>
-								<template is='dom-if' if='[[alarm.attributes.perimeter_mode]]'>
-									<paper-button id='arm-perimeter' on-click='callService' data-call='alarm_arm_night' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Perimeter Mode</paper-button> 
+								<template is='dom-if' if='[[!attemptedArm]]'>
+									<template is='dom-if' if='[[alarm.attributes.perimeter_mode]]'>
+										<paper-button id='arm_perimeter' on-click='callService' data-call='arm' data-arm='alarm_arm_night' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Perimeter Mode</paper-button> 
+									</template>
+									<paper-button id='arm_home' on-click='callService' data-call='arm' data-arm='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
+									<paper-button id='arm_away' on-click='callService' data-call='arm' data-arm='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
 								</template>
-								<paper-button id='arm-home' on-click='callService' data-call='alarm_arm_home' raised><iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode</paper-button>
-								<paper-button id='arm-away' on-click='callService' data-call='alarm_arm_away' raised><iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode</paper-button>
+								<template is='dom-if' if='[[attemptedArm]]'>
+									<paper-button id='arm-override' class='big override' on-click='callService' data-call='override' data-arm='attemptArmMode'>Override Sensors and Arm Alarm</paper-button>
+									<paper-button id='arm-cancel' class='little cancel' on-click='resetButtons' data-call='cancel'>Cancel</paper-button>
+								</template>
 							</div>
 						</div>
 					</template>
@@ -110,7 +119,7 @@
 											<paper-button on-click='callcode' data-digit=1 raised>1</paper-button>
 											<paper-button on-click='callcode' data-digit=2 raised>2</paper-button>
 											<paper-button on-click='callcode' data-digit=3 raised>3</paper-button>
-											<paper-button class='disarm' on-click='callService' data-call='alarm_disarm' raised>Disarm</paper-button>
+											<paper-button class='disarm' on-click='callService' data-call='disarm' raised>Disarm</paper-button>
 										</div>
 										<div class='digits horizontal layout center-justified'>
 											<paper-button on-click='callcode' data-digit=4 raised>4</paper-button>
@@ -245,7 +254,7 @@
 </dom-module>
 
 <script>
-	class HaPanelAlarm extends window.hassMixins.LocalizeMixin(Polymer.Element) {
+	class HaPanelAlarm extends Polymer.Element {
 		static get is(){ return 'ha-panel-alarm'; }
 		
 		// Element class can define custom element reactions
@@ -259,12 +268,13 @@
 
 		ready(){
 			super.ready();
-    		this.loadResources();
+
 			this.hideSensors = this.alarm.attributes.hide_sensor_groups
 			this.hideCustom  = this.alarm.attributes.hide_custom_panel
 
 			this.errors = [];
 			if (this.alarm.attributes.hide_sidebar == true)	this.toggleSidebar();
+
   		}
 
 	  	static get properties(){
@@ -307,7 +317,7 @@
 				notificationAnim: { type: String, value: 'remove' },
 
 				errors:          { type: Array, value: [] }, 
-				version:         { type: String, value: '1.1.0'}, 
+				version:         { type: String, value: '1.1.1'}, 
 	  		};
 	  	}
 
@@ -355,8 +365,8 @@
 		}
 
 		monitorAlarm(){
-			var countdownTimerDiv = Polymer.dom(this.root).querySelector('#countdown360_countdown');
-			if (countdownTimerDiv) countdownTimerDiv.remove();
+			/*console.log(this.$.alarm_panel.querySelector('#arm_home'));*/
+			this.$.countdown.innerHTML = "";
 
 			this.updateStyles({'--countdown-timer-display': 'none'});
 			this.updateStyles({'--time-display': 'initial'});
@@ -404,7 +414,7 @@
 
 			if (locked == true) startColour = middleColour = endColour = 'red';
 
-			var countdownDiv = Polymer.dom(this.root).querySelector('#countdown');
+			var countdownDiv = this.$.countdown;
 			$(countdownDiv).unbind().removeData();
 			var countdown = $(countdownDiv).countdown360(
 			{
@@ -549,19 +559,44 @@
 		}
 
 		callService(ev){
+
 			ev.stopPropagation();
-			var call = ev.target.getAttribute('data-call');
-			if (call == 'cancel'){ //cancel alarm set and return page to default settings
-				this.resetButtons();
-			} else if (ev.target.getAttribute('data-override')){ //Override of open sensors has been pressed so activate alarm
-				this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code});
-			} else if ((call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night') && this.checkOpenSensors(call)){ //Check if trying to activate home with open sensors. If so ping the warning message
-				console.log('WARNING open sensors');
-			} else { //No open sensors or another service call
-				this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code });
-				this.code = '';
-				this.display_code = '';
+
+			var call            = ev.target.getAttribute('data-call');	
+
+			switch (call){
+
+				//If the arm buttons are pressed check there are no open sensors.
+				case 'arm':
+					this.attemptArmMode = ev.target.getAttribute('data-arm');
+					if ( this.checkOpenSensors(this.attemptArmMode) )
+						return;
+					this.alarmService(this.attemptArmMode);
+
+				//The arming of the alarm has been cancelled, reset parameters.
+				case 'cancel':
+					this.attemptArmMode = '';
+					this.resetButtons();
+
+				//Open sensors detected but overridden
+				case 'override':
+					this.alarmService(this.attemptArmMode);
+					break;
+
+				//Disarm the alarm
+				case 'disarm':
+					this.alarmService('alarm_disarm');
+					break;
+
 			}
+			
+			this.code = '';
+			this.display_code = '';
+
+		}
+
+		alarmService(call){
+			this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code });
 		}
 
 		checkOpenSensors(call){
@@ -574,31 +609,7 @@
 					if (this.ovverideSensors == null || this.overrideSensors.indexOf(this.allsensors[sensor]) == -1){ //No: return so display message
 						this.attemptedArm = true; //display the warning message and shake
 
-						var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
-						var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
-
-						if (this.alarm.attributes.perimeter_mode){
-							var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
-							btnArmPerimeter.classList.add('remove');
-						}
-						btnArmHome.classList.add('big');
-						btnArmAway.classList.add('little');
-
-						this.override = document.createAttribute("data-override");
-						this.override.value = "true";
-						btnArmHome.setAttributeNode(this.override);
-
-						var arm_mode = document.createAttribute("data-call");
-						arm_mode.value = call;
-						btnArmHome.setAttributeNode(arm_mode);
-
-						var arm_mode2 = document.createAttribute("data-call");
-						arm_mode2.value = 'cancel';
-						btnArmAway.setAttributeNode(arm_mode2);
-						btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
-						btnArmAway.innerHTML = 'Cancel Arm';
-
-						var pageContent = Polymer.dom(this.root).querySelector('.content');
+						var pageContent = this.$.content;
 						pageContent.classList.add('shake');
 
 						return true;
@@ -610,31 +621,8 @@
 		resetButtons(){
 			this.attemptedArm = false;
 
-			var pageContent = Polymer.dom(this.root).querySelector('.content');
+			var pageContent = this.$.content;
 			pageContent.classList.remove('shake');
-
-			var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
-			var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
-			if (this.alarm.attributes.perimeter_mode){
-				var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
-				btnArmPerimeter.classList.remove('remove');
-			}
-			btnArmHome.classList.remove('big');
-			btnArmAway.classList.remove('little');
-
-			//var override = document.createAttribute("data-override");
-			btnArmHome.removeAttributeNode(this.override);
-
-			var arm_mode = document.createAttribute("data-call");
-			arm_mode.value = 'alarm_arm_home';
-			btnArmHome.setAttributeNode(arm_mode);
-
-			var arm_mode2 = document.createAttribute("data-call");
-			arm_mode2.value = 'alarm_arm_away';
-			btnArmAway.setAttributeNode(arm_mode2);
-
-			btnArmHome.innerHTML = "<iron-icon icon='mdi:lock-outline'></iron-icon>&nbsp;Home Mode";
-			btnArmAway.innerHTML = "<iron-icon icon='mdi:lock'></iron-icon>&nbsp;Away Mode";
 		}
 
 		entityTapped(ev){
