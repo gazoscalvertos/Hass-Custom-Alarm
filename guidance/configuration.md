@@ -1,18 +1,8 @@
 ## Installation Guide
-To get this running add the files from this repo into your home assistant configuration directory
+To get this running add the files (alarm.yaml, panels/alarm.html, custom_components/alarm_control_panel/bwalarm.py, www/lib/countdown360.js, www/lib/jquery-3.2.1.min.js, www/alarm/alarm.css) from this repo into your home assistant configuration directory, then add the following to your configuration.yaml file:
 
-```
-alarm.yaml
-panel_custom.yaml *(See Note Below)
-panels/alarm.html
-custom_components/alarm_control_panel/bwalarm.py
-www/lib/countdown360.js
-www/lib/jquery-3.2.1.min.js
-www/alarm/alarm.css
-```
 **NOTE:** If you already have a panel_custom.yaml for say floorplan then just copy and paste the code from this repo file into your own panel_custom.yaml to prevent floorplan from being overritten.
-
-Then add the following to your configuration.yaml file:
+**NOTE:** Same goes for Automations.yaml. Append the samples inside of this file into your own automations.yaml
 
 ```
 alarm_control_panel: !include alarm.yaml
@@ -25,9 +15,6 @@ panel_custom: !include panel_custom.yaml
 frontend:
   javascript_version: latest
 ```
-
-Once you have carried out the above steps you should see a new link in your Home Assistant Menu named 'Alarm'. Alternatively the direct link would be: http://[HA IP:PORT]/alarm
-
 ## Configuration variables:
 
 **Alarm.yaml configuration settings:**

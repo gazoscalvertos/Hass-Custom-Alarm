@@ -45,11 +45,9 @@ This is very much a community project so if you wish to chip in then please do!!
 [Installation/Configuration Instructions](guidance/configuration.md)
 
 ### Testing
-- Tested on HA v0.70 and below.
+- Tested on HA v0.65.5 and below.
 
 ### Recent Changelog
-- (29/05/18) COMPATIBILITY - Update panels/alarm.html (version 1.1.1) to the latest version to ensure compatibility with HA version 0.70.
-
 - (28/03/18) Major Update - Moved the entire codebase of the panel (alarm.html v1.1.0) over to Polymer2 so that translations can be included and the panel can be integrated into the HA codebase at some point once its ready. Please note that depending on your browser you will likely need to set the javascript version to the latest version using the config below. I don't know how this will effect older browsers but this has been tested on a Samsung Galaxy Tab 10 (Original), S7 Edge, Iphone 6, Firefox, Chrome
 ```
 #CONFIGURATION.YAML
