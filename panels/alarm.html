@@ -1,7 +1,10 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
 	https://github.com/gazoscalvertos/Hass-Custom-Alarm
-	VERSION:  1.1.0
-	MODIFIED: 25/03/18
+	VERSION:  1.1.1
+	MODIFIED: 29/05/18
+
+	CHANGELOG:
+	-Update for 0.70 compatibility
 -->
 
 <script src="/local/lib/jquery-3.2.1.min.js"></script>
@@ -41,7 +44,7 @@
 					</div>
 				</app-toolbar>
 			</app-header>
-			<div class='content'>
+			<div id='content'>
 				<div id='alarm-panel' >	
 					<div class='horizontal layout center-justified'>
 						<div class='box zone-card box-header'>
@@ -245,7 +248,7 @@
 </dom-module>
 
 <script>
-	class HaPanelAlarm extends window.hassMixins.LocalizeMixin(Polymer.Element) {
+	class HaPanelAlarm extends Polymer.Element {
 		static get is(){ return 'ha-panel-alarm'; }
 		
 		// Element class can define custom element reactions
@@ -259,7 +262,7 @@
 
 		ready(){
 			super.ready();
-    		this.loadResources();
+
 			this.hideSensors = this.alarm.attributes.hide_sensor_groups
 			this.hideCustom  = this.alarm.attributes.hide_custom_panel
 
@@ -307,7 +310,7 @@
 				notificationAnim: { type: String, value: 'remove' },
 
 				errors:          { type: Array, value: [] }, 
-				version:         { type: String, value: '1.1.0'}, 
+				version:         { type: String, value: '1.1.1'}, 
 	  		};
 	  	}
 
@@ -355,7 +358,7 @@
 		}
 
 		monitorAlarm(){
-			var countdownTimerDiv = Polymer.dom(this.root).querySelector('#countdown360_countdown');
+			var countdownTimerDiv = this.$.countdown360_countdown;
 			if (countdownTimerDiv) countdownTimerDiv.remove();
 
 			this.updateStyles({'--countdown-timer-display': 'none'});
@@ -404,7 +407,7 @@
 
 			if (locked == true) startColour = middleColour = endColour = 'red';
 
-			var countdownDiv = Polymer.dom(this.root).querySelector('#countdown');
+			var countdownDiv = this.$.countdown;
 			$(countdownDiv).unbind().removeData();
 			var countdown = $(countdownDiv).countdown360(
 			{
@@ -574,11 +577,11 @@
 					if (this.ovverideSensors == null || this.overrideSensors.indexOf(this.allsensors[sensor]) == -1){ //No: return so display message
 						this.attemptedArm = true; //display the warning message and shake
 
-						var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
-						var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+						var btnArmHome      = this.$.arm-home;
+						var btnArmAway      = this.$.arm-away;
 
 						if (this.alarm.attributes.perimeter_mode){
-							var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+							var btnArmPerimeter = this.$.arm-perimeter;
 							btnArmPerimeter.classList.add('remove');
 						}
 						btnArmHome.classList.add('big');
@@ -598,7 +601,7 @@
 						btnArmHome.innerHTML = 'Override Sensors and Arm Alarm';
 						btnArmAway.innerHTML = 'Cancel Arm';
 
-						var pageContent = Polymer.dom(this.root).querySelector('.content');
+						var pageContent = this.$.content;
 						pageContent.classList.add('shake');
 
 						return true;
@@ -610,13 +613,13 @@
 		resetButtons(){
 			this.attemptedArm = false;
 
-			var pageContent = Polymer.dom(this.root).querySelector('.content');
+			var pageContent = thiis.$.content;
 			pageContent.classList.remove('shake');
 
-			var btnArmHome      = Polymer.dom(this.root).querySelector('#arm-home');
-			var btnArmAway      = Polymer.dom(this.root).querySelector('#arm-away');
+			var btnArmHome      = this.$.arm-home;
+			var btnArmAway      = this.$.arm-away;
 			if (this.alarm.attributes.perimeter_mode){
-				var btnArmPerimeter = Polymer.dom(this.root).querySelector('#arm-perimeter');
+				var btnArmPerimeter = this.$.arm-perimeter;
 				btnArmPerimeter.classList.remove('remove');
 			}
 			btnArmHome.classList.remove('big');
