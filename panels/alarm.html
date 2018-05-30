@@ -1,10 +1,10 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
 	https://github.com/gazoscalvertos/Hass-Custom-Alarm
-	VERSION:  1.1.1
-	MODIFIED: 29/05/18
+	VERSION:  1.1.2
+	MODIFIED: 30/05/18
 
 	CHANGELOG:
-	-Update for 0.70 compatibility
+	-Fixed sidebar issue
 -->
 
 <script src="/local/lib/jquery-3.2.1.min.js"></script>
@@ -271,10 +271,6 @@
 
 			this.hideSensors = this.alarm.attributes.hide_sensor_groups
 			this.hideCustom  = this.alarm.attributes.hide_custom_panel
-
-			this.errors = [];
-			if (this.alarm.attributes.hide_sidebar == true)	this.toggleSidebar();
-
   		}
 
 	  	static get properties(){
@@ -302,6 +298,7 @@
 				code:            { type: String, value: '' },
 				display_code:    { type: String, value: '' },
 
+				sidebarTimerId:  { type: Number },
 				timeoutID:       { type: Number },
 
 				cleanup:         { type: Array, value: [] },
@@ -359,13 +356,18 @@
 			}
 		}
 
-		toggleSidebar(){
-			if (this.alarm) if(this.alarm.state != 'disarmed') this.fire('hass-close-menu');
-			this.async(this.toggleSidebar, 100);
+		toggleSidebar(instance){
+			if (instance) if(instance.alarm.state != 'disarmed') instance.fire('hass-close-menu');
 		}
 
 		monitorAlarm(){
-			/*console.log(this.$.alarm_panel.querySelector('#arm_home'));*/
+
+			if (this.alarm.attributes.hide_sidebar == true){
+				clearInterval(this.sidebarTimerId);
+				// Close the sidebar if alarm is set and the option is enabled
+				this.sidebarTimerId = setInterval(this.toggleSidebar, 100, this);
+			}
+
 			this.$.countdown.innerHTML = "";
 
 			this.updateStyles({'--countdown-timer-display': 'none'});
@@ -634,6 +636,20 @@
 		// Observer: polymer gaurantees that this won't be called util hass and panel are both defined
 		onPanelUpdate(hass, panel){
 			this.alarm = hass.states[panel.config.alarmid];
+		}
+
+		fire(type, detail, options) {
+			options = options || {};
+			detail = (detail === null || detail === undefined) ? {} : detail;
+			const event = new Event(type, {
+				bubbles: options.bubbles === undefined ? true : options.bubbles,
+				cancelable: Boolean(options.cancelable),
+				composed: options.composed === undefined ? true : options.composed
+			});
+			event.detail = detail;
+			const node = options.node || this;
+			node.dispatchEvent(event);
+			return event;
 		}
 	}
 	customElements.define(HaPanelAlarm.is, HaPanelAlarm);
