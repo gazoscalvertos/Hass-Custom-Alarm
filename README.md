@@ -2,14 +2,6 @@
 ## Intro :-)
 <img align="right" width="376.5" height="525" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
 
-Welcome my fellow modders, tinkerers, home assistant wizards!!
-
-Follow the thread [here](https://community.home-assistant.io/t/yet-another-take-on-an-alarm-system/32386)
-
-Consider donating to this project to keep it going as anything contributed will be placed back in to enable more hardware integration, new features and bug squashing.
-
-This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
-
 ### Branch DEV:
 Hi everyone, I thought it was time to show the progress of the new UI. Still very much a work in progress but its close!! There are bugs which I'll log in github to allow me to keep track, please feel free to share. Mobile responsiveness needs looking at as does a few other bits and pieces such as default HA colours, status colours, user defined codes.
 
