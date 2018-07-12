@@ -1,22 +1,12 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.0.4
+  VERSION:  1.0.5
   MODIFIED: 18/04/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 
   CHANGE LOG:
-  -Custom 'Home Alarm' message
-  -Multicodes inc name & pictures
-  -Activity Log
-  -Log size as alarm option (default 10)
-  -Panic mode only shows a deafult disarm message
-  -Camera options added
-  -Added optional code to arm mode
-  -Added changed by user for UI/automation purposes
-  -Removed duplicate change by
-  -Override code added to immediate arm
-  -Added YAML Editor
+  -MOved admin password
 
   TODO
 
@@ -57,7 +47,7 @@ import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
-VERSION                            = '1.0.4'
+VERSION                            = '1.0.5'
 
 DOMAIN                             = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
@@ -231,7 +221,6 @@ def _state_schema():
 
 PANEL_SCHEMA = vol.Schema({
 	vol.Optional(CONF_CAMERAS):                                   cv.entity_ids,
-	vol.Optional(CONF_ADMIN_PASSWORD, default='HG28!!&dn'):       cv.string,     # Admin panel password
     vol.Optional(cv.slug):                                        cv.string,
 })
 
@@ -293,19 +282,7 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(CONF_CODE_TO_ARM, default=False):                 cv.boolean,    # Require code to arm alarm?
 
     #---------------------------PANEL RELATED---------------------------
-    # vol.Optional(CONF_CLOCK, default=False):                       cv.boolean,    # Display clock on panel ###REMOVE###
-    # vol.Optional(CONF_WEATHER, default=False):                     cv.boolean,    # Display weather on panel ###REMOVE###
-    # vol.Optional(CONF_ENABLE_SENSORS_PANEL, default=True):         cv.boolean,    # Enable sensor groups panel? ###REMOVE###
-    # vol.Optional(CONF_ENABLE_CUSTOM_PANEL, default=False):         cv.boolean,    # Enable custom panel? ###REMOVE###
-    # vol.Optional(CONF_ENABLE_CAMERA_PANEL, default=False):         cv.boolean,    # Enable camera panel? ###REMOVE###
-    # vol.Optional(CONF_ENABLE_FLOORPLAN_PANEL, default=False):      cv.boolean,    # Enable floorplan panel? ###REMOVE###
-    # vol.Optional(CONF_HIDE_PASSCODE, default=True):                cv.boolean,    # Show passcode entry during disarm? ###REMOVE###
-    # vol.Optional(CONF_HIDE_SIDEBAR, default=False):                cv.boolean,    # Show all sensors in group? ###REMOVE###
-    # vol.Optional(CONF_LANGUAGE, default='english'):                cv.string,     # GUI Language ###REMOVE###
-    # vol.Optional(CONF_FLOORPLAN, default='binary_sensor.floorplan'):  cv.entity_id,  # Floorplan binary_sensor ###REMOVE###
-    # vol.Optional(CONF_ROUND_BUTTONS, default=False):               cv.boolean,    # GUI Round Buttons ###REMOVE###
-    # vol.Optional(CONF_PANEL_TITLE, default='Home Alarm'):          cv.string,     # GUI Panel Title ###REMOVE###
-    # vol.Optional(CONF_ENABLE_SERIF_FONT, default=True):            cv.boolean,    # GUI serif font ###REMOVE###
+    vol.Optional(CONF_ADMIN_PASSWORD, default='HG28!!&dn'):       cv.string,     # Admin panel password
 
     #--------------------------PASSWORD ATTEMPTS--------------------------
     vol.Optional(CONF_PASSCODE_ATTEMPTS, default=-1):              vol.All(vol.Coerce(int), vol.Range(min=-1)),
@@ -568,6 +545,8 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             'updateUI':					self._updateUI,
 
+            'admin_password':           hashlib.sha256(str.encode(self._config[CONF_ADMIN_PASSWORD])).hexdigest(),
+
             'bwalarm_version':          VERSION,
             'py_version':               sys.version_info,
         }
@@ -582,9 +561,9 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             panel = copy.deepcopy(self._config[CONF_PANEL])
 
-            if (CONF_ADMIN_PASSWORD not in panel):
-                panel[CONF_ADMIN_PASSWORD] = 'HG28!!&dn'
-            panel[CONF_ADMIN_PASSWORD] = hashlib.sha256(str.encode(panel[CONF_ADMIN_PASSWORD])).hexdigest()
+            # if (CONF_ADMIN_PASSWORD not in panel):
+            #     panel[CONF_ADMIN_PASSWORD] = 'HG28!!&dn'
+            # panel[CONF_ADMIN_PASSWORD] = hashlib.sha256(str.encode(panel[CONF_ADMIN_PASSWORD])).hexdigest()
 
             results[CONF_PANEL] = panel
 

@@ -547,8 +547,8 @@
 													<span class='info-header'>Admin Password: </span>
 													<span class='info-detail'>Reset the password used to access this settings panel.</span>
 													<div class='setting-input horizontal layout'>
-														<paper-input id='panel-admin_password' type="password" placeholder='Admin Password'></paper-input>
-														<paper-icon-button data-type='button' data-setting='panel-admin_password' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+														<paper-input id='admin_password' type="password" placeholder='Admin Password'></paper-input>
+														<paper-icon-button data-type='button' data-setting='admin_password' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
 													</div>
 												</div>	
 											</div>
@@ -614,7 +614,7 @@
 
 											<div class='setting-outer vertical layout'>
 												<div class='setting-inner horizontal layout'>
-													<span class='info-header'>Shadow Effect: </span>
+													<span class='info-header'>Shadow Text Effect: </span>
 													<paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.panel.shadow_effect}}' on-change='settingsSave' data-type='toggle' data-setting='panel-shadow_effect'></paper-toggle-button>
 												</div>
 												<span class='info-detail'>Enables the shadow text effect in this panel. Defaults to false</span>
@@ -622,7 +622,7 @@
 
 											<div class='setting-outer vertical layout'>
 												<div class='setting-inner horizontal layout'>
-													<span class='info-header'>Serif Font: </span>
+													<span class='info-header'>Serif Font: </span> 
 													<paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.panel.enable_serif_font}}' on-change='settingsSave' data-type='toggle' data-setting='panel-enable_serif_font'></paper-toggle-button>
 												</div>
 												<span class='info-detail'>Enables the 'Lobster' serif font on the title, time and weather within this panel. Default False</span>
@@ -1741,7 +1741,7 @@
 			    var passwordHash = this.passwordToHash($(passwordInput).val());
 
 			    //If it matches the stored hash then grant access
-			    if (passwordHash == this.alarm.attributes.panel.admin_password){
+			    if (passwordHash == this.alarm.attributes.admin_password){
 			    	//Password matches so load settings cell
 			    	this.settingsUnlock = true;
 					this.carouselChange(this.shadowRoot.querySelector('#settings-info'));
@@ -1762,6 +1762,13 @@
 				if (this.alarm.attributes.panel == null) {
 					this.alarm.attributes.panel = {};
 					this.settingsUpdate('panel', {});
+
+				}
+
+				if (this.alarm.attributes.panel.cameras == null) {
+					var panel = this.alarm.attributes.panel;
+					panel.cameras = [];
+					this.settingsUpdate('panel', panel);
 				}
 
 				if (this.alarm.attributes.states == null) {

@@ -11,10 +11,27 @@
 platform: bwalarm
 name: House
 
-panel: {enable_sensors_panel: true, admin_password: q, panel_title: q, enable_clock: true,
-  enable_clock_12hr: true, enable_weather: true, hide_passcode: true, hide_sidebar: true,
-  round_buttons: true, enable_serif_font: true, theme: false, floorplan: binary_sensor.floorplan,
-  enable_floorplan_panel: true, shadow_effect: true, enable_camera_panel: true, camera_update_interval: '5'}
+panel:
+  enable_sensors_panel: 'True'
+  panel_title: Home Alarm
+  enable_clock: 'True'
+  enable_clock_12hr: 'True'
+  enable_weather: 'True'
+  hide_passcode: 'True'
+  hide_sidebar: 'True'
+  round_buttons: 'True'
+  enable_serif_font: 'True'
+  theme: 'False'
+  floorplan: binary_sensor.floorplan
+  enable_floorplan_panel: 'True'
+  shadow_effect: 'True'
+  enable_camera_panel: 'True'
+  camera_update_interval: '5'
+  cameras:
+  - camera.garage
+  - camera.tv_room
+  - camera.outdoor
+  - camera.pool
 states:
   armed_away:
     immediate:
@@ -64,3 +81,4 @@ code: '9876'
 themes: {}
 panic_code: '1234'
 passcode_attempts: '3'
+admin_password: q
