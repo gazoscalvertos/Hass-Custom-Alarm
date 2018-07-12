@@ -610,6 +610,14 @@
 													<paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.panel.round_buttons}}' on-change='settingsSave' data-type='toggle' data-setting='panel-round_buttons'></paper-toggle-button>
 												</div>
 												<span class='info-detail'>Choose whether the alarm buttons should be round or not.</span>
+											</div>	
+
+											<div class='setting-outer vertical layout'>
+												<div class='setting-inner horizontal layout'>
+													<span class='info-header'>Shadow Effect: </span>
+													<paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.panel.shadow_effect}}' on-change='settingsSave' data-type='toggle' data-setting='panel-shadow_effect'></paper-toggle-button>
+												</div>
+												<span class='info-detail'>Enables the shadow text effect in this panel. Defaults to false</span>
 											</div>		
 
 											<div class='setting-outer vertical layout'>
@@ -869,7 +877,7 @@
 
 												<paper-listbox id='states-armed_away-immediate-checkbox' class='vertical layout' attr-for-selected="name"  multi selected-values='[[alarm.attributes.states.armed_away.immediate]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_away-immediate'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -880,7 +888,7 @@
 
 												<paper-listbox id='states-armed_away-delayed-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_away.delayed]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_away-delayed'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -891,7 +899,7 @@
 
 												<paper-listbox id='states-armed_away-override-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_away.override]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_away-override'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -939,7 +947,7 @@
 
 												<paper-listbox id='states-armed_home-immediate-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_home.immediate]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_home-immediate'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -950,7 +958,7 @@
 
 												<paper-listbox id='states-armed_home-delayed-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_home.delayed]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_home-delayed'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -961,7 +969,7 @@
 
 												<paper-listbox id='states-armed_home-override-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_home.override]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_home-override'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -974,7 +982,7 @@
 												<span class='info-header'>Enable Perimeter Mode: </span>
 												<paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_perimeter_mode}}' on-change='settingsSave' data-type='toggle' data-setting='enable_perimeter_mode'></paper-toggle-button>
 											</div>
-											<span class='info-detail'>Enable perimeter mode. Default is True</span>
+											<span class='info-detail'>Enable perimeter mode. Default is False</span>
 										</div>	
 
 										<div class='setting-outer horizontal layout'>
@@ -1016,7 +1024,7 @@
 
 												<paper-listbox id='states-armed_perimeter-immediate-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_perimeter.immediate]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_perimeter-immediate'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1027,7 +1035,7 @@
 
 												<paper-listbox id='states-armed_perimeter-delayed-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_perimeter.delayed]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_perimeter-delayed'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1038,7 +1046,7 @@
 
 												<paper-listbox id='states-armed_perimeter-override-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_perimeter.override]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_perimeter-override'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;'>[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1068,7 +1076,7 @@
 											<div class='setting-inner vertical layout'>
 												<paper-listbox id='panel-floorplan-listbox' class='vertical layout' attr-for-selected="name" on-selected-item-changed='settingsSave' data-type='listbox' data-setting='panel-floorplan'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='bs'>
-														<paper-item name="[[bs]]"'>[[computeFriendlyName(bs)]]</paper-item>
+														<paper-item name="[[bs]]"' title$="{{bs}}">[[computeFriendlyName(bs)]]</paper-item>
 													</template>
 												</paper-listbox>
 											</div>	
@@ -1099,7 +1107,7 @@
 
 										<paper-listbox id='cameras-checkboxs' class='vertical layout' attr-for-selected="name" multi selected-values={{alarm.attributes.panel.cameras}} selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='panel-cameras'>
 											<template is='dom-repeat' items='{{cameras}}' as='camera'>
-												<paper-checkbox name$="{{camera}}" style='padding: 5px;'>[[computeFriendlyName(camera)]]</paper-checkbox>
+												<paper-checkbox name$="{{camera}}" style='padding: 5px;' title$="{{camera}}">[[computeFriendlyName(camera)]]</paper-checkbox>
 											</template>
 										</paper-listbox>
 									</div>
@@ -1790,17 +1798,9 @@
 					this.controlsLoaded = false;
 				}
 
-				//Load the yaml colors into the selection fields
-				//this.loadSettingColors();
-				//this.$.carousel_main.style.height = '60vh';
-
 				this.carouselMainSelected = this.$.carousel_template;
 
 				this.carouselChange(this.$.controls);
-/*				if (this.alarm.attributes.panel.enable_floorplan_panel) this.carouselChange(this.$.floorplan);
-				else if (this.alarm.attributes.panel.enable_sensors_panel)   this.carouselChange(this.$.sensors);
-				else if (this.alarm.attributes.panel.enable_camera_panel)    this.carouselChange(this.$.cameras);
-				else                                                         this.carouselChange(this.$.log);*/
 
 				this.$.carousel_main.style.height = '40vh'
 			}
@@ -1970,6 +1970,11 @@
 					this.updateStyles({'--button-shape': '50%'});
 				}
 				else this.updateStyles({'--button-shape': '0%'});
+
+				if (this.alarm.attributes.panel.shadow_effect){ 
+					this.updateStyles({'--shadow-effect': 'below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1))'});
+				}
+				else this.updateStyles({'--shadow-effect': 'unset'});
 
 				if (this.alarm.attributes.panel.hide_sidebar == true){
 					clearInterval(this.sidebarTimerId);

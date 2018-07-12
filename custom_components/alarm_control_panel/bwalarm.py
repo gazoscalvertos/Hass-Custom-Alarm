@@ -210,7 +210,7 @@ def _state_schema():
     """Validate the state."""
     schema = {}
     # if state in SUPPORTED_PENDING_STATES:
-    schema[vol.Optional(CONF_TRIGGER_TIME, default=DEFAULT_TRIGGER_TIME)] = vol.All(vol.Coerce(int), vol.Range(min=1))
+    schema[vol.Optional(CONF_TRIGGER_TIME, default=DEFAULT_TRIGGER_TIME)] = vol.All(vol.Coerce(int), vol.Range(min=-1))
     schema[vol.Optional(CONF_PENDING_TIME, default=DEFAULT_PENDING_TIME)] = vol.All(vol.Coerce(int), vol.Range(min=0))
     schema[vol.Optional(CONF_WARNING_TIME, default=DEFAULT_WARNING_TIME)] = vol.All(vol.Coerce(int), vol.Range(min=0))
     schema[vol.Optional(CONF_IMMEDIATE,    default=[])]                   = cv.entity_ids # things that cause an immediate alarm
@@ -912,7 +912,10 @@ class BWAlarm(alarm.AlarmControlPanel):
                 _LOGGER.debug("[ALARM] Turning on alarm")
                 if self._config.get(CONF_ALARM):
                     switch.turn_on(self._hass, self._config.get(CONF_ALARM))
-                self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_TRIGGER_TIME]))
+                if (self._states[self._armstate][CONF_TRIGGER_TIME] == -1):
+                    self._timeoutat = now() + datetime.timedelta(hours=int(24))
+                else:
+                    self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_TRIGGER_TIME]))
                 self._update_log('HA', 'Alarm has been triggered by: ' + self._lasttrigger)
             elif new_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Pending user leaving house")

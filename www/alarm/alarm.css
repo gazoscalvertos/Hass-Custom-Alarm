@@ -88,6 +88,8 @@
 
    --font-header:                     unset; /*Font of the header, time and weather text*/
 
+   --shadow-effect:                   below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
+
 }
 app-toolbar {
   background-color: var(--header-background-color);
@@ -683,7 +685,7 @@ div.options paper-button{
 }
 .shadow {
     padding-bottom: 6px;
-    -webkit-box-reflect: below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
+    -webkit-box-reflect: var(--shadow-effect);
 }
 #time {
    color: var( --time-text-color);

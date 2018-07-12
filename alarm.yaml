@@ -1,11 +1,66 @@
 ##########################################################
 ## CUSTOM ALARM COMPONENT ALARM.YAML
 ## https://github.com/gazoscalvertos/Hass-Custom-Alarm
-## VERSION:  1.0.3
-## MODIFIED: 07/07/18
+## VERSION:  1.0.2
+## MODIFIED: 18/04/18
 ## CHANGE LOG:
-## NEe yaml
+## Add Multi Codes, names, pics
+## optional code to arm alarm
 ##########################################################
 
 platform: bwalarm
 name: House
+
+panel: {enable_sensors_panel: true, admin_password: q, panel_title: q, enable_clock: true,
+  enable_clock_12hr: true, enable_weather: true, hide_passcode: true, hide_sidebar: true,
+  round_buttons: true, enable_serif_font: true, theme: false, floorplan: binary_sensor.floorplan,
+  enable_floorplan_panel: true, shadow_effect: true, enable_camera_panel: true, camera_update_interval: '5'}
+states:
+  armed_away:
+    immediate:
+    - binary_sensor.kitchen_motion
+    - binary_sensor.garage_door
+    - binary_sensor.second_floor_motion
+    - binary_sensor.first_floor_motion
+    - binary_sensor.front_door
+    - binary_sensor.hall_motion
+    - binary_sensor.kitchen_window
+    - binary_sensor.floorplan
+    delayed: []
+    override:
+    - binary_sensor.hall_motion
+    - binary_sensor.kitchen_motion
+    - binary_sensor.floorplan
+    - binary_sensor.kitchen_window
+    - binary_sensor.front_door
+    - binary_sensor.first_floor_motion
+    pending_time: 0
+    warning_time: 0
+    trigger_time: '-1'
+  armed_home:
+    immediate:
+    - binary_sensor.front_door
+    - binary_sensor.first_floor_motion
+    delayed:
+    - binary_sensor.second_floor_motion
+    - binary_sensor.back_door
+    override:
+    - binary_sensor.floorplan
+    pending_time: 0
+    warning_time: 0
+    trigger_time: 600
+  armed_perimeter:
+    immediate:
+    - binary_sensor.kitchen_window
+    delayed:
+    - binary_sensor.first_floor_motion
+    override: []
+    pending_time: 0
+    warning_time: 0
+    trigger_time: 600
+log: {}
+enable_persistence: true
+code: '9876'
+themes: {}
+panic_code: '1234'
+passcode_attempts: '3'
