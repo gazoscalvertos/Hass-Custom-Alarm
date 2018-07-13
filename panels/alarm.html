@@ -1806,6 +1806,14 @@
 /*					//Remove the keypad and controls to the carousel
 					this.controlsLoaded = false;*/
 				}
+				if ($(window).width() > 767) {
+				setTimeout(function(instance) 
+					{
+						if (instance.shadowRoot.querySelector('#weather_svg')) {
+							instance.shadowRoot.querySelector('#weather_svg').getSVGDocument().querySelectorAll('svg')[0].setAttribute("fill", window.getComputedStyle(instance.shadowRoot.querySelector('#weather-icon')).getPropertyValue("fill"));
+						}
+					}, 2000, this);
+				}
 
 				this.carouselMainSelected = this.$.carousel_template;
 
@@ -2000,13 +2008,7 @@
 				if (this.alarm.attributes.panel.enable_serif_font) this.updateStyles({'--font-header': "'Lobster'"});
 				else this.updateStyles({'--font-header': "unset"});		
 
-				setTimeout(function(instance) 
-					{
-						if (instance.shadowRoot.querySelector('#weather_svg')) {
-							console.log(instance.shadowRoot.querySelector('#weather_svg'));
-							instance.shadowRoot.querySelector('#weather_svg').getSVGDocument().querySelectorAll('svg')[0].setAttribute("fill", window.getComputedStyle(instance.shadowRoot.querySelector('#weather-icon')).getPropertyValue("fill"));
-						}
-					}, 1000, this);
+
 				
 			}
 
