@@ -273,8 +273,8 @@ ha-label-badge {
   @apply --paper-font-common-nowrap;
   position: relative;
   bottom: 46px;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
+/*  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;*/
   background-color: rgba(0, 0, 0, 0.3);
   padding: 10px;
   font-size: 16px;
@@ -409,10 +409,12 @@ text-align: left;
       width: 100%;
       padding-bottom: 20px;
   }
-
+.cameras{
+    padding-right: 15px;
+  }
   .camera-feed {
   width: 400px;
-  padding-right: 15px;
+
 }
 
 .log-item{

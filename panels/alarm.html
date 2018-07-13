@@ -1431,10 +1431,8 @@
 					this.settingsUpdate('themes', this.alarm.attributes.themes);
 				}*/
 
-				var themeName = this.alarm.attributes.panel.theme;
-
-				if (typeof themeName == 'string') this.updateTheme(themeName);
-	  		}
+				
+			}
 
 	  		getKeys(obj){
 	  			return Object.keys(obj);
@@ -1657,13 +1655,19 @@
                 this.setCarouselHeight(this.carouselMainSelected);
 			}
 
-	  		updateTheme(themeName){
-	  			var styles = {};
-			    for (var cssVar in this.alarm.attributes.themes[themeName]){
-					var style = '--' + cssVar.replace(new RegExp('_', 'g'), '-');
-					styles[style] = this.alarm.attributes.themes[themeName][cssVar];
-			    }
-			    this.updateStyles(styles);
+	  		updateTheme(){
+	  			if (this.alarm.attributes.panel){
+		  			var themeName = this.alarm.attributes.panel.theme;
+
+					if (typeof themeName == 'string'){
+			  			var styles = {};
+					    for (var cssVar in this.alarm.attributes.themes[themeName]){
+							var style = '--' + cssVar.replace(new RegExp('_', 'g'), '-');
+							styles[style] = this.alarm.attributes.themes[themeName][cssVar];
+					    }
+					    this.updateStyles(styles);
+					}
+				}
 	  		}
 
 	  		deleteTheme(ev){
@@ -1820,6 +1824,8 @@
 				this.carouselChange(this.$.controls);
 
 				this.$.carousel_main.style.height = '40vh'
+
+				this.updateTheme();
 			}
 
 			setupDt(){
@@ -1943,8 +1949,14 @@
 			//Monitors the alarm status for any changes
 			monitorAlarm(){
 
+				var themeName = null;
+
+				this.updateStyles({'--panel-outer-background-color': ''});
+				this.updateTheme();
+
 				if (this.alarm.attributes.panel) {
 					this.updatePanelStyles();
+					themeName = this.alarm.attributes.panel.theme;
 				}
 
 				//Resets countdown display
@@ -1967,6 +1979,13 @@
 					this.loadUITimer(false, this.alarm.attributes.states[this.alarm.attributes.arm_state].warning_time);
 				}
 
+				if (typeof themeName == 'string'){
+		  			var color = this.alarm.attributes.themes[themeName][this.alarm.state + '_color'];
+		  			if (color)
+						this.updateStyles({'--panel-outer-background-color': color});
+				}				
+
+
 				if (this.alarm.attributes.panel_locked == true){
 					console.log('Panel locked');
 					this.updateStyles({'--primary-color': 'grey'}); //[TODO] Implement panel locked color - this.alarm.attributes.colors['panel_locked});
@@ -1979,6 +1998,7 @@
 
 				
 				if (this.carouselMainSelected != null) this.setCarouselHeight(this.carouselMainSelected);
+
 			}
 
 			updatePanelStyles(){
@@ -2008,8 +2028,6 @@
 				if (this.alarm.attributes.panel.enable_serif_font) this.updateStyles({'--font-header': "'Lobster'"});
 				else this.updateStyles({'--font-header': "unset"});		
 
-
-				
 			}
 
 			//Loads the count down timer when arming the alarm
@@ -2079,12 +2097,9 @@
 
 						this.time = this.hass.states['sensor.time'].state;
 
-						if (this.alarm.attributes.panel.enable_clock_12hr){
-							if ((parseInt(String(this.time).split(':')[0]) - 12) > 0 ){
+						if (this.alarm.attributes.panel.enable_clock_12hr)
+							if ((parseInt(String(this.time).split(':')[0]) - 12) > 0 )
 								this.time = String( parseInt( String(this.time).split(':')[0] ) - 12 ) + ":" + String(this.time).split(':')[1];
-
-							}
-						}
 					}
 				}
 			}
@@ -2319,6 +2334,8 @@
 
 					//Call the service to update the yaml file
 					if (setting != null && value != null) this.settingsUpdate(setting, value);
+
+					this.updateTheme();
 				}
 			}
 
