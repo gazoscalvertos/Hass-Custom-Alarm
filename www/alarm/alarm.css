@@ -266,13 +266,7 @@ ha-label-badge {
    text-align: center;
 } 
 .cameras {
-  width: 400px;
-  padding-right: 15px;
   cursor: pointer;
-}
-
-.camera-feed {
-  width: 400px;
 }
 
 .camera-caption {
@@ -293,15 +287,37 @@ ha-label-badge {
   flex-direction: column;
   justify-content: center;
 }
+/* ################################################# height > 600px ############################################# */
+@media screen and (min-height: 600px) {
+  #status-bar {
+    margin-top: 15px;
+    margin-bottom: 15px;
 
-/* ################################################# XS < 767 ############################################# */
+  }
+}
+
+/* ################################################# width XS < 767 ############################################# */
 @media screen and (max-width: 767px) {
 
+#carousel_settings {
+    margin-right: 10px;
+    margin-left: 10px;
+        /*text-align: center;*/
+}
+#carousel_settings h1{
+text-align: center;
+  }
+#carousel_settings li{
+text-align: left;
+  }
   .log-item-date {
     font-weight: 300;    
     font-style: italic; 
     font-size: smaller;   
 }
+.camera-feed {
+  width: 300px;
+  }
   .content-box {
       width: 100%;
   }
@@ -312,16 +328,15 @@ ha-label-badge {
     padding-bottom: 30px;
   }
   div.arm paper-button {
-    width: 21vh;
-    height: 21vh;
+    width: 20vh;
+    height: 20vh;
     margin: 15px;
     font-size: large;
   }
   #status-bar {
   padding-top: 10px;
   padding-bottom: 10px;
-/*      margin-top: 10px;
-    margin-bottom: 10px;*/
+
   }
   #alarm-status span {
     font-size: x-large;
@@ -395,6 +410,11 @@ ha-label-badge {
       padding-bottom: 20px;
   }
 
+  .camera-feed {
+  width: 400px;
+  padding-right: 15px;
+}
+
 .log-item{
   display:flex;
   flex-direction:row;
@@ -437,8 +457,6 @@ ha-label-badge {
   #status-bar {
   padding-top: 30px;
   padding-bottom: 30px;
-      margin-top: 10px;
-    margin-bottom: 10px;
 }
   #alarm-status span {
    font-size: xx-large;
@@ -476,8 +494,8 @@ ha-label-badge {
    }
    div.digits paper-button, div.digits paper-iron-button{
     border-radius: var(--button-shape);
-    width: 120px;
-    height: 123px;
+    width: 115px;
+    height: 115px;
     border: 3px solid var(--dark-light-blue);
     background-color: var(--button-background-color);
     display: inline-block;
@@ -490,12 +508,9 @@ ha-label-badge {
   }
 }
 
-/* md */
+/* ######################################################### width > 1024 ################################################# */
 @media screen and (min-width: 992px) {
-  .content-box {
-      width: 100%;
-  }
-     #weather, #clock, #alarm-status {
+  #weather, #clock, #alarm-status {
      width: 33%;
    }
 }

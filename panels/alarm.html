@@ -443,7 +443,7 @@
 											<h1><iron-icon icon='mdi:heart-pulse' style='padding-right: 8px'></iron-icon>Help Support This Work</h1>
 
 											<span class='info-detail'>Thanks to the community for all the input into this. Consider supporting this project and donate! All funds will go towards bringing new features, hardware support and bug squashing! It is a community effort to make both the alarm and this smart panel feature-rich as well as simple to deploy and use. We need all the help we can get!</span>
-											<div class='setting-inner horizontal layout flexwrap'>
+											<div class='setting-inner horizontal layout flexwrap' style='    justify-content: center;'>
 
 												<div id='paypal' class='vertical layout donate'>
 													<span class='info-header'>Paypal:</span>
@@ -1793,15 +1793,18 @@
 				this.setupDt();
 
 				// Screen less than 1200 px
-				if ($(window).width() < 1200) {
-					if (!this.controlsLoaded) {
+				if ($(window).height() < 600) {
+					this.updateStyles({'--shadow-effect': 'unset'});
+/*					if (!this.controlsLoaded) {
 						//Add the keypad and controls to the carousel
 				    	this.controlsLoaded = true;
-					}
+					}*/
 				}
 				else {
-					//Remove the keypad and controls to the carousel
-					this.controlsLoaded = false;
+					if (this.alarm.attributes.panel.shadow_effect) this.updateStyles({'--shadow-effect': 'below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1))'});
+					else this.updateStyles({'--shadow-effect': 'unset'});
+/*					//Remove the keypad and controls to the carousel
+					this.controlsLoaded = false;*/
 				}
 
 				this.carouselMainSelected = this.$.carousel_template;
@@ -1983,10 +1986,7 @@
 				}
 				else this.updateStyles({'--button-shape': '0%'});
 
-				if (this.alarm.attributes.panel.shadow_effect){ 
-					this.updateStyles({'--shadow-effect': 'below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1))'});
-				}
-				else this.updateStyles({'--shadow-effect': 'unset'});
+
 
 				if (this.alarm.attributes.panel.hide_sidebar == true){
 					clearInterval(this.sidebarTimerId);
