@@ -29,9 +29,6 @@ panel:
   camera_update_interval: '5'
   cameras:
   - camera.garage
-  - camera.tv_room
-  - camera.outdoor
-  - camera.pool
 states:
   armed_away:
     immediate:

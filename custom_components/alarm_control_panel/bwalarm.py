@@ -411,7 +411,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._states                 = {}
         for state in self._config.get(CONF_STATES, {}):
             self._states[state]      = self._config[CONF_STATES][state]
-            self._allsensors = set(self._states[state]['immediate']) | set(self._states[state]['delayed']) | set(self._states[state]['override'])
+            self._allsensors = set(self._allsensors) | set(self._states[state]['immediate']) | set(self._states[state]['delayed']) | set(self._states[state]['override'])
 
         #-------------------------------------SENSORS--------------------------------------------------
         # self._immediate_by_state     = {state: self._config[state].get(CONF_IMMEDIATE, []) for state in SUPPORTED_PENDING_STATES}
@@ -560,10 +560,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         if (CONF_PANEL in self._config):
 
             panel = copy.deepcopy(self._config[CONF_PANEL])
-
-            # if (CONF_ADMIN_PASSWORD not in panel):
-            #     panel[CONF_ADMIN_PASSWORD] = 'HG28!!&dn'
-            # panel[CONF_ADMIN_PASSWORD] = hashlib.sha256(str.encode(panel[CONF_ADMIN_PASSWORD])).hexdigest()
 
             results[CONF_PANEL] = panel
 

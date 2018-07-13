@@ -126,17 +126,17 @@
 
 						<div id='weather' class='box box-header weather'>  
 							<template is='dom-if' if='[[alarm.attributes.panel.enable_weather]]'>
-								<div class='box'>  
+<!-- 								<div class='box'>   -->
 									<div class='weather-summary shadow'>
 										<span>[[temp]] &#176;C</span>
 									</div>
 									<div id='weather-icon' class='weather-summary'>
-										<object id='weather-svg' type='image/svg+xml' data='[[weather.attributes.entity_picture]]'></object>
+										<object id='weather_svg' class='weather-summary' type='image/svg+xml' data='[[weather.attributes.entity_picture]]'></object>
 									</div>
 									<div class='weather-summary shadow'>
 										<span>[[weather.state]]</span>
 									</div>
-								</div>
+<!-- 								</div> -->
 							</template>
 						</div>
 					</div>
@@ -304,7 +304,6 @@
 										<div class='sensors'>
 											<template is='dom-repeat' items='[[opensensors(alarm, allsensors)]]' as='entity'>
 												<state-card-display state-obj='[[entity]]' hass='[[hass]]' class='tappable' on-tap='entityTapped' data-entity$='[[entity.entity_id]]'></state-card-display>
-
 											</template>
 											<template is='dom-repeat' items='[[closedsensors(alarm, allsensors)]]' as='entity'>
 												<state-card-display state-obj='[[entity]]' hass='[[hass]]' class='tappable' on-tap='entityTapped' data-entity$='[[entity.entity_id]]'></state-card-display>
@@ -1994,6 +1993,8 @@
 
 				if (this.alarm.attributes.panel.enable_serif_font) this.updateStyles({'--font-header': "'Lobster'"});
 				else this.updateStyles({'--font-header': "unset"});
+
+				//console.log(this.$.weather.querySelector('weather-icon'));
 			}
 
 			//Loads the count down timer when arming the alarm
