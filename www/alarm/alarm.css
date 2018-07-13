@@ -320,8 +320,8 @@ ha-label-badge {
   #status-bar {
   padding-top: 10px;
   padding-bottom: 10px;
-      margin-top: 10px;
-    margin-bottom: 10px;
+/*      margin-top: 10px;
+    margin-bottom: 10px;*/
   }
   #alarm-status span {
     font-size: x-large;
@@ -383,6 +383,9 @@ ha-label-badge {
     margin: 8px;
     font-weight: 400;
   }
+    #code-display {
+       margin-bottom: 15px;
+  }
 }
 /* ############## SM > 768 ############### */
 @media screen and (min-width: 768px) {
@@ -421,6 +424,7 @@ ha-label-badge {
   }
   #code-display {
        margin-top: 20px;
+       margin-bottom: 40px;
   }
   div.arm paper-button {
     width: 150px;
@@ -632,7 +636,6 @@ div.code {
     width: 150px;
     border-bottom: solid;
     border-bottom-width: 1.3px;
-    margin-bottom: 40px;
     margin-top: auto;
     margin-right: auto;
     margin-left: auto;

@@ -82,3 +82,4 @@ themes: {}
 panic_code: '1234'
 passcode_attempts: '3'
 admin_password: q
+enable_perimeter_mode: true

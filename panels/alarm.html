@@ -225,7 +225,7 @@
 												<paper-button class='clear' on-click='callclearcode' raised>C</paper-button>
 												<paper-button on-click='callcode' data-digit=0 raised>0</paper-button>
 												<template is='dom-if' if='[[!isdisarmed(alarm)]]'> 
-													<paper-icon-button class='disarm' on-click='callAlarmService' data-call='alarm_disarm' icon='mdi:fingerprint' raised></paper-icon-button>
+													<paper-icon-button class='disarm' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
 												</template>
 											</div>
 										</div>
