@@ -193,6 +193,10 @@ a:hover {
 
 }
 
+.margin-left {
+  margin-left: -15px;
+}
+
 .carousel-cell {
   left: 1600px;
 
@@ -205,10 +209,7 @@ a:hover {
   -moz-transition: all 1s ease-in-out; /** Firefox **/
   -o-transition: all 1s ease-in-out; /** Opera **/
 
-  width: 95%; 
-  max-width: 95%;
-  margin-left: 15px;
-  margin-right: 15px;
+  width: 100%; 
   margin-bottom: 60px;
   color: var(--panel-text-color);
 }
@@ -386,7 +387,7 @@ ha-label-badge {
 /* ############## SM > 768 ############### */
 @media screen and (min-width: 768px) {
     .content-box {
-      height: 100%;
+      /*height: 100%;*/
       width: 100%;
       padding-bottom: 20px;
   }
@@ -508,7 +509,7 @@ ha-label-badge {
   }
 
   .content-box {
-      width: 50%;
+      width: 75%;
   }
   #controls {
 /*    width: 50% !important;
@@ -759,7 +760,6 @@ div.options paper-button{
 #main-title-text{
    width: 100%;
    position: relative;
-   margin-left: -15px;
    font-size: xx-large;
    font-family: var(--font-header);
 }

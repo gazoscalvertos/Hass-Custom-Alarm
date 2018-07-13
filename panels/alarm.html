@@ -1971,6 +1971,12 @@
 			}
 
 			updatePanelStyles(){
+
+				//Re-aligns title bar
+				var title = this.shadowRoot.querySelector('#main-title-text');
+				if (this.alarm.attributes.panel != null && (this.alarm.state == 'disarmed' || this.alarm.attributes.panel.hide_sidebar == false)) title.classList.add('margin-left');
+				else title.classList.remove('margin-left');
+
 				//Changes the shape of the buttons
 				if (this.alarm.attributes.panel.round_buttons){ 
 					this.updateStyles({'--button-shape': '50%'});

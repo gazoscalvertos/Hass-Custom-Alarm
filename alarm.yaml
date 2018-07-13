@@ -29,6 +29,9 @@ panel:
   camera_update_interval: '5'
   cameras:
   - camera.garage
+  - camera.pool
+  - camera.outdoor
+  - camera.tv_room
 states:
   armed_away:
     immediate:
@@ -60,7 +63,7 @@ states:
     - binary_sensor.back_door
     override:
     - binary_sensor.floorplan
-    pending_time: 0
+    pending_time: '10'
     warning_time: 0
     trigger_time: 600
   armed_perimeter:
