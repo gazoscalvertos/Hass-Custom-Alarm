@@ -554,9 +554,7 @@ paper-listbox {
 h1 {
   color: var(--title-color);
 }
-#weather-svg > svg {
-  fill: var(--weather-text-color);
-}
+
 #settings-nav {
   color: var(--primary-text-color);     
   justify-content: center;    
@@ -740,12 +738,10 @@ div.options paper-button{
 #weather-icon {
   width: 100px;
   text-align: center;
+  fill: var( --weather-text-color);
 }
 #weather-icon object {
   transform: scale(3,3);
-}
-#weather-icon object svg {
-   fill: var(--weather-text-color);
 }
 .weather-summary span {
    display: inline-block;
@@ -758,6 +754,7 @@ div.options paper-button{
    font-family: var(--font-header);
    color: var( --weather-text-color); 
 }
+
 #main-title-bar{
    display: -webkit-box;
    display: -ms-flexbox;

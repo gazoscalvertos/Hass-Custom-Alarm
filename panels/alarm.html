@@ -1998,9 +1998,16 @@
 				this.getPanelTitle();
 
 				if (this.alarm.attributes.panel.enable_serif_font) this.updateStyles({'--font-header': "'Lobster'"});
-				else this.updateStyles({'--font-header': "unset"});
+				else this.updateStyles({'--font-header': "unset"});		
 
-				//console.log(this.$.weather.querySelector('weather-icon'));
+				setTimeout(function(instance) 
+					{
+						if (instance.shadowRoot.querySelector('#weather_svg')) {
+							console.log(instance.shadowRoot.querySelector('#weather_svg'));
+							instance.shadowRoot.querySelector('#weather_svg').getSVGDocument().querySelectorAll('svg')[0].setAttribute("fill", window.getComputedStyle(instance.shadowRoot.querySelector('#weather-icon')).getPropertyValue("fill"));
+						}
+					}, 1000, this);
+				
 			}
 
 			//Loads the count down timer when arming the alarm
@@ -2379,6 +2386,26 @@
 				const node = options.node || this;
 				node.dispatchEvent(event);
 				return event;
+			}
+
+			getStyleRuleValue(style, selector) {
+				var selector_compare=selector.toLowerCase();
+				var selector_compare2= selector_compare.substr(0,1)==='.' ?  selector_compare.substr(1) : '.'+selector_compare;
+
+				for (var i = 0; i < document.styleSheets.length; i++) {
+				    var mysheet = document.styleSheets[i];
+				    var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+				    for (var j = 0; j < myrules.length; j++) {
+				        if (myrules[j].selectorText) {
+				            var check = myrules[j].selectorText.toLowerCase();
+				            switch (check) {
+				                case selector_compare  :
+				                case selector_compare2 : return myrules[j].style[style];
+				            }
+				        }
+				    }
+
+				}
 			}
 		}
 		customElements.define(HaPanelAlarm.is, HaPanelAlarm);

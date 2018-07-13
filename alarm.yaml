@@ -10,3 +10,79 @@
 
 platform: bwalarm
 name: House
+
+panel:
+  enable_sensors_panel: 'True'
+  panel_title: Home Alarm
+  enable_clock: 'True'
+  enable_clock_12hr: 'True'
+  enable_weather: 'True'
+  hide_passcode: 'True'
+  hide_sidebar: 'True'
+  round_buttons: false
+  enable_serif_font: 'True'
+  theme: ddd
+  floorplan: binary_sensor.floorplan
+  enable_floorplan_panel: 'True'
+  shadow_effect: 'True'
+  enable_camera_panel: 'True'
+  camera_update_interval: '5'
+  cameras:
+  - camera.garage
+  - camera.pool
+  - camera.outdoor
+  - camera.tv_room
+  enable_custom_panel: true
+states:
+  armed_away:
+    immediate:
+    - binary_sensor.kitchen_motion
+    - binary_sensor.garage_door
+    - binary_sensor.second_floor_motion
+    - binary_sensor.first_floor_motion
+    - binary_sensor.front_door
+    - binary_sensor.hall_motion
+    - binary_sensor.kitchen_window
+    - binary_sensor.floorplan
+    delayed: []
+    override:
+    - binary_sensor.hall_motion
+    - binary_sensor.kitchen_motion
+    - binary_sensor.floorplan
+    - binary_sensor.kitchen_window
+    - binary_sensor.front_door
+    - binary_sensor.first_floor_motion
+    pending_time: 0
+    warning_time: 0
+    trigger_time: '-1'
+  armed_home:
+    immediate:
+    - binary_sensor.front_door
+    - binary_sensor.first_floor_motion
+    delayed:
+    - binary_sensor.second_floor_motion
+    - binary_sensor.back_door
+    override:
+    - binary_sensor.floorplan
+    pending_time: '10'
+    warning_time: 0
+    trigger_time: 600
+  armed_perimeter:
+    immediate:
+    - binary_sensor.kitchen_window
+    delayed:
+    - binary_sensor.first_floor_motion
+    override: []
+    pending_time: 0
+    warning_time: 0
+    trigger_time: 600
+log: {}
+enable_persistence: true
+code: '9876'
+themes:
+  ddd:
+    weather_text_color: '#632CFF'
+panic_code: '1234'
+passcode_attempts: '3'
+admin_password: q
+enable_perimeter_mode: true
