@@ -579,17 +579,22 @@ class BWAlarm(alarm.AlarmControlPanel):
         return results;
 
     def yaml_load(self):
-        from ruamel.yaml                   import YAML
-        self.yaml = YAML()
-        with open(self._hass.config.path() + "/alarm.yaml") as stream:
-            try:
-                return self.yaml.load(stream)
-            except self.yaml.YAMLError as exc:
-                print(exc)
-        return None
+        try:
+            from ruamel.yaml                   import YAML
+            self.yaml = YAML()
+            with open(self._hass.config.path() + "/alarm.yaml") as stream:
+                try:
+                    return self.yaml.load(stream)
+                except self.yaml.YAMLError as exc:
+                    print(exc)
+            return None
+        except Exception as e:
+            _LOGGER.warning(e);
+
 
     def settings_save(self, configuration=None, value=None):
         """Push the alarm state to the given value."""
+        self._yaml_content = self.yaml_load() 
 
         configuration = configuration.lower();
         configDict = configuration.split('-')
@@ -971,7 +976,7 @@ class BWAlarm(alarm.AlarmControlPanel):
     def _update_log(self, name, message):
         self.changedbyuser = name
         if (CONF_LOG in self._config):
-            self._log_size = self._config[CONF_LOG][CONF_LOG_SIZE] if CONF_LOG_SIZE in self._config[CONF_LOG] else 10
+            self._log_size = int(self._config[CONF_LOG][CONF_LOG_SIZE]) if CONF_LOG_SIZE in self._config[CONF_LOG] else 10
             if self._log_size != -1 and len(self._config[CONF_LOG]["logs"]) >= self._log_size:
                 self._config[CONF_LOG]["logs"].remove(self._config[CONF_LOG]["logs"][0])
             self._config[CONF_LOG]["logs"].append({"name": name, "message": message, "dayTime": datetime.datetime.strftime(now(), "%H:%M %A")})

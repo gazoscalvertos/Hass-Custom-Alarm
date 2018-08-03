@@ -1529,7 +1529,7 @@
 
 	  			this.settingColors[15] = {
 	  				'name':'weather_image_color', 'header':'Weather Image', 'theme':themeName,
-	  				'description':'##WORK IN PROGRESS## The color of the Weather image.',
+	  				'description':'The color of the Weather image.',
 	  				'color': (theme != null && theme.weather_image_color != null) ? theme.weather_image_color  : 'black'};
 
 	  			this.settingColors[16] = {
@@ -1979,7 +1979,7 @@
 					this.loadUITimer(false, this.alarm.attributes.states[this.alarm.attributes.arm_state].warning_time);
 				}
 
-				if (typeof themeName == 'string'){
+				if (typeof themeName == 'string' && this.alarm.attributes.themes && this.alarm.attributes.themes[themeName]){
 		  			var color = this.alarm.attributes.themes[themeName][this.alarm.state + '_color'];
 		  			if (color)
 						this.updateStyles({'--panel-outer-background-color': color});

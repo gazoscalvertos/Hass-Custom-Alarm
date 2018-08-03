@@ -63,7 +63,7 @@
    --alarmstatus-text-color:         var(--dark-green); /*The text color of the Alarm Status*/
    --time-text-color:                var(--dark-white-text); /*The text color of the Time label*/
    --weather-text-color:             var(--dark-white-text); /*The text color of the Weather label.*/
-   --weather-image-color:            var(--dark-light-blue); /*##WORK IN PROGRESS## The color of the Weather image*/
+   --weather-image-color:            var(--dark-light-blue); /*The color of the Weather image*/
 
    --info-header-text-color:         white; /* The color of the Heading within a particular Section*/
    --info-detail-text-color:         var(--dark-green); /*The color of the descriptive text within a particular Section.*/
@@ -740,7 +740,7 @@ div.options paper-button{
 #weather-icon {
   width: 100px;
   text-align: center;
-  fill: var( --weather-text-color);
+  fill: var( --weather-image-color);
 }
 #weather-icon object {
   transform: scale(3,3);

@@ -10,3 +10,44 @@
 
 platform: bwalarm
 name: House
+panel:
+  cameras:
+  - camera.tv_room
+  - camera.pool
+  - camera.garage
+  enable_floorplan_panel: true
+  floorplan: binary_sensor.floorplan
+  enable_sensors_panel: true
+  enable_camera_panel: true
+  enable_custom_panel: true
+states:
+  armed_away:
+    immediate:
+    - binary_sensor.back_door
+    - binary_sensor.second_floor_motion
+    delayed:
+    - binary_sensor.kitchen_motion
+    - binary_sensor.kitchen_window
+    - binary_sensor.hall_motion
+    - binary_sensor.first_floor_motion
+    override: []
+    pending_time: 0
+    warning_time: 0
+    trigger_time: 600
+  armed_home:
+    immediate: []
+    delayed: []
+    override: []
+    pending_time: 0
+    warning_time: 0
+    trigger_time: 600
+  armed_perimeter:
+    immediate: []
+    delayed: []
+    override: []
+    pending_time: 0
+    warning_time: 0
+    trigger_time: 600
+admin_password: a
+log: {log_size: '5'}
+enable_perimeter_mode: true
