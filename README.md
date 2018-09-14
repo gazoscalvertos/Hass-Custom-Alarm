@@ -21,6 +21,9 @@ There are many improvements to be made in the code still and this is very much a
 Please test and provide feedback/suggestions.
 
 ### Change Log:
+- Updated alarm.html to 1.3.2
+- Fixed SVG slowdown
+
 - Updated alarm.html to 1.3.1
 - Fixed Mobile buttons
 

@@ -225,7 +225,9 @@ a:hover {
   top: 0;
 
   position: absolute;
-  
+  padding-left: 15px;
+  padding-right: 15px;
+
   transition: all 1s ease-in-out;
   -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
   -moz-transition: all 1s ease-in-out; /** Firefox **/
@@ -265,7 +267,7 @@ ha-label-badge {
    width: 100%;
 }
 .title{
-   font-size: x-large;
+   font-size: xx-large;
 /*   background-color: var(--panel-background-color);*/
    color:            var(--subtitle-text-color);
    text-align: center;
@@ -465,12 +467,12 @@ text-align: left;
        margin-bottom: 40px;
   }
   div.arm paper-button {
-    width: 150px;
-    height: 150px;
-    line-height: 110px;
+    width: 250px;
+    height: 250px;
+/*    line-height: 110px;*/
     margin: 20px;
     padding: 20px;
-    font-size: large;
+    font-size: x-large;
 }
   #alarm-status span {
    font-size: xx-large;
@@ -522,14 +524,42 @@ text-align: left;
   }
 }
 
-/* ######################################################### width > 1024 ################################################# */
-@media screen and (min-width: 992px) {
+/* ######################################################### width => 1024 ################################################# */
+@media screen and (min-width: 1024px) {
   #weather, #clock, #alarm-status {
      width: 33%;
    }
+   .info-detail {
+    font-size: large;
+   }
+   h1 {
+    font-size: x-large;
+   }
+
+   .settings-nav-inner{
+    margin-right: 20px;
+   }
+
+  .settings-nav-inner paper-icon-button {
+    width: 60px;
+    height: 60px;
+
+  }
+
+
+   #info-panel-selection paper-icon-button {
+    width: 60px;
+    height: 60px;
+    margin-left: 15px;
+  }
+  span, li, .settings-nav-text{
+    font-size: large;
+  }
+
+
 }
 
-/* lg */
+/* ######################################################### width => 1200 ################################################# */
 @media screen and (min-width: 1200px) {
   .md {
     display: none !important;
@@ -549,6 +579,9 @@ text-align: left;
     max-height: 60vh;
     height: auto;*/
   }
+
+
+
 }
 
 
@@ -582,12 +615,12 @@ h1 {
   text-align: center;
 }
 .settings-nav-inner {
-  max-width: 40px;
+/*  max-width: 40px;*/
   padding: 3px;
 }
-.settings-nav-text {
+/*.settings-nav-text {
   font-size: x-small;
-}
+}*/
 
 .info-header {
   color: var(--info-header-text-color);
@@ -618,12 +651,12 @@ h1 {
   color: var(--info-panel-buttons-color); 
   text-align: center; 
   width: 100%; 
-  padding: 10px 0;
+/*  padding: 10px 0;*/
   background: var(--panel-outer-background-color);
   position: fixed;
   bottom: 0;
   height: auto;
-  max-height: 60px;
+/*  max-height: 60px;*/
 }
 
 #main-content {
@@ -724,13 +757,14 @@ div.options paper-button{
     padding-bottom: 6px;
     -webkit-box-reflect: var(--shadow-effect);
 }
-#time {
+#time, #time span {
    color: var( --time-text-color);
    text-shadow: 1px 1px #6b8d9b;
    display: var(--time-display);
    font-size: xx-large;
    font-family: var(--font-header);
 }
+
 #middle {
    text-align: center;
    padding-left: 8px;

@@ -1,6 +1,6 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
 	https://github.com/gazoscalvertos/Hass-Custom-Alarm
-	VERSION:  1.3.1
+	VERSION:  1.3.2
 	MODIFIED: 14/09/18
 
 	CHANGE LOG:
@@ -26,7 +26,7 @@
   // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
   const _NAME = 'Security Panel';
   const _URL = 'https://github.com/gazoscalvertos/Hass-Custom-Alarm/';
-  const _VERSION = '14/09/18 v1.3.1';
+  const _VERSION = '14/09/18 v1.3.2';
 
   if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
   window.CUSTOM_UI_LIST.push({
@@ -433,7 +433,7 @@
 											<h1><iron-icon icon='mdi:heart-pulse' style='padding-right: 8px'></iron-icon>Help Support This Work</h1>
 
 											<span class='info-detail'>Thanks to the community for all the input into this. Consider supporting this project and donate! All funds will go towards bringing new features, hardware support and bug squashing! It is a community effort to make both the alarm and this smart panel feature-rich as well as simple to deploy and use. We need all the help we can get!</span>
-											<div class='setting-inner horizontal layout flexwrap' style='    justify-content: center;'>
+											<div class='setting-inner horizontal layout flexwrap' style='padding-top: 10px;'>
 
 												<div class='vertical layout donate-box'>
 													<div id='paypal' class='donate' data-address='ha.custom.alarm@gmail.com'>
@@ -941,7 +941,7 @@
 
 												<paper-listbox id='states-armed_away-immediate-checkbox' class='vertical layout' attr-for-selected="name"  multi selected-values='[[alarm.attributes.states.armed_away.immediate]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_away-immediate'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -952,7 +952,7 @@
 
 												<paper-listbox id='states-armed_away-delayed-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_away.delayed]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_away-delayed'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -963,7 +963,7 @@
 
 												<paper-listbox id='states-armed_away-override-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_away.override]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_away-override'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1011,7 +1011,7 @@
 
 												<paper-listbox id='states-armed_home-immediate-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_home.immediate]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_home-immediate'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1022,7 +1022,7 @@
 
 												<paper-listbox id='states-armed_home-delayed-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_home.delayed]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_home-delayed'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1033,7 +1033,7 @@
 
 												<paper-listbox id='states-armed_home-override-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_home.override]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_home-override'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1088,7 +1088,7 @@
 
 												<paper-listbox id='states-armed_perimeter-immediate-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_perimeter.immediate]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_perimeter-immediate'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1099,7 +1099,7 @@
 
 												<paper-listbox id='states-armed_perimeter-delayed-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_perimeter.delayed]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_perimeter-delayed'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1110,7 +1110,7 @@
 
 												<paper-listbox id='states-armed_perimeter-override-checkbox' class='vertical layout' attr-for-selected="name" multi selected-values='[[alarm.attributes.states.armed_perimeter.override]]' selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='states-armed_perimeter-override'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
-														<paper-checkbox name$="{{sensor}}" style='padding: 5px;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
+														<paper-checkbox name$="{{sensor}}" style='padding: 5px; font-size: large;' title$="{{sensor}}">[[computeFriendlyName(sensor)]]</paper-checkbox>
 													</template>
 												</paper-listbox>
 											</div>
@@ -1140,7 +1140,7 @@
 											<div class='setting-inner vertical layout'>
 												<paper-listbox id='panel-floorplan-listbox' class='vertical layout' attr-for-selected="name" on-selected-item-changed='settingsSave' data-type='listbox' data-setting='panel-floorplan'>
 													<template is='dom-repeat' items='{{binary_sensors}}' as='bs'>
-														<paper-item name="[[bs]]"' title$="{{bs}}">[[computeFriendlyName(bs)]]</paper-item>
+														<paper-item name="[[bs]]" style='font-size: large;' title$="{{bs}}">[[computeFriendlyName(bs)]]</paper-item>
 													</template>
 												</paper-listbox>
 											</div>	
@@ -1171,7 +1171,7 @@
 
 										<paper-listbox id='cameras-checkboxs' class='vertical layout' attr-for-selected="name" multi selected-values={{alarm.attributes.panel.cameras}} selected-attribute="checked" on-selected-items-changed='settingsSave' data-type='checkbox' data-setting='panel-cameras'>
 											<template is='dom-repeat' items='{{cameras}}' as='camera'>
-												<paper-checkbox name$="{{camera}}" style='padding: 5px;' title$="{{camera}}">[[computeFriendlyName(camera)]]</paper-checkbox>
+												<paper-checkbox name$="{{camera}}" style='padding: 5px; font-size: large;' title$="{{camera}}">[[computeFriendlyName(camera)]]</paper-checkbox>
 											</template>
 										</paper-listbox>
 									</div>
@@ -1412,7 +1412,7 @@
 					binary_sensors:  { type: Array, value: [] },
 
 					errors:          { type: Array }, 
-					version:         { type: String, value: '1.3.1'}, 
+					version:         { type: String, value: '1.3.2'}, 
 
 					camera_update_interval: { type: Number, value: 5000 }, // ms
 
@@ -1456,48 +1456,7 @@
 
 				//Determine screensize and set appropriate controls
 				this.setupUI();
-
-				/*var theme = {}; */
-
-/* 				theme.panel_background_color         = 'var(--dark-background)';
-				theme.panel_outer_background_color   = 'var(--dark-inner)';
-
-				theme.header_background_color        = 'var(--dark-background)';
-    			theme.header_text_color              = 'var(--dark-white-text)'; 
-
-				theme.primary_text_color             = 'white';
-
-				theme.alarmstatus_text_color         = 'var(--dark-green)';
-
-				theme.paper_listbox_background_color = 'unset';
-				theme.paper_listbox_color            = 'var(--dark-light-blue)';
-
-				theme.time_text_color                = 'white';
-				theme.weather_text_color             = 'white';
-
-				theme.subtitle_text                  = 'var(--dark-light-blue)';
-				theme.opensensors_title              = 'var(--dark-orange)';
-
-				theme.info_header_text               = 'var(--dark-orange)';
-				theme.info_detail_text               = 'var(--dark-green)';
-				theme.info_panel_buttons             = 'var(--dark-light-blue)';
-
-				theme.settings_title                 = 'var(--dark-orange)';
-				theme.setting_header                 = 'white';
-
-				theme.theme_text                     = 'var(--dark-white-text)';
-
-				theme.button_background              = 'var(--dark-background)';
-
-				theme.arm_button_border              = 'var(--dark-light-blue)';
-				theme.arm_button_text                = 'white';*/
-				
-/*				if (this.alarm.attributes.themes == null) {
-					this.alarm.attributes.themes = {'default' : theme};
-					this.settingsUpdate('themes', this.alarm.attributes.themes);
-				}*/
-
-				
+			
 			}
 
 	  		getKeys(obj){
@@ -1949,21 +1908,29 @@
 					this.controlsLoaded = false;*/
 				}
 				if ($(window).width() > 767) {
-				setTimeout(function(instance) 
-					{
-						if (instance.shadowRoot.querySelector('#weather_svg')) {
-							instance.shadowRoot.querySelector('#weather_svg').getSVGDocument().querySelectorAll('svg')[0].setAttribute("fill", window.getComputedStyle(instance.shadowRoot.querySelector('#weather-icon')).getPropertyValue("fill"));
-						}
-					}, 2000, this);
+				
+					if (this.alarm.attributes.panel){
+						this.weatherTimer = setInterval(() => this.updateWeatherSVG(), 500);	
+					}
+
 				}
 
 				this.carouselMainSelected = this.$.carousel_template;
 
 				this.carouselChange(this.$.controls);
 
-				this.$.carousel_main.style.height = '40vh'
+				this.$.carousel_main.style.height = '40vh';
 
 				this.updateTheme();
+			}
+
+			updateWeatherSVG() {
+				if (this.shadowRoot.querySelector('#weather_svg')) {
+					if (this.shadowRoot.querySelector('#weather_svg').getSVGDocument() != null){
+						this.shadowRoot.querySelector('#weather_svg').getSVGDocument().querySelectorAll('svg')[0].setAttribute("fill", window.getComputedStyle(this.shadowRoot.querySelector('#weather-icon')).getPropertyValue("fill"));
+						clearInterval(this.weatherTimer);
+					}
+				}
 			}
 
 			setupDt(){
