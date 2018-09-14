@@ -20,5 +20,13 @@ There are many improvements to be made in the code still and this is very much a
 
 Please test and provide feedback/suggestions.
 
+### Change Log:
+- Updated alarm.html to 1.3.0
+- Added user specific codes to settings page and they now work correctly with the logs.
+- The logs have been changed around and a few extra logs captured. I plan on expanding this.
+- Theres a bug in the persistance mode which I'm working on.
+- bwalarm.py updated to 1.1.0
+
+
 ### Features:
 - Too many to put in writing at this point!!

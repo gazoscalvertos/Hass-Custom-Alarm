@@ -1,12 +1,13 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.0.6
+  VERSION:  1.1.0
   MODIFIED: 03/08/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 
   CHANGE LOG:
   -Fixed log size issue
+  -implemented users
 
 """
 
@@ -24,6 +25,7 @@ import json
 import pytz
 import copy
 import hashlib
+import time
 
 from homeassistant.const         import (
     STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_DISARMED,
@@ -45,7 +47,7 @@ import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
-VERSION                            = '1.0.5'
+VERSION                            = '1.1.0'
 
 DOMAIN                             = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
@@ -83,6 +85,9 @@ CONF_STATES                        = 'states'
 CONF_USERS                         = 'users'
 CONF_NAME                          = 'name'
 CONF_PICTURE                       = 'picture'
+CONF_HOME_PERM                     = 'home_permision'
+CONF_AWAY_PERM                     = 'away_permission'
+CONF_PERI_PERM                     = 'perimiter_permission'
 CONF_ENABLED                       = 'enabled'
 CONF_CODE_TO_ARM                   = 'code_to_arm'
 CONF_PANIC_CODE                    = 'panic_code'
@@ -109,21 +114,8 @@ CONF_ENABLE_PERSISTENCE            = 'enable_persistence'
 #//----------------------PANEL RELATED------------------------------
 CONF_GUI                           = 'gui'
 CONF_PANEL                         = 'panel'
-CONF_ColorS                       = 'colors'
+CONF_ColorS                        = 'colors'
 CONF_THEMES                        = 'themes'
-# CONF_ENABLE_SENSORS_PANEL          = 'enable_sensors_panel'
-# CONF_ENABLE_CUSTOM_PANEL           = 'enable_custom_panel'
-# CONF_ENABLE_CAMERA_PANEL           = 'enable_camera_panel'
-# CONF_ENABLE_FLOORPLAN_PANEL        = 'enable_floorplan_panel'
-# CONF_HIDE_PASSCODE                 = 'hide_passcode'
-# CONF_HIDE_SIDEBAR                  = 'hide_sidebar'
-# CONF_CLOCK                         = 'clock'
-# CONF_WEATHER                       = 'weather'
-# CONF_LANGUAGE                      = 'language'
-# CONF_FLOORPLAN                     = 'floorplan'
-# CONF_ROUND_BUTTONS                 = 'round_buttons'
-# CONF_PANEL_TITLE                   = 'panel_title'
-# CONF_ENABLE_SERIF_FONT             = 'panel_enable_serif_font'
 CONF_ADMIN_PASSWORD                = 'admin_password'
 
 #//-----------------------ColorS------------------------------------
@@ -168,15 +160,15 @@ class Events(enum.Enum):
     Trigger                  = 7
     ArmPerimeter             = 8
 
-_USER_SCHEMA = vol.All(
-    vol.Schema({
-        vol.Required(CONF_NAME):                            cv.string,
-        vol.Optional(CONF_PICTURE):                         cv.string,
-        vol.Required(CONF_CODE):                            cv.string,
-        vol.Optional(CONF_ENABLED, default=True):           cv.boolean
-        ##ADD TIME BASED SETTINGS
-    })
-)
+class LOG(enum.Enum):
+    DISARMED = 0 #'disarmed the alarm'
+    DISARM_FAIL = 1 #'Failed to disarm alarm'
+    TRIGGERED = 2 #'alarm has been triggered!'
+    HOME = 3 #'set the alarm in Home mode'
+    AWAY = 4 #'set the alarm in Away mode'
+    TRIPPED = 5 #'Alarm has been tripped by: '
+    LOCKED = 6 #'Panel Locked
+    PERIMETER = 8 #'set the alarm in Perimeter mode'
 
 DEFAULT_PENDING_TIME = 0   #0 Seconds
 DEFAULT_WARNING_TIME = 0   #0 Seconds
@@ -206,20 +198,22 @@ def _state_schema():
     schema[vol.Optional(CONF_OVERRIDE,     default=[])]                   = cv.entity_ids # sensors that can be ignored if open when trying to set alarm
     return vol.Schema(schema)
 
-# ColorS_SCHEMA = vol.Schema({
-#     vol.Optional(CONF_WARNING_Color,    default='orange'):       cv.string,     # Custom color of warning
-#     vol.Optional(CONF_PENDING_Color,    default='orange'):       cv.string,     # Custom color of pending
-#     vol.Optional(CONF_DISARMED_Color,   default='#03A9F4'):      cv.string,     # Custom color of disarmed
-#     vol.Optional(CONF_TRIGGERED_Color,  default='red'):          cv.string,     # Custom color of triggered
-#     vol.Optional(CONF_ARMED_AWAY_Color, default='black'):        cv.string,     # Custom color of armed away
-#     vol.Optional(CONF_ARMED_HOME_Color, default='black'):        cv.string,     # Custom color of armed home
-#     vol.Optional(CONF_PERIMETER_Color,  default='black'):        cv.string,     # Custom color of perimeter
-#     vol.Optional(cv.slug):                                        cv.string,
-# })
-
 PANEL_SCHEMA = vol.Schema({
 	vol.Optional(CONF_CAMERAS):                                   cv.entity_ids,
     vol.Optional(cv.slug):                                        cv.string,
+})
+
+USER_SCHEMA = vol.Schema({
+    vol.Optional(cv.slug):                                        
+        vol.Schema({    
+            vol.Optional(CONF_PICTURE, default='/local/images/ha.png'):  cv.string,
+            vol.Required(CONF_CODE):                                     cv.string,
+            vol.Optional(CONF_ENABLED, default=True):                    cv.boolean
+            # vol.Optional(CONF_HOME_PERM, default=True):                  cv.boolean,
+            # vol.Optional(CONF_AWAY_PERM, default=True):                  cv.boolean,
+            # vol.Optional(CONF_PERI_PERM, default=True):                  cv.boolean
+            ##ADD TIME BASED SETTINGS
+        })
 })
 
 THEMES_SCHEMA = vol.Schema({
@@ -249,7 +243,7 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(CONF_CUSTOM_SUPPORTED_STATUSES_ON):               vol.Schema([cv.string]),
     vol.Optional(CONF_CUSTOM_SUPPORTED_STATUSES_OFF):              vol.Schema([cv.string]),
     vol.Optional(CONF_CODE):                                       cv.string,
-    vol.Optional(CONF_USERS):                                      vol.Schema([_USER_SCHEMA]), # Schema to hold the list of names with codes allowed to disarm the alarm
+    vol.Optional(CONF_USERS):                                      USER_SCHEMA, # Schema to hold the list of names with codes allowed to disarm the alarm
     vol.Optional(CONF_PANIC_CODE):                                 cv.string,
 
     #------------------------------STATE RELATED-------------------------
@@ -263,13 +257,6 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     #------------------------------GUI-----------------------------------
     vol.Optional(CONF_PANEL):                                        PANEL_SCHEMA,
     vol.Optional(CONF_THEMES):                                       THEMES_SCHEMA,
-    # vol.Optional(CONF_WARNING_Color, default='orange'):           cv.string,     # Custom color of warning display ###REMOVE###
-    # vol.Optional(CONF_PENDING_Color, default='orange'):           cv.string,     # Custom color of pending display ###REMOVE###
-    # vol.Optional(CONF_DISARMED_Color, default='#03A9F4'):         cv.string,     # Custom color of disarmed display ###REMOVE###
-    # vol.Optional(CONF_TRIGGERED_Color, default='red'):            cv.string,     # Custom color of triggered display ###REMOVE###
-    # vol.Optional(CONF_ARMED_AWAY_Color, default='black'):         cv.string,     # Custom color of armed away display ###REMOVE###
-    # vol.Optional(CONF_ARMED_HOME_Color, default='black'):         cv.string,     # Custom color of armed home display ###REMOVE###
-    # vol.Optional(CONF_PERIMETER_Color, default='black'):          cv.string,     # Custom color of perimeter display ###REMOVE###
 
     #---------------------------OPTIONAL MODES---------------------------
     vol.Optional(CONF_LOG):                                        vol.Any(vol.Schema({vol.Optional(CONF_LOG_SIZE): vol.All(vol.Coerce(int), vol.Range(min=-1))}), None), 
@@ -287,42 +274,35 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=-1):      vol.All(vol.Coerce(int), vol.Range(min=-1)),
 
     #---------------------------MQTT RELATED------------------------------
-    # vol.Optional(CONF_MQTT):                                       _mqtt_schema(),
     vol.Optional(CONF_MQTT):                                         vol.Any(MQTT_SCHEMA, None), #cv.boolean, # Allows MQTT functionality
-    # vol.Optional(CONF_QOS, default=0):                             vol.All(vol.Coerce(int), vol.Range(min=0)), ###REMOVE###
-    # vol.Optional(CONF_STATE_TOPIC, default='home/alarm'):          cv.string, ###REMOVE###
-    # vol.Optional(CONF_COMMAND_TOPIC, default='home/alarm/set'):    cv.string, ###REMOVE###
-    # vol.Optional(CONF_PAYLOAD_ARM_AWAY, default='ARM_AWAY'):       cv.string, ###REMOVE###
-    # vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):       cv.string, ###REMOVE###
-    # vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):     cv.string, ###REMOVE###
-    # vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):           cv.string, ###REMOVE###
-    # vol.Optional(CONF_OVERRIDE_CODE, default=False):               cv.boolean, ###REMOVE###
-    # vol.Optional(CONF_PENDING_ON_WARNING, default=False):          cv.boolean, ###REMOVE###
-
-
-
-    #---------------------------CAMERA RELATED----------------------------
-    # vol.Optional(CONF_CAMERAS):                                    cv.entity_ids, #List of cameras
 
     #---------------------------YAML RELATED----------------------------
-    # vol.Optional(CONF_ADMIN_PASSWORD, default='HG28!!&dn'):        cv.string, #Admin panel password
     vol.Optional(CONF_YAML_ALLOW_EDIT, default=True):              cv.boolean, #Allow alarm.yaml to be edited
     #-----------------------------END------------------------------------
 }, _state_validator))
 
 SERVICE_YAML_SAVE  = 'ALARM_YAML_SAVE'
+SERVICE_YAML_USER  = 'ALARM_YAML_USER'
 
 CONF_CONFIGURATION      = 'configuration'
 CONF_VALUE              = 'value'
 
-# YAML_SAVE_SERVICE_SCHEMA = vol.Schema({
-#     vol.Required(CONF_CONFIGURATION): cv.string,
-#     vol.Required(CONF_VALUE):         cv.string,
-# })
+CONF_USER               = 'user'
+CONF_COMMAND            = 'command'
 
 _LOGGER = logging.getLogger(__name__)
 
+try:
+    from ruamel.yaml                   import YAML
+except Exception as e:
+    _LOGGER.warning('Import Error: %s. Attempting to download and import', e)
 
+# from ruamel.yaml                   import YAML
+
+# import importlib
+# yaml_spec = importlib.util.find_spec("ruamel.yaml")
+# found = yaml_spec is not None
+# _LOGGER.warning(found)
 
 @asyncio.coroutine
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
@@ -340,8 +320,13 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     @callback
     def alarm_yaml_save(service):
         alarm.settings_save(service.data.get(CONF_CONFIGURATION), service.data.get(CONF_VALUE))
+
+    @callback
+    def alarm_yaml_user(service):
+        alarm.settings_user(service.data.get(CONF_USER), service.data.get(CONF_COMMAND))
      
     hass.services.async_register(DOMAIN, SERVICE_YAML_SAVE, alarm_yaml_save)
+    hass.services.async_register(DOMAIN, SERVICE_YAML_USER, alarm_yaml_user)
   
 class BWAlarm(alarm.AlarmControlPanel):
 
@@ -355,49 +340,8 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         self._updateUI = False
 
-        #---------------------------------------SENSORS--------------------------------------------
-
-
-        #------------------------------------OPTIONAL MODES---------------------------------------
-        # self._code_to_arm            = config[CONF_CODE_TO_ARM]
-        # self._enable_log             = config[CONF_LOG]
-        
-        # self._enable_persistence     = config[CONF_ENABLE_PERSISTENCE]
-
-
-
-    #     #-------------------------------------MQTT--------------------------------------------------
-    #     self._mqtt                   = config[CONF_MQTT]
-    #     # self._qos                    = config[CONF_QOS]
-    #     # self._state_topic            = config[CONF_STATE_TOPIC]
-    #     # self._command_topic          = config[CONF_COMMAND_TOPIC]
-    #     # self._payload_disarm         = config[CONF_PAYLOAD_DISARM]
-    #     # self._payload_arm_home       = config[CONF_PAYLOAD_ARM_HOME]
-    #     # self._payload_arm_away       = config[CONF_PAYLOAD_ARM_AWAY]
-    #     # self._payload_arm_night      = config[CONF_PAYLOAD_ARM_NIGHT]
-    #     # self._override_code          = config[CONF_OVERRIDE_CODE]
-    #     # self._pending_on_warning     = config[CONF_PENDING_ON_WARNING]
-    #         vol.Optional(CONF_STATE_TOPIC, default='home/alarm'):          cv.string,
-    # vol.Optional(CONF_COMMAND_TOPIC, default='home/alarm/set'):    cv.string,
-    # vol.Optional(CONF_PAYLOAD_ARM_AWAY, default='ARM_AWAY'):       cv.string,
-    # vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):       cv.string,
-    # vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):     cv.string,
-    # vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):           cv.string,
-    # vol.Optional(CONF_OVERRIDE_CODE, default=False):               cv.boolean,
-    # vol.Optional(CONF_PENDING_ON_WARNING, default=False):          cv.boolean,
-
-
-
-
-
-
-
     def init_variables(self):
         #-------------------------------------STATE SPECIFIC--------------------------------------------------
-        # self._trigger_time_by_state = {state: self._config[state][CONF_TRIGGER_TIME] for state in SUPPORTED_PENDING_STATES}
-        # self._pending_time_by_state = {state: self._config[state][CONF_PENDING_TIME] for state in SUPPORTED_PENDING_STATES}
-        # self._warning_time_by_state = {state: self._config[state][CONF_WARNING_TIME] for state in SUPPORTED_PENDING_STATES}
-
         self._supported_statuses_on  = self._config.get(CONF_CUSTOM_SUPPORTED_STATUSES_ON,  []) + SUPPORTED_STATUSES_ON
         self._supported_statuses_off = self._config.get(CONF_CUSTOM_SUPPORTED_STATUSES_OFF, []) + SUPPORTED_STATUSES_OFF
 
@@ -412,24 +356,10 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._allsensors = set(self._allsensors) | set(self._states[state]['immediate']) | set(self._states[state]['delayed']) | set(self._states[state]['override'])
 
         #-------------------------------------SENSORS--------------------------------------------------
-        # self._immediate_by_state     = {state: self._config[state].get(CONF_IMMEDIATE, []) for state in SUPPORTED_PENDING_STATES}
-        # self._delayed_by_state       = {state: self._config[state].get(CONF_DELAYED,   []) for state in SUPPORTED_PENDING_STATES}
-        # self._override_by_state      = {state: self._config[state].get(CONF_OVERRIDE,  []) for state in SUPPORTED_PENDING_STATES}
         self.immediate               = None
         self.delayed                 = None
         self.override                = None
         self._opensensors            = None
-
-        # for state in SUPPORTED_PENDING_STATES:
-        #     for value in self._immediate_by_state[state]:
-        #         if value not in self._allsensors:
-        #             self._allsensors.append(value)
-        #     for value in self._delayed_by_state[state]:
-        #         if value not in self._allsensors:
-        #             self._allsensors.append(value)
-        #     for value in self._override_by_state[state]:
-        #         if value not in self._allsensors:
-        #             self._allsensors.append(value)
 
         #------------------------------------CORE ALARM RELATED------------------------------------- 
         self._enable_perimeter_mode  = self._config[CONF_ENABLE_PERIMETER_MODE]
@@ -549,24 +479,21 @@ class BWAlarm(alarm.AlarmControlPanel):
             'py_version':               sys.version_info,
         }
 
-        users = []
-
-        for entity in self._users:
-            users.append('{"name":"' + entity['name'] + '","enabled":"' + str(entity['enabled']) + '", "picture":"' + entity['picture'] + '"}')
-        results['users'] = users
+        if (CONF_USERS in self._config):
+            users = copy.deepcopy(self._config[CONF_USERS])
+            for user in users:
+                users[user]['code'] = '****'
+            results[CONF_USERS] = users
 
         if (CONF_PANEL in self._config):
-
-            panel = copy.deepcopy(self._config[CONF_PANEL])
-
-            results[CONF_PANEL] = panel
+            results[CONF_PANEL] = self._config[CONF_PANEL]
 
         if (CONF_THEMES in self._config):
-
             results[CONF_THEMES] = self._config[CONF_THEMES]
 
         if (CONF_LOG in self._config):
             results[CONF_LOG] = self._config[CONF_LOG]
+            results[CONF_LOG]['logs'] = self._config[CONF_LOG]['logs'][-10:]
 
         if (CONF_MQTT in self._config):
             results[CONF_MQTT] = self._config[CONF_MQTT]
@@ -578,7 +505,6 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def yaml_load(self):
         try:
-            from ruamel.yaml                   import YAML
             self.yaml = YAML()
             with open(self._hass.config.path() + "/alarm.yaml") as stream:
                 try:
@@ -636,6 +562,30 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         self.init_variables()
 
+        self.schedule_update_ha_state()
+
+    def settings_user(self, user=None, command=None):
+        """Push the alarm state to the given value."""
+        self._yaml_content = self.yaml_load() 
+
+        if (command == 'update'):
+             if ('users' not in self._config):
+                self._config['users'] = user
+                self._yaml_content['users'] = user
+             else:
+                self._config['users'].update(user)
+                self._yaml_content['users'].update(user)
+        elif (command == 'delete'):
+             self._config['users'].pop(user, None)
+             self._yaml_content['users'].pop(user, None)
+
+        #Trigger a GUI update
+        self._updateUI = not self._updateUI
+
+        with open(self._hass.config.path() + "/alarm.yaml", 'w') as fil:
+            self.yaml.dump(self._yaml_content, fil)
+
+        self.init_variables()
         self.schedule_update_ha_state()
 
     ### LOAD persistence previously saved
@@ -735,79 +685,47 @@ class BWAlarm(alarm.AlarmControlPanel):
         if self._validate_panic_code(code):
             self.process_event(Events.Disarm)
             self._panic_mode = "ACTIVE"
-            self._update_log('HA', 'Alarm disarmed') #Show a default disarm message incase this is displayed on the interface
+            self._update_log('HA', LOG.DISARMED, None) #Show a default disarm message incase this is displayed on the interface
             # Let HA know that something changed
             self.schedule_update_ha_state()
             return
 
         if not self._validate_code(code):
+            self._update_log('', LOG.DISARM_FAIL, None)
             return
         self.process_event(Events.Disarm)
 
-    def alarm_arm_home(self, code=None):
+    def alarm_arm(self, code, mode):
+        user = 'HA'
         if code == "override": #ARM THE ALARM IMMEDIATELY
-            self.process_event(Events.ArmHome, True)
-            self._update_log('HA', 'Alarm set in Home mode')
-            return
-
-        for entity in self._users:
-            if entity['code'] == code:
-                self._update_log(entity['name'], 'alarm set in Home mode')
-                self.process_event(Events.ArmHome)
-                return
-
-        if self._config[CONF_CODE_TO_ARM]:
-            if code == self._code:
-                self._update_log('HA', 'Alarm set in Home mode')
-                self.process_event(Events.ArmHome)
+            self.process_event(mode, True)
         else:
-            self._update_log('HA', 'Alarm set in Home mode')
-            self.process_event(Events.ArmHome)
+            for entity in self._users:
+                if self._users[entity]['enabled'] == True:
+                    if self._users[entity]['code'] == code:
+                        user = entity
+                        self.process_event(mode)
 
+            if self._config[CONF_CODE_TO_ARM]:
+                if code == self._code:
+                    self.process_event(mode)
+            else:
+                self.process_event(mode)
+
+        self._update_log(user, mode, None)
+
+    def alarm_arm_home(self, code=None):
+        self.alarm_arm(code, Events.ArmHome)
 
     def alarm_arm_away(self, code=None):
-        if code == "override": #ARM THE ALARM IMMEDIATELY
-            self.process_event(Events.ArmAwat, True)
-            self._update_log('HA', 'Alarm set in Away mode')
-            return
-
-        for entity in self._users:
-            if entity['code'] == code:
-                self._update_log(entity['name'], 'alarm set in Away mode')
-                self.process_event(Events.ArmAway)
-                return
-
-        if self._config[CONF_CODE_TO_ARM]:
-            if code == self._code:
-                self._update_log('HA', 'Alarm set in Away mode')
-                self.process_event(Events.ArmAway)
-        else:
-            self._update_log('HA', 'Alarm set in Away mode')
-            self.process_event(Events.ArmAway)
+        self.alarm_arm(code, Events.ArmAway)
 
     def alarm_arm_night(self, code=None):
-        if code == "override": #ARM THE ALARM IMMEDIATELY
-            self.process_event(Events.ArmPerimeter, True)
-            self._update_log('HA', 'Alarm set in Perimeter mode')
-            return
-
-        for entity in self._users:
-            if entity['code'] == code:
-                self._update_log(entity['name'], 'alarm set in Perimeter mode')
-                self.process_event(Events.ArmPerimeter)
-                return
-
-        if self._config[CONF_CODE_TO_ARM]:
-            if code == self._code:
-                self._update_log('HA', 'Alarm set in Perimeter mode')
-                self.process_event(Events.ArmPerimeter)
-        else:
-            self._update_log('HA', 'Alarm set in Perimeter mode')
-            self.process_event(Events.ArmPerimeter)
+        self.alarm_arm(code, Events.ArmPerimeter)
 
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
-        self._update_log('HA', 'Alarm has been triggered')
+        self._update_log('', LOG.TRIGGERED, None)
 
     ### Internal processing
     def setsignals(self, alarmMode):
@@ -885,7 +803,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 if self._config.get(CONF_WARNING):
                     switch.turn_on(self._hass, self._config.get(CONF_WARNING))
                 self._timeoutat = now() +  datetime.timedelta(seconds=int(self._states[self._armstate][CONF_WARNING_TIME]))
-                self._update_log('HA', 'Alarm has been tripped by: ' + self._lasttrigger)
+                self._update_log('', LOG.TRIPPED, self._lasttrigger)
             elif new_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning on alarm")
                 if self._config.get(CONF_ALARM):
@@ -894,7 +812,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                     self._timeoutat = now() + datetime.timedelta(hours=int(24))
                 else:
                     self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_TRIGGER_TIME]))
-                self._update_log('HA', 'Alarm has been triggered by: ' + self._lasttrigger)
+                self._update_log('', LOG.TRIPPED, self._lasttrigger)
             elif new_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Pending user leaving house")
                 if self._config.get(CONF_WARNING):
@@ -936,7 +854,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         if ((self._passcode_attempt_allowed == -1) or (self._passcodeAttemptNo <= self._passcode_attempt_allowed)):
             check = self._code is None or code == self._code or self._validate_user_codes(code)
             if code == self._code: 
-                self._update_log('HA', "Disarmed the alarm")
+                self._update_log('HA', LOG.DISARMED, None)
             return self._validate_code_attempts(check)
         else:
             _LOGGER.warning("[ALARM] Too many passcode attempts, try again later")
@@ -944,9 +862,10 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def _validate_user_codes(self, code):
         for entity in self._users:
-            if entity['code'] == code:
-                self._update_log(entity['name'], "disarmed the alarm")
-                return True
+            if self._users[entity]['enabled'] == True:
+                if self._users[entity]['code'] == code:
+                    self._update_log(entity, LOG.DISARMED, None)
+                    return True
         return False
 
     def _validate_code_attempts(self, check):
@@ -959,7 +878,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self._panel_locked = True
                 self._passcode_timeoutat = now() + datetime.timedelta(seconds=int(self._passcode_attempt_timeout))
                 _LOGGER.warning("[ALARM] Panel locked, too many passcode attempts!")
-                self._update_log('HA', 'Panel locked')
+                self._update_log('', LOG.LOCKED, None)
         self.schedule_update_ha_state()
         return check
 
@@ -971,13 +890,13 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._passcodeAttemptNo = 0
         return check
 
-    def _update_log(self, name, message):
+    def _update_log(self, name, message, entity_id):
         self.changedbyuser = name
         if (CONF_LOG in self._config):
             self._log_size = int(self._config[CONF_LOG][CONF_LOG_SIZE]) if CONF_LOG_SIZE in self._config[CONF_LOG] else 10
             if self._log_size != -1 and len(self._config[CONF_LOG]["logs"]) >= self._log_size:
                 self._config[CONF_LOG]["logs"].remove(self._config[CONF_LOG]["logs"][0])
-            self._config[CONF_LOG]["logs"].append({"name": name, "message": message, "dayTime": datetime.datetime.strftime(now(), "%H:%M %A")})
+            self._config[CONF_LOG]["logs"].append([time.time(), name, message.value, entity_id])
             self.log_save()
 
     ### Actions from the outside world that affect us, turn into enum events for internal processing
