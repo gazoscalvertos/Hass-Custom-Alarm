@@ -1,9 +1,10 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
 	https://github.com/gazoscalvertos/Hass-Custom-Alarm
-	VERSION:  1.3.0
-	MODIFIED: 07/09/18
+	VERSION:  1.3.1
+	MODIFIED: 14/09/18
 
 	CHANGE LOG:
+	-Fixed mobile buttons
 	-Integrated users and specific user codes
 		-Changed this function around and added support into the settings screens
 
@@ -25,7 +26,7 @@
   // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
   const _NAME = 'Security Panel';
   const _URL = 'https://github.com/gazoscalvertos/Hass-Custom-Alarm/';
-  const _VERSION = '07/09/18 v1.3.0';
+  const _VERSION = '14/09/18 v1.3.1';
 
   if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
   window.CUSTOM_UI_LIST.push({
@@ -1411,7 +1412,7 @@
 					binary_sensors:  { type: Array, value: [] },
 
 					errors:          { type: Array }, 
-					version:         { type: String, value: '1.3.0'}, 
+					version:         { type: String, value: '1.3.1'}, 
 
 					camera_update_interval: { type: Number, value: 5000 }, // ms
 
