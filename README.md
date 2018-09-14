@@ -21,6 +21,9 @@ There are many improvements to be made in the code still and this is very much a
 Please test and provide feedback/suggestions.
 
 ### Change Log:
+- Updated alarm.html to 1.3.1
+- Fixed Mobile buttons
+
 - Updated alarm.html to 1.3.0
 - Added user specific codes to settings page and they now work correctly with the logs.
 - The logs have been changed around and a few extra logs captured. I plan on expanding this.

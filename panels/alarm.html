@@ -25,7 +25,7 @@
   // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
   const _NAME = 'Security Panel';
   const _URL = 'https://github.com/gazoscalvertos/Hass-Custom-Alarm/';
-  const _VERSION = '30/05/18 v1.3.0';
+  const _VERSION = '07/09/18 v1.3.0';
 
   if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
   window.CUSTOM_UI_LIST.push({
@@ -209,10 +209,10 @@
 											        </template> 
 												</div>
 												<div class='xs digits horizontal layout center-justified'>
-													<paper-button class='clear action-button on-click='callclearcode' raised>C</paper-button>
+													<paper-button class='clear action-button' on-click='callclearcode' raised>C</paper-button>
 													<paper-button on-click='callcode' data-digit=0 raised>0</paper-button>
 													<template is='dom-if' if='[[!isdisarmed(alarm)]]'> 
-														<paper-icon-button class='disarm action-button on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
+														<paper-icon-button class='disarm action-button' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
 													</template>
 												</div>
 											</div>
