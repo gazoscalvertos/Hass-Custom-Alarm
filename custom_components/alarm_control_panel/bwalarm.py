@@ -1,13 +1,12 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.1.0
-  MODIFIED: 03/08/18
+  VERSION:  1.1.1
+  MODIFIED: 15/10/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 
   CHANGE LOG:
-  -Fixed log size issue
-  -implemented users
+  -Fixed switch.turn_on/off issue
 
 """
 
@@ -801,13 +800,13 @@ class BWAlarm(alarm.AlarmControlPanel):
             if new_state == STATE_ALARM_WARNING:
                 _LOGGER.debug("[ALARM] Turning on warning")
                 if self._config.get(CONF_WARNING):
-                    switch.turn_on(self._hass, self._config.get(CONF_WARNING))
+                    self._hass.services.call("switch", "turn_on", self._config.get(CONF_WARNING))
                 self._timeoutat = now() +  datetime.timedelta(seconds=int(self._states[self._armstate][CONF_WARNING_TIME]))
                 self._update_log('', LOG.TRIPPED, self._lasttrigger)
             elif new_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning on alarm")
                 if self._config.get(CONF_ALARM):
-                    switch.turn_on(self._hass, self._config.get(CONF_ALARM))
+                    self._hass.services.call("switch", "turn_on", self._config.get(CONF_ALARM))
                 if (self._states[self._armstate][CONF_TRIGGER_TIME] == -1):
                     self._timeoutat = now() + datetime.timedelta(hours=int(24))
                 else:
@@ -816,7 +815,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif new_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Pending user leaving house")
                 if self._config.get(CONF_WARNING):
-                    switch.turn_on(self._hass, self._config.get(CONF_WARNING))
+                    self._hass.services.call("switch", "turn_on", self._config.get(CONF_WARNING))
                 self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_PENDING_TIME]))
                 #self._returnto = STATE_ALARM_ARMED_AWAY
                 self.setsignals(self._armstate)
@@ -837,12 +836,12 @@ class BWAlarm(alarm.AlarmControlPanel):
             if old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Turning off warning")
                 if self._config.get(CONF_WARNING):
-                    switch.turn_off(self._hass, self._config.get(CONF_WARNING))
+                    self._hass.services.call("switch", "turn_off", self._config.get(CONF_WARNING))
                 
             elif old_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning off alarm")
                 if self._config.get(CONF_ALARM):
-                    switch.turn_off(self._hass, self._config.get(CONF_ALARM))
+                    self._hass.services.call("switch", "turn_off", self._config.get(CONF_ALARM))
 
             # Let HA know that something changed
             if self._config[CONF_ENABLE_PERSISTENCE]:
