@@ -1,9 +1,12 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.0.3
-  MODIFIED: 15/10/18
+  VERSION:  1.0.4
+  MODIFIED: 16/10/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
+  
+  Change log:
+  -Fixed switch.turn_on/off
 """
 import asyncio
 import sys
@@ -563,15 +566,15 @@ class BWAlarm(alarm.AlarmControlPanel):
             # Things to do on entering state
             if new_state == STATE_ALARM_WARNING:
                 _LOGGER.debug("[ALARM] Turning on warning")
-                self._hass.services.call("switch", "turn_on", self._warning)
+                self._hass.services.call("switch", "turn_on", {self._warning})
                 self._timeoutat = now() +  datetime.timedelta(seconds=self._pending_time_by_state[self._armstate])
             elif new_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning on alarm")
-                self._hass.services.call("switch", "turn_on", self._alarm)
+                self._hass.services.call("switch", "turn_on", {self._alarm})
                 self._timeoutat = now() + datetime.timedelta(seconds=self._trigger_time_by_state[self._armstate])
             elif new_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Pending user leaving house")
-                self._hass.services.call("switch", "turn_on", self._warning)
+                self._hass.services.call("switch", "turn_on", {self._warning})
                 self._timeoutat = now() + datetime.timedelta(seconds=self._pending_time_by_state[self._armstate])
                 #self._returnto = STATE_ALARM_ARMED_AWAY
                 self.setsignals(self._armstate)
@@ -591,11 +594,11 @@ class BWAlarm(alarm.AlarmControlPanel):
             # Things to do on leaving state
             if old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Turning off warning")
-                self._hass.services.call("switch", "turn_off", self._warning)
+                self._hass.services.call("switch", "turn_off", {self._warning})
                 
             elif old_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning off alarm")
-                self._hass.services.call("switch", "turn_off", self._alarm)
+                self._hass.services.call("switch", "turn_off", {self._alarm})
 
             # Let HA know that something changed
             if self._persistence:
