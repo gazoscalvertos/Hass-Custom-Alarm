@@ -1,7 +1,7 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.0.4
+  VERSION:  1.0.5
   MODIFIED: 16/10/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
   
