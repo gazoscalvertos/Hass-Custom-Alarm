@@ -25,10 +25,11 @@ The default password to access the settings page is: **HG28!!&dn**
 Please test and provide feedback/suggestions.
 
 ### Features:
-- Multi Language Support (NEW)
 - State specific groups and times (NEW)
+- User specific codes
 - Panic Mode
 - MQTT Integration
+- Floorplan Integration
 - Alarm State Persistence on reboots/power restore
 - Lockout of HA sidebar when armed
 - Custom Panel allowing your own html to display whatever you choose (Cameras, Sliding Images etc)
