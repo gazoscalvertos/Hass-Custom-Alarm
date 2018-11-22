@@ -20,9 +20,7 @@ platform: bwalarm
 name: House
 ```
 
-The default password to access the settings page is: HG28!!&dn
-
-There are many improvements to be made in the code still and this is very much an alpha release and should not be used in a live environment!!
+The default password to access the settings page is: **HG28!!&dn**
 
 Please test and provide feedback/suggestions.
 
