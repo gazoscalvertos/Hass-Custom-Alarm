@@ -1,6 +1,5 @@
 # Home Assistant - Custom Alarm Interface!
 ## Intro :-)
-<img align="right" width="376.5" height="525" src="https://github.com/gazoscalvertos/Hass-Custom-Alarm/blob/master/BTC.png">
 
 ### Branch DEV:
 Hi everyone, I thought it was time to show the progress of the new UI. Still very much a work in progress but its close!! There are bugs which I'll log in github to allow me to keep track, please feel free to share. Mobile responsiveness needs looking at as does a few other bits and pieces such as default HA colours, status colours, user defined codes.
