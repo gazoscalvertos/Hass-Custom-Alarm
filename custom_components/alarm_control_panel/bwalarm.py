@@ -1,6 +1,7 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
+
   VERSION:  1.1.3
   MODIFIED: 13/11/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
@@ -959,4 +960,5 @@ class BWAlarm(alarm.AlarmControlPanel):
                 state = STATE_ALARM_PENDING
 
             self._mqtt.async_publish(self._hass, self._state_topic, state, self._qos, True)
+
             _LOGGER.debug("[ALARM/MQTT] State changed")
