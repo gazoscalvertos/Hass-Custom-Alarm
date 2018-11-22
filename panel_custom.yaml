@@ -3,3 +3,17 @@
     sidebar_icon: mdi:security-home
     config:
       alarmid: alarm_control_panel.house
+
+    # This is the name of the web component that will be defined by the panel
+  - name: react-panel
+    sidebar_title: React Demo
+    sidebar_icon: mdi:react
+    # This is the url that will load the panel
+    url_path: react-panel-demo
+    # Location where the panel is hosted during development
+    js_url: http://192.168.0.2:8080/main.js
+    # We want to load in an iframe to work around limitations in React
+    embed_iframe: true
+    # This will be available as prop `panel.config`.
+    config:
+      name: World

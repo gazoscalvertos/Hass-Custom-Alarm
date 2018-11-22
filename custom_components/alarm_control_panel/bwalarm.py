@@ -1,13 +1,20 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.1.0
-  MODIFIED: 03/08/18
+  VERSION:  1.1.3
+  MODIFIED: 13/11/18
   GazosCalvertos: Yet another take on a custom alarm for Home Assistant
 
   CHANGE LOG:
-  -Fixed log size issue
-  -implemented users
+  -Fixed PERSISTENCE
+  -Removed Windows line breaks
+  -fixed mqtt?
+  -fixed automation/switch trigger
+  -added option to disable animations in panel
+  -Rejigged logs
+  -modified mqtt config
+  -fixed 0.82 compatibility
+  -fixed persistance mode
 
 """
 
@@ -26,12 +33,13 @@ import pytz
 import copy
 import hashlib
 import time
+import uuid
 
 from homeassistant.const         import (
     STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_DISARMED,
     STATE_ALARM_PENDING, STATE_ALARM_TRIGGERED, CONF_PLATFORM, CONF_NAME,
     CONF_CODE, CONF_PENDING_TIME, CONF_TRIGGER_TIME, CONF_DISARM_AFTER_TRIGGER,
-    CONF_DELAY_TIME, EVENT_STATE_CHANGED, EVENT_TIME_CHANGED, 
+    CONF_DELAY_TIME, EVENT_STATE_CHANGED, EVENT_TIME_CHANGED,
     STATE_ON, STATE_OFF)
 
 from operator                    import attrgetter
@@ -47,7 +55,7 @@ import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
-VERSION                            = '1.1.0'
+VERSION                            = '1.1.3'
 
 DOMAIN                             = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
@@ -84,6 +92,7 @@ SUPPORTED_STATUSES_OFF             = [STATE_OFF, STATE_FALSE, STATE_LOCKED, STAT
 CONF_STATES                        = 'states'
 CONF_USERS                         = 'users'
 CONF_NAME                          = 'name'
+CONF_ID                            = 'id'
 CONF_PICTURE                       = 'picture'
 CONF_HOME_PERM                     = 'home_permision'
 CONF_AWAY_PERM                     = 'away_permission'
@@ -117,6 +126,7 @@ CONF_PANEL                         = 'panel'
 CONF_ColorS                        = 'colors'
 CONF_THEMES                        = 'themes'
 CONF_ADMIN_PASSWORD                = 'admin_password'
+CONF_DISABLE_ANIMATIONS            = 'disable_animations'
 
 #//-----------------------ColorS------------------------------------
 CONF_WARNING_Color                = 'warning_color'
@@ -129,6 +139,7 @@ CONF_PERIMETER_Color              = 'perimeter_color'
 
 #//-----------------------MQTT RELATED-------------------------------
 CONF_MQTT                          = 'mqtt'
+CONF_ENABLE_MQTT                   = 'enable_mqtt'
 CONF_OVERRIDE_CODE                 = 'override_code'
 CONF_PAYLOAD_DISARM                = 'payload_disarm'
 CONF_PAYLOAD_ARM_HOME              = 'payload_arm_home'
@@ -140,14 +151,15 @@ CONF_COMMAND_TOPIC                 = 'command_topic'
 CONF_PENDING_ON_WARNING            = 'pending_on_warning'
 
 #//-----------------------LOG RELATED--------------------------------
-CONF_LOG                           = 'log'
+CONF_ENABLE_LOG                    = 'enable_log'
 CONF_LOG_SIZE                      = 'log_size'
+CONF_LOGS                          = 'logs'
 
 #//-----------------------CAMERA RELATED--------------------------------
 CONF_CAMERAS                       = 'cameras'
 
 #//-----------------------YAML RELATED--------------------------------
-# 
+#
 CONF_YAML_ALLOW_EDIT               = 'yaml_allow_edit'
 
 class Events(enum.Enum):
@@ -203,33 +215,34 @@ PANEL_SCHEMA = vol.Schema({
     vol.Optional(cv.slug):                                        cv.string,
 })
 
-USER_SCHEMA = vol.Schema({
-    vol.Optional(cv.slug):                                        
-        vol.Schema({    
+USER_SCHEMA = vol.Schema([{
+            vol.Required(CONF_ID, default=uuid.uuid4().hex):             cv.string,
+            vol.Required(CONF_NAME):                                     cv.string,
             vol.Optional(CONF_PICTURE, default='/local/images/ha.png'):  cv.string,
             vol.Required(CONF_CODE):                                     cv.string,
-            vol.Optional(CONF_ENABLED, default=True):                    cv.boolean
+            vol.Optional(CONF_ENABLED, default=True):                    cv.boolean,
+            vol.Optional(CONF_DISABLE_ANIMATIONS, default=False):        cv.boolean
             # vol.Optional(CONF_HOME_PERM, default=True):                  cv.boolean,
             # vol.Optional(CONF_AWAY_PERM, default=True):                  cv.boolean,
             # vol.Optional(CONF_PERI_PERM, default=True):                  cv.boolean
             ##ADD TIME BASED SETTINGS
-        })
-})
+}])
 
-THEMES_SCHEMA = vol.Schema({
-    vol.Optional(cv.slug):                                        vol.Schema({vol.Optional(cv.slug): cv.string,}),
-})
+THEMES_SCHEMA = vol.Schema([{
+    vol.Optional(cv.slug):                                        cv.string,
+}])
 
 MQTT_SCHEMA = vol.Schema({
-    vol.Optional(CONF_QOS):                                       vol.All(vol.Coerce(int), vol.Range(min=0)),
-    vol.Optional(CONF_STATE_TOPIC):                               cv.string,
-    vol.Optional(CONF_COMMAND_TOPIC):                             cv.string,
-    vol.Optional(CONF_PAYLOAD_ARM_AWAY):                          cv.string,
-    vol.Optional(CONF_PAYLOAD_ARM_HOME):                          cv.string,
-    vol.Optional(CONF_PAYLOAD_ARM_NIGHT):                         cv.string,
-    vol.Optional(CONF_PAYLOAD_DISARM):                            cv.string,
-    vol.Optional(CONF_OVERRIDE_CODE):                             cv.boolean,
-    vol.Optional(CONF_PENDING_ON_WARNING):                        cv.boolean,
+    vol.Required(CONF_ENABLE_MQTT, default=False):                cv.boolean,
+    vol.Optional(CONF_QOS, default=0):                            vol.All(vol.Coerce(int), vol.Range(min=0)),
+    vol.Optional(CONF_STATE_TOPIC, default='home/alarm'):         cv.string,
+    vol.Optional(CONF_COMMAND_TOPIC, default='home/alarm/set'):   cv.string,
+    vol.Optional(CONF_PAYLOAD_ARM_AWAY, default='ARM_AWAY'):      cv.string,
+    vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):      cv.string,
+    vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):    cv.string,
+    vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):          cv.string,
+    vol.Optional(CONF_OVERRIDE_CODE, default=False):              cv.boolean,
+    vol.Optional(CONF_PENDING_ON_WARNING, default=False):         cv.boolean,
 })
 
 PLATFORM_SCHEMA = vol.Schema(vol.All({
@@ -259,9 +272,11 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(CONF_THEMES):                                       THEMES_SCHEMA,
 
     #---------------------------OPTIONAL MODES---------------------------
-    vol.Optional(CONF_LOG):                                        vol.Any(vol.Schema({vol.Optional(CONF_LOG_SIZE): vol.All(vol.Coerce(int), vol.Range(min=-1))}), None), 
+    vol.Optional(CONF_ENABLE_LOG, default=True):                   cv.boolean,
+    vol.Optional(CONF_LOG_SIZE, default=10):                       vol.All(vol.Coerce(int), vol.Range(min=-1)),
+    vol.Optional(CONF_LOGS):                                       vol.Schema([cv.string]),
     #---------------------------LOG RELATED------------------------------
-    
+
     vol.Optional(CONF_ENABLE_PERIMETER_MODE, default=False):       cv.boolean,    # Enable perimeter mode?
     vol.Optional(CONF_ENABLE_PERSISTENCE, default=False):          cv.boolean,    # Enables persistence for alarm state
     vol.Optional(CONF_CODE_TO_ARM, default=False):                 cv.boolean,    # Require code to arm alarm?
@@ -271,10 +286,10 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
 
     #--------------------------PASSWORD ATTEMPTS--------------------------
     vol.Optional(CONF_PASSCODE_ATTEMPTS, default=-1):              vol.All(vol.Coerce(int), vol.Range(min=-1)),
-    vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=-1):      vol.All(vol.Coerce(int), vol.Range(min=-1)),
+    vol.Optional(CONF_PASSCODE_ATTEMPTS_TIMEOUT, default=900):      vol.All(vol.Coerce(int), vol.Range(min=1)),
 
     #---------------------------MQTT RELATED------------------------------
-    vol.Optional(CONF_MQTT):                                         vol.Any(MQTT_SCHEMA, None), #cv.boolean, # Allows MQTT functionality
+    vol.Required(CONF_MQTT, default={CONF_ENABLE_MQTT: False}):                                       MQTT_SCHEMA, #vol.Any(MQTT_SCHEMA, None), #cv.boolean, # Allows MQTT functionality
 
     #---------------------------YAML RELATED----------------------------
     vol.Optional(CONF_YAML_ALLOW_EDIT, default=True):              cv.boolean, #Allow alarm.yaml to be edited
@@ -297,19 +312,12 @@ try:
 except Exception as e:
     _LOGGER.warning('Import Error: %s. Attempting to download and import', e)
 
-# from ruamel.yaml                   import YAML
-
-# import importlib
-# yaml_spec = importlib.util.find_spec("ruamel.yaml")
-# found = yaml_spec is not None
-# _LOGGER.warning(found)
-
 @asyncio.coroutine
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 
     #Setup MQTT if enabled
     mqtt = None
-    if (CONF_MQTT in config):
+    if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
         import homeassistant.components.mqtt as mqtt
     alarm = BWAlarm(hass, config, mqtt)
     hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
@@ -324,10 +332,10 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     @callback
     def alarm_yaml_user(service):
         alarm.settings_user(service.data.get(CONF_USER), service.data.get(CONF_COMMAND))
-     
+
     hass.services.async_register(DOMAIN, SERVICE_YAML_SAVE, alarm_yaml_save)
     hass.services.async_register(DOMAIN, SERVICE_YAML_USER, alarm_yaml_user)
-  
+
 class BWAlarm(alarm.AlarmControlPanel):
 
     def __init__(self, hass, config, mqtt):
@@ -361,14 +369,14 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.override                = None
         self._opensensors            = None
 
-        #------------------------------------CORE ALARM RELATED------------------------------------- 
+        #------------------------------------CORE ALARM RELATED-------------------------------------
         self._enable_perimeter_mode  = self._config[CONF_ENABLE_PERIMETER_MODE]
         self._panic_mode             = 'deactivated'
         self._lasttrigger            = ""
         self._timeoutat              = None
         self._passcode_timeoutat     = None
 
-        #------------------------------------PASSCODE RELATED------------------------------------- 
+        #------------------------------------PASSCODE RELATED-------------------------------------
         self._code                   = self._config.get(CONF_CODE, None)
         self._users                  = self._config.get(CONF_USERS, [])
         self._panic_code             = self._config.get(CONF_PANIC_CODE, None)
@@ -382,25 +390,25 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         #-------------------------------------MQTT--------------------------------------------------
         # IF MQTT Enabled define its configuration
-        if (CONF_MQTT in self._config):    
-            # If MQTT enabled but is empty then set default values
-            if (self._config[CONF_MQTT] == None): self._config[CONF_MQTT] = {}
+        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
+            # # If MQTT enabled but is empty then set default values
+            # if (self._config[CONF_MQTT] == None): self._config[CONF_MQTT] = {}
 
-            self._qos                   = self._config[CONF_MQTT].get(CONF_QOS, 0)
-            self._state_topic           = self._config[CONF_MQTT].get(CONF_STATE_TOPIC, 'home/alarm')
-            self._command_topic         = self._config[CONF_MQTT].get(CONF_COMMAND_TOPIC, 'home/alarm/set')
-            self._payload_disarm        = self._config[CONF_MQTT].get(CONF_PAYLOAD_DISARM, 'DISARM')
-            self._payload_arm_home      = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_HOME, 'ARM_HOME')
-            self._payload_arm_away      = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_AWAY, 'ARM_HOME')
-            self._payload_arm_night     = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_NIGHT, 'ARM_NIGHT')
-            self._override_code         = self._config[CONF_MQTT].get(CONF_OVERRIDE_CODE, False)
-            self._pending_on_warning    = self._config[CONF_MQTT].get(CONF_PENDING_ON_WARNING, False)
+            self._qos                   = self._config[CONF_MQTT].get(CONF_QOS)
+            self._state_topic           = self._config[CONF_MQTT].get(CONF_STATE_TOPIC)
+            self._command_topic         = self._config[CONF_MQTT].get(CONF_COMMAND_TOPIC)
+            self._payload_disarm        = self._config[CONF_MQTT].get(CONF_PAYLOAD_DISARM)
+            self._payload_arm_home      = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_HOME)
+            self._payload_arm_away      = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_AWAY)
+            self._payload_arm_night     = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_NIGHT)
+            self._override_code         = self._config[CONF_MQTT].get(CONF_OVERRIDE_CODE)
+            self._pending_on_warning    = self._config[CONF_MQTT].get(CONF_PENDING_ON_WARNING)
 
         #------------------------------------LOGGING--------------------------------------------------------
         # IF logging Enabled define its configuration
-        if (CONF_LOG in self._config):
-            self._config[CONF_LOG]['logs']  = []
-            self._log_size = self._config[CONF_LOG].get(CONF_LOG_SIZE, 10) 
+        if (CONF_ENABLE_LOG in self._config):
+            self._config[CONF_LOGS]  = []
+            self._log_size = self._config.get(CONF_LOG_SIZE, 10)
 
             # Get the log file or create one if it doesnt exist
             log_path       = self._hass.config.path()
@@ -410,8 +418,17 @@ class BWAlarm(alarm.AlarmControlPanel):
                self._log_final_path = os.path.join(log_path, "alarm_log.json")
                self.log_load()
 
+
+        #------------------------------------YAML--------------------------------------------------------
+        # self._yaml_allow_edit                = self._config[CONF_YAML_ALLOW_EDIT]
+        # if (self._yaml_allow_edit):
+        self._yaml_content = self.yaml_load()
+
+        # Reset Alarm
+        self.clearsignals()
+
         #------------------------------------PERSISTENCE----------------------------------------------------
-        self._persistence_list  = []
+        self._persistence_list  = json.loads('{}')
         if (self._config[CONF_ENABLE_PERSISTENCE]):
            persistence_path     = self._hass.config.path()
 
@@ -419,21 +436,17 @@ class BWAlarm(alarm.AlarmControlPanel):
               _LOGGER.error("[ALARM] Persistence path %s does not exist.", persistence_path)
            else:
               self._persistence_final_path = os.path.join(persistence_path, "alarm.json")
-              self.persistence_load()
+              if (self.persistence_load()):
+                  self._state     = self._persistence_list["state"]
+                  self._timeoutat = pytz.UTC.localize(datetime.datetime.strptime(self._persistence_list["timeoutat"].split(".")[0].replace("T"," "), '%Y-%m-%d %H:%M:%S')) if self._persistence_list["timeoutat"] != None else None
+                  self._returnto  = self._persistence_list["returnto"]
+                  self._armstate  = self._persistence_list["armstate"]
 
-              self._state     = self._persistence_list["state"]
-              self._timeoutat = pytz.UTC.localize(datetime.datetime.strptime(self._persistence_list["timeoutat"].split(".")[0].replace("T"," "), '%Y-%m-%d %H:%M:%S')) if self._persistence_list["timeoutat"] != None else None
-              self._returnto  = self._persistence_list["returnto"]
-
-              self.save_alarm_state()
-
-        #------------------------------------YAML--------------------------------------------------------
-        # self._yaml_allow_edit                = self._config[CONF_YAML_ALLOW_EDIT]         
-        # if (self._yaml_allow_edit):
-        self._yaml_content = self.yaml_load()  
-
-        # Reset Alarm
-        self.clearsignals()
+                  if (self._armstate != "disarmed"):
+                      self._states    = self._persistence_list["states"]
+                      self.immediate  = self._states[self._state]["immediate"]
+                      self.delayed    = self._states[self._state]["delayed"]
+                      self.override   = self._states[self._state]["override"]
 
     # Alarm properties
     @property
@@ -458,7 +471,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             'panel_locked':             self._panel_locked,
             'passcode_attempts':        self._passcode_attempt_allowed,
-            'passcode_attempt_timeout': self._passcode_attempt_timeout,
+            'passcode_attempts_timeout': self._passcode_attempt_timeout,
 
             'changedbyuser':            self.changedbyuser,
             'panic_mode':               self._panic_mode,
@@ -467,6 +480,9 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             'enable_perimeter_mode':    self._config[CONF_ENABLE_PERIMETER_MODE],
             'enable_persistence':       self._config[CONF_ENABLE_PERSISTENCE],
+
+            'enable_log':               self._config[CONF_ENABLE_LOG],
+            'log_size':                 self._config[CONF_LOG_SIZE],
 
             'supported_statuses_on':    self._supported_statuses_on,
             'supported_statuses_off':   self._supported_statuses_off,
@@ -482,7 +498,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         if (CONF_USERS in self._config):
             users = copy.deepcopy(self._config[CONF_USERS])
             for user in users:
-                users[user]['code'] = '****'
+                user['code'] = '****'
             results[CONF_USERS] = users
 
         if (CONF_PANEL in self._config):
@@ -491,9 +507,8 @@ class BWAlarm(alarm.AlarmControlPanel):
         if (CONF_THEMES in self._config):
             results[CONF_THEMES] = self._config[CONF_THEMES]
 
-        if (CONF_LOG in self._config):
-            results[CONF_LOG] = self._config[CONF_LOG]
-            results[CONF_LOG]['logs'] = self._config[CONF_LOG]['logs'][-10:]
+        if (CONF_LOGS in self._config):
+            results[CONF_LOGS] = self._config[CONF_LOGS][-10:]
 
         if (CONF_MQTT in self._config):
             results[CONF_MQTT] = self._config[CONF_MQTT]
@@ -518,67 +533,55 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def settings_save(self, configuration=None, value=None):
         """Push the alarm state to the given value."""
-        self._yaml_content = self.yaml_load() 
+        self._yaml_content = self.yaml_load()
 
-        configuration = configuration.lower();
-        configDict = configuration.split('-')
+        configuration = configuration.lower()
 
-        # TODO REWORK THIS AS ITS SLOPPY
-        if ( len(configDict) == 1 ):
-            if (configuration == 'log' or configuration == 'mqtt'):
-                if (value): 
-                    self._config[configuration] = dict()
-                    self._yaml_content[configuration] = dict()
-                else: 
-                    self._config.pop(configuration, None)
-                    self._yaml_content.pop(configuration, None)
-            else:
-                self._config[configuration] = value
-                self._yaml_content[configuration] = value
-        if ( len(configDict) == 2 ):
-            self._config[ configDict[0] ][ configDict[1] ] = value
-            self._yaml_content[ configDict[0] ][ configDict[1] ] = value
-        if ( len(configDict) == 3 ):
-            self._config[ configDict[0] ][ configDict[1] ][ configDict[2] ] = value
-            self._yaml_content[ configDict[0] ][ configDict[1] ][ configDict[2] ] = value
-        if ( len(configDict) == 4 ):
-            self._config[ configDict[0] ][ configDict[1] ][ configDict[2] ][ configDict[3] ] = value
-            self._yaml_content[ configDict[0] ][ configDict[1] ][ configDict[2] ][ configDict[3] ] = value
-        if ( len(configDict) == 5 ):
-            self._config[ configDict[0] ][ configDict[1] ][ configDict[2] ][ configDict[3] ][ configDict[4] ]  = value
-            self._yaml_content[ configDict[0] ][ configDict[1] ][ configDict[2] ][ configDict[3] ][ configDict[4] ]  = value
-
-
-
-        #Trigger a GUI update
-        self._updateUI = not self._updateUI
-
-        # yaml = YAML()
-
-        with open(self._hass.config.path() + "/alarm.yaml", 'w') as fil:
-            self.yaml.dump(self._yaml_content, fil)
+        self._config[configuration] = value
+        self._yaml_content[configuration] = value
 
         _LOGGER.debug("Set the yaml entry %s to %s", configuration, value)
 
-        self.init_variables()
-
-        self.schedule_update_ha_state()
+        self.settings_yaml_save()
 
     def settings_user(self, user=None, command=None):
         """Push the alarm state to the given value."""
-        self._yaml_content = self.yaml_load() 
+        self._yaml_content = self.yaml_load()
 
-        if (command == 'update'):
-             if ('users' not in self._config):
-                self._config['users'] = user
-                self._yaml_content['users'] = user
-             else:
-                self._config['users'].update(user)
-                self._yaml_content['users'].update(user)
+        x = 0
+
+        if (command == 'add'):
+            if user['id'] == None:
+                user['id'] = uuid.uuid4().hex
+            if ('users' not in self._config):
+                self._config['users'] = [user]
+                self._yaml_content['users'] = [user]
+            else:
+                _LOGGER.warning(user)
+                self._config['users'].append(user)
+                self._yaml_content['users'].append(user)
+        elif (command == 'update'):
+            for _user in self._config['users']:
+                if _user['id'] == user['id']:
+                    self._config['users'][x] = user
+                    self._yaml_content['users'][x] = user
+                x = x + 1
         elif (command == 'delete'):
-             self._config['users'].pop(user, None)
-             self._yaml_content['users'].pop(user, None)
+            for _user in self._config['users']:
+                if _user['id'] == user:
+                    self._config['users'].pop(x)
+                    self._yaml_content['users'].pop(x)
+                x = x + 1
+        elif (command == True or command == False):
+            for _user in self._config['users']:
+                if _user['id'] == user:
+                    self._config['users'][x]['enabled'] = command
+                    self._yaml_content['users'][x]['enabled'] = command
+                x = x + 1
 
+        self.settings_yaml_save()
+
+    def settings_yaml_save(self):
         #Trigger a GUI update
         self._updateUI = not self._updateUI
 
@@ -587,21 +590,24 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         self.init_variables()
         self.schedule_update_ha_state()
+
 
     ### LOAD persistence previously saved
     def persistence_load(self):
         try:
            if os.path.isfile(self._persistence_final_path):  #Find the persistence JSON file and load. Once found update the alarm_control_panel object
               self._persistence_list = json.load(open(self._persistence_final_path, 'r'))
+              return True
            else: #No persistence file found
               _LOGGER.warning("[ALARM] Persistence file doesnt exist")
-              self._persistence_list = json.loads('{"state":"disarmed", "timeoutat":null, "returnto":null}')
+              return False
+              #self._persistence_list = json.loads('{"state":"disarmed", "timeoutat":null, "returnto":null, "immediate":[], "delayed":[], "override":[], "states":{}, "armstate":"disarmed"}')
 
         except Exception as e:
-           _LOGGER.error("[ALARM] Error occured loading: %s", str(e))
+           _LOGGER.error("[ALARM] Persistence error occured loading: %s", str(e))
 
     ### UPDATE persistence
-    def persistence_save(self, persistence): 
+    def persistence_save(self, persistence):
         if persistence is not None: #Check we have something to save [TODO] validate this is a persistence object
             self._persistence_list = persistence
             try:
@@ -611,30 +617,30 @@ class BWAlarm(alarm.AlarmControlPanel):
                else:
                   _LOGGER.error("[ALARM] No persistence to save!")
             except Exception as e:
-               _LOGGER.error("[ALARM] Error occured saving: %s", str(e))
+               _LOGGER.error("[ALARM] Persistence Error occured saving: %s", str(e))
 
     ### LOAD activity log previously saved
     def log_load(self):
         try:
-           if os.path.isfile(self._log_final_path):  #Find the persistence JSON file and load. Once found update the alarm_control_panel object
-              self._config[CONF_LOG]['logs'] = json.load(open(self._log_final_path, 'r'))
-           else: #No persistence file found
+           if os.path.isfile(self._log_final_path):  #Find the log file and load.
+              self._config[CONF_LOGS] = json.load(open(self._log_final_path, 'r'))
+           else: #No log file found
               _LOGGER.warning("[ALARM] Activity log file doesnt exist")
-              self._config[CONF_LOG]['logs'] = []
+              self._config[CONF_LOGS] = []
               self.log_save()
         except Exception as e:
            _LOGGER.error("[ALARM] Error occured loading: %s", str(e))
 
     ### UPDATE activity log
-    def log_save(self): 
+    def log_save(self):
         try:
-           if self._config[CONF_LOG]['logs'] is not []: #Check we have genuine log to save if so dump to file
+           if self._config[CONF_LOGS] is not []: #Check we have genuine log to save if so dump to file
               with open(self._log_final_path, 'w') as fil:
-                 fil.write(json.dumps(self._config[CONF_LOG]['logs'], ensure_ascii=False))
+                 fil.write(json.dumps(self._config[CONF_LOGS], ensure_ascii=False))
            else:
               _LOGGER.error("[ALARM] No log to save!")
         except Exception as e:
-           _LOGGER.error("[ALARM] Error occured saving: %s", str(e))
+           _LOGGER.error("[ALARM] Log Error occured saving: %s", str(e))
 
 
     ### Save alarm state
@@ -642,8 +648,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._persistence_list["state"]     = self._state
         self._persistence_list["timeoutat"] = self._timeoutat.isoformat() if self._timeoutat != None else None
         self._persistence_list["returnto"]  = self._returnto
+        self._persistence_list["states"]  = self._states
+        self._persistence_list["armstate"]  = self._armstate
         self.persistence_save(self._persistence_list)
-    
+
     ### Actions from the outside world that affect us, turn into enum events for internal processing
     def time_change_listener(self, eventignored):
         """ I just treat the time events as a periodic check, its simpler then (re-/un-)registration """
@@ -670,7 +678,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                         self.process_event(Events.DelayedTrip)
 
     # def check_open_sensors(self):
-    #     for sensor in self._allsensors:    
+    #     for sensor in self._allsensors:
     #         if self._hass.states.get(sensor).state != None:
     #             if self._hass.states.get(sensor).state in self._supported_statuses_on:
     #                 _LOGGER.error(self._hass.states.get(sensor)) # do summit
@@ -680,7 +688,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         """One or more characters."""
         return None if self._code is None else '.+'
 
-    def alarm_disarm(self, code=None):     
+    def alarm_disarm(self, code=None):
         #If the provided code matches the panic alarm then deactivate the alarm but set the state of the panic mode to active.
         if self._validate_panic_code(code):
             self.process_event(Events.Disarm)
@@ -691,7 +699,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             return
 
         if not self._validate_code(code):
-            self._update_log('', LOG.DISARM_FAIL, None)
+            self._update_log('HA', LOG.DISARM_FAIL, None)
             return
         self.process_event(Events.Disarm)
 
@@ -701,9 +709,9 @@ class BWAlarm(alarm.AlarmControlPanel):
             self.process_event(mode, True)
         else:
             for entity in self._users:
-                if self._users[entity]['enabled'] == True:
-                    if self._users[entity]['code'] == code:
-                        user = entity
+                if entity['enabled'] == True:
+                    if entity['code'] == code:
+                        user = entity['id']
                         self.process_event(mode)
 
             if self._config[CONF_CODE_TO_ARM]:
@@ -725,7 +733,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
-        self._update_log('', LOG.TRIGGERED, None)
+        self._update_log('HA', LOG.TRIGGERED, None)
 
     ### Internal processing
     def setsignals(self, alarmMode):
@@ -746,24 +754,24 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def process_event(self, event, override_pending_time=False):
         old_state = self._state
-        
+
         #Update the state of the alarm panel
         if event == Events.Disarm:
             self._state = STATE_ALARM_DISARMED
 
         elif event == Events.Trigger:
-            self._state = STATE_ALARM_TRIGGERED 
+            self._state = STATE_ALARM_TRIGGERED
 
         #If there is a pending time set in either of the state configs then drop into pending mode else simply arm the alarm
         elif old_state == STATE_ALARM_DISARMED:
-            if   event == Events.ArmHome:       
+            if   event == Events.ArmHome:
                 if (datetime.timedelta(seconds=int(self._states[STATE_ALARM_ARMED_HOME][CONF_PENDING_TIME])) and override_pending_time == False):
                     self._state = STATE_ALARM_PENDING
                 else:
                     self._state = STATE_ALARM_ARMED_HOME
                 self._armstate = STATE_ALARM_ARMED_HOME
-            
-            elif event == Events.ArmAway:       
+
+            elif event == Events.ArmAway:
                 if (datetime.timedelta(seconds=int(self._states[STATE_ALARM_ARMED_AWAY][CONF_PENDING_TIME])) and override_pending_time == False):
                     self._armstate = STATE_ALARM_ARMED_AWAY
                     self._state = STATE_ALARM_PENDING
@@ -771,7 +779,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                     self._state = STATE_ALARM_ARMED_AWAY
                 self._armstate = STATE_ALARM_ARMED_AWAY
 
-            elif event == Events.ArmPerimeter:  
+            elif event == Events.ArmPerimeter:
                 if (datetime.timedelta(seconds=int(self._states[STATE_ALARM_ARMED_PERIMETER][CONF_PENDING_TIME])) and override_pending_time == False):
                     self._armstate = STATE_ALARM_ARMED_PERIMETER
                     self._state = STATE_ALARM_PENDING
@@ -795,28 +803,28 @@ class BWAlarm(alarm.AlarmControlPanel):
             if   event == Events.Timeout:       self._state = self._returnto
 
         new_state = self._state
-        if old_state != new_state: 
+        if old_state != new_state:
             _LOGGER.debug("[ALARM] Alarm changing from {} to {}".format(old_state, new_state))
             # Things to do on entering state
             if new_state == STATE_ALARM_WARNING:
                 _LOGGER.debug("[ALARM] Turning on warning")
                 if self._config.get(CONF_WARNING):
-                    switch.turn_on(self._hass, self._config.get(CONF_WARNING))
+                    self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_WARNING)})
                 self._timeoutat = now() +  datetime.timedelta(seconds=int(self._states[self._armstate][CONF_WARNING_TIME]))
-                self._update_log('', LOG.TRIPPED, self._lasttrigger)
+                self._update_log('HA', LOG.TRIPPED, self._lasttrigger)
             elif new_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning on alarm")
                 if self._config.get(CONF_ALARM):
-                    switch.turn_on(self._hass, self._config.get(CONF_ALARM))
+                    self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_ALARM)})
                 if (self._states[self._armstate][CONF_TRIGGER_TIME] == -1):
                     self._timeoutat = now() + datetime.timedelta(hours=int(24))
                 else:
                     self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_TRIGGER_TIME]))
-                self._update_log('', LOG.TRIPPED, self._lasttrigger)
+                self._update_log('HA', LOG.TRIPPED, self._lasttrigger)
             elif new_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Pending user leaving house")
                 if self._config.get(CONF_WARNING):
-                    switch.turn_on(self._hass, self._config.get(CONF_WARNING))
+                    self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_WARNING)})
                 self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_PENDING_TIME]))
                 #self._returnto = STATE_ALARM_ARMED_AWAY
                 self.setsignals(self._armstate)
@@ -832,17 +840,17 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif new_state == STATE_ALARM_DISARMED:
                 self._returnto = new_state
                 self.clearsignals()
-  
+
             # Things to do on leaving state
             if old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Turning off warning")
                 if self._config.get(CONF_WARNING):
-                    switch.turn_off(self._hass, self._config.get(CONF_WARNING))
-                
+                    self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_WARNING)})
+
             elif old_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning off alarm")
                 if self._config.get(CONF_ALARM):
-                    switch.turn_off(self._hass, self._config.get(CONF_ALARM))
+                    self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_ALARM)})
 
             # Let HA know that something changed
             if self._config[CONF_ENABLE_PERSISTENCE]:
@@ -851,9 +859,9 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def _validate_code(self, code):
         """Validate given code."""
-        if ((self._passcode_attempt_allowed == -1) or (self._passcodeAttemptNo <= self._passcode_attempt_allowed)):
+        if ((int(self._passcode_attempt_allowed) == -1) or (self._passcodeAttemptNo <= int(self._passcode_attempt_allowed))):
             check = self._code is None or code == self._code or self._validate_user_codes(code)
-            if code == self._code: 
+            if code == self._code:
                 self._update_log('HA', LOG.DISARMED, None)
             return self._validate_code_attempts(check)
         else:
@@ -862,9 +870,9 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def _validate_user_codes(self, code):
         for entity in self._users:
-            if self._users[entity]['enabled'] == True:
-                if self._users[entity]['code'] == code:
-                    self._update_log(entity, LOG.DISARMED, None)
+            if entity['enabled'] == True:
+                if entity['code'] == code:
+                    self._update_log(entity['id'], LOG.DISARMED, None)
                     return True
         return False
 
@@ -873,12 +881,12 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._passcodeAttemptNo = 0
         else:
             _LOGGER.debug("[ALARM] Invalid code given")
-            self._passcodeAttemptNo += 1   
-            if (self._passcode_attempt_allowed != -1 and self._passcodeAttemptNo > self._passcode_attempt_allowed):
+            self._passcodeAttemptNo += 1
+            if (int(self._passcode_attempt_allowed) != -1 and self._passcodeAttemptNo > int(self._passcode_attempt_allowed)):
                 self._panel_locked = True
                 self._passcode_timeoutat = now() + datetime.timedelta(seconds=int(self._passcode_attempt_timeout))
                 _LOGGER.warning("[ALARM] Panel locked, too many passcode attempts!")
-                self._update_log('', LOG.LOCKED, None)
+                self._update_log('HA', LOG.LOCKED, None)
         self.schedule_update_ha_state()
         return check
 
@@ -890,13 +898,13 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._passcodeAttemptNo = 0
         return check
 
-    def _update_log(self, name, message, entity_id):
-        self.changedbyuser = name
-        if (CONF_LOG in self._config):
-            self._log_size = int(self._config[CONF_LOG][CONF_LOG_SIZE]) if CONF_LOG_SIZE in self._config[CONF_LOG] else 10
-            if self._log_size != -1 and len(self._config[CONF_LOG]["logs"]) >= self._log_size:
-                self._config[CONF_LOG]["logs"].remove(self._config[CONF_LOG]["logs"][0])
-            self._config[CONF_LOG]["logs"].append([time.time(), name, message.value, entity_id])
+    def _update_log(self, id, message, entity_id):
+        self.changedbyuser = id
+        if (CONF_ENABLE_LOG in self._config):
+            self._log_size = int(self._config[CONF_LOG_SIZE]) if CONF_LOG_SIZE in self._config else 10
+            if self._log_size != -1 and len(self._config[CONF_LOGS]) >= self._log_size:
+                self._config[CONF_LOGS].remove(self._config[CONF_LOGS][0])
+            self._config[CONF_LOGS].append([time.time(), id, message.value, entity_id])
             self.log_save()
 
     ### Actions from the outside world that affect us, turn into enum events for internal processing
@@ -913,9 +921,9 @@ class BWAlarm(alarm.AlarmControlPanel):
         """Subscribe mqtt events.
         This method must be run in the event loop and returns a coroutine.
         """
-        if (CONF_MQTT in self._config):
+        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             async_track_state_change(
-                self.hass, self.entity_id, self._async_state_changed_listener
+                self._hass, self.entity_id, self._async_state_changed_listener
             )
 
         @callback
@@ -938,17 +946,17 @@ class BWAlarm(alarm.AlarmControlPanel):
             else:
                 _LOGGER.warning("[ALARM/MQTT] Received unexpected payload: %s", payload)
                 return
-        if (CONF_MQTT in self._config): 
+        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             return self._mqtt.async_subscribe(
-                self.hass, self._command_topic, message_received, self._qos)
-        
+                self._hass, self._command_topic, message_received, self._qos)
+
     @asyncio.coroutine
     def _async_state_changed_listener(self, entity_id, old_state, new_state):
         """Publish state change to MQTT."""
-        if (CONF_MQTT in self._config): 
+        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             state = new_state.state
             if (self._pending_on_warning == True and state == STATE_ALARM_WARNING):
                 state = STATE_ALARM_PENDING
 
-            self._mqtt.async_publish(self.hass, self._state_topic, state, self._qos, True)
+            self._mqtt.async_publish(self._hass, self._state_topic, state, self._qos, True)
             _LOGGER.debug("[ALARM/MQTT] State changed")

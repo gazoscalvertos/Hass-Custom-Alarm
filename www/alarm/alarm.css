@@ -1,12 +1,8 @@
 /* CUSTOM ALARM COMPONENT PANEL CSS
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.0.3
-  MODIFIED: 01/04/18
+  VERSION:  1.1.4
+  MODIFIED: 13/11/18
 */
-:-webkit-full-screen 
-        {
-            background-color: red;
-        }
 :host {
    --countdown-timer-display: none;
    --time-display: initial;
@@ -14,7 +10,7 @@
    /* THEME - DARK */
    --dark-background:   #191A1F;
    --dark-inner:        #212227;
-   
+
    --dark-green:        #23C48E;
    --dark-black:        #1A1E22;
 
@@ -34,7 +30,7 @@
         /* THEME - LIGHT */
    --light-background:   white;
    --light-inner:        #f3f3f3;
-   
+
    --light-green:        #23C48E;
    --light-black:        #1A1E22;
 
@@ -98,7 +94,7 @@
 app-toolbar {
   background-color: var(--header-background-color);
   color: var(--header-text-color);
-}  
+}
 ha-app-layout {
    background-color: var(--panel-outer-background-color);
 }
@@ -119,6 +115,22 @@ a:hover {
     color: var(--panel-text-color);
 }
 
+.list-item {
+      cursor: pointer;
+      font-size: large;
+}
+.checkbox {
+      cursor: pointer;
+      padding: 5px;
+      font-size: large;
+}
+
+.iron-selected:before{
+  /* content: '✔'; /* Insert content that looks like bullets */ */
+  padding-right: 8px;
+  color: var(--dark-orange); /* Or a color you prefer */
+}
+
 #restart{
   background-color: unset;
   padding-left: 0;
@@ -126,12 +138,16 @@ a:hover {
   text-transform: none;
 }
 
-#userDetail{
+#userDetail, #themeDetail{
     border: var(--primary-text-color);
     border-width: 0.5px;
     border-style: groove;
     padding-left: 20px;
     padding-right: 20px;
+}
+
+.iron-selected {
+  color: var(--title-color);
 }
 
 .validation-error{
@@ -221,19 +237,15 @@ a:hover {
 
 .carousel-cell {
   left: 1600px;
-
   top: 0;
-
   position: absolute;
-  padding-left: 15px;
-  padding-right: 15px;
 
   transition: all 1s ease-in-out;
   -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
   -moz-transition: all 1s ease-in-out; /** Firefox **/
   -o-transition: all 1s ease-in-out; /** Opera **/
 
-  width: 100%; 
+  width: 100%;
   margin-bottom: 60px;
   color: var(--panel-text-color);
 }
@@ -268,17 +280,20 @@ ha-label-badge {
 }
 .title{
    font-size: xx-large;
-/*   background-color: var(--panel-background-color);*/
+}
+.sensor-title{
+   font-size: x-large;
+}
+.title, .sensor-title{
    color:            var(--subtitle-text-color);
    text-align: center;
    font-weight: 500;
    padding-top: 15px;
-/*   font-family: 'Lobster';*/
 }
 .openSensors {
    margin-left: 8%;
    margin-right: 8%;
-   color: var(--openSensors-title-color); 
+   color: var(--openSensors-title-color);
    font-size: x-large;
    text-align: center;
    font-weight: 500;
@@ -288,7 +303,7 @@ ha-label-badge {
 .summary {
    margin: 0px auto 0px;
    text-align: center;
-} 
+}
 .cameras {
   cursor: pointer;
 }
@@ -335,9 +350,9 @@ text-align: center;
 text-align: left;
   }
   .log-item-date {
-    font-weight: 300;    
-    font-style: italic; 
-    font-size: smaller;   
+    font-weight: 300;
+    font-style: italic;
+    font-size: smaller;
 }
 .camera-feed {
   width: 300px;
@@ -443,7 +458,7 @@ text-align: left;
 }
 
 .log-item > span{
-  flex-grow:1; 
+  flex-grow:1;
 }
 
 .log-item > div{
@@ -454,9 +469,9 @@ text-align: left;
 }
 
 .log-item-date {
-    font-weight: 300;    
-    font-style: italic;   
-    text-align: right; 
+    font-weight: 300;
+    font-style: italic;
+    text-align: right;
 }
   #main-content {
     padding-top: 20px;
@@ -606,9 +621,9 @@ h1 {
 }
 
 #settings-nav {
-  color: var(--primary-text-color);     
-  justify-content: center;    
-  text-align: center;    
+  color: var(--primary-text-color);
+  justify-content: center;
+  text-align: center;
   padding-top: 10px;
 }
 #set-login {
@@ -628,7 +643,7 @@ h1 {
   padding-right: 5px;
 }
 .setting-outer {
-  padding-top: 10px; 
+  padding-top: 10px;
   padding-bottom: 10px;
 }
 .setting-inner {
@@ -648,9 +663,9 @@ h1 {
   align-items: center;
 }
 #info-panel-selection {
-  color: var(--info-panel-buttons-color); 
-  text-align: center; 
-  width: 100%; 
+  color: var(--info-panel-buttons-color);
+  text-align: center;
+  width: 100%;
 /*  padding: 10px 0;*/
   background: var(--panel-outer-background-color);
   position: fixed;
@@ -667,7 +682,7 @@ h1 {
 }
 
 .sign {
-   margin-left: -20px;  
+   margin-left: -20px;
 }
 .ok {
    color: green;
@@ -782,7 +797,7 @@ div.options paper-button{
     text-transform: capitalize;
 }
 #alarm-status span {
-   color: var( --alarmstatus-text-color); 
+   color: var( --alarmstatus-text-color);
    font-weight: bolder;
    text-align: center;
  }
@@ -798,12 +813,12 @@ div.options paper-button{
    display: inline-block;
    vertical-align: middle;
    font-size: x-large;
-   margin-left: 5px; 
+   margin-left: 5px;
    padding-right: 5px;
    text-align: center;
    height: 100%;
    font-family: var(--font-header);
-   color: var( --weather-text-color); 
+   color: var( --weather-text-color);
 }
 
 #main-title-bar{
@@ -995,7 +1010,7 @@ div.options paper-button{
 }
 
 /* Add Animation - Zoom in the Modal */
-.modal-camera-content, #captionCamera { 
+.modal-camera-content, #captionCamera {
     animation-name: zoomCamera;
     animation-duration: 1.6s;
 }
@@ -1018,7 +1033,7 @@ div.options paper-button{
   margin: 10px auto 10px auto;
 }
 
-.donate {
+.donate, .donate-paypal {
   text-align: center;
   padding-top: 10px;
   padding-right: 10px;
