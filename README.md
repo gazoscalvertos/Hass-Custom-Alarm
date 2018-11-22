@@ -9,7 +9,7 @@ Consider donating to this project to keep it going as anything contributed will 
 
 This is very much a community project so if you wish to chip in then please do!! I could really use a CSS, animation, design guru to make this look amazing. Also please feel free to leave comments, suggestions, enhancements and fixes!!
 
-Hi everyone, it's time to publish the New UI and settings into the master release.
+** NOTE!!! MAJOR CHANGE** It's time to publish the New UI and settings into the master release.
 
 You may need to restart HA if the component doesn't load first time as HA will install a dependency (ruamel.yaml)
 
