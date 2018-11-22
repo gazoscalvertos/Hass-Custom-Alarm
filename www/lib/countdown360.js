@@ -6,7 +6,7 @@
  *  Made by John Schult
  *  Under MIT License
  */
- ;(function ($, window, document, undefined) {
+ (function ($, window, document, undefined) {
   var pluginName = "countdown360",
   defaults = {
       radius: 15.5,                    // radius of arc
@@ -39,11 +39,7 @@
     }
 
     Plugin.prototype = {
-      //updateOptions: fucntion()
-      //{
 
-
-    //  }
       getTimeRemaining: function()
       {
         var timeRemaining = this._secondsLeft(this.getElapsedTime());
