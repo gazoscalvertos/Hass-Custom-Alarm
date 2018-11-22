@@ -21,6 +21,27 @@ There are many improvements to be made in the code still and this is very much a
 Please test and provide feedback/suggestions.
 
 ### Change Log:
+- 22/11/2018:
+- Quite a few bugs and issues have been resolved on this release. There has also been a number of changes to the config file layout so you are likely required to start from scratch as the users, themes and panel settings have changed.
+
+- Updated alarm.html to 1.3.3
+- Updated bwalarm.py to 1.1.3
+
+- fixed duplicate sensors in settings panel
+- fixed passcode attempts setting
+- fixed code to arm display issues
+- fixed persistant mode
+- fixed sesnor groups
+- fixed code to arm panel display and alignment
+- reformated logs
+- fixed log (displaying name and image)
+- removed windows line feed
+- integrated HASS users into alarm automatically however these initially are disabled
+- fixed switch breaks on service call
+- fixed themes
+
+
+
 - Updated alarm.html to 1.3.2
 - Fixed SVG slowdown
 
