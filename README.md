@@ -11,14 +11,33 @@ This is very much a community project so if you wish to chip in then please do!!
 
 **NOTE!!! MAJOR CHANGE** It's time to publish the New UI and settings into the master release.
 
-You may need to restart HA if the component doesn't load first time as HA will install a dependency (ruamel.yaml)
+## Installation
 
-This new UI allows you to start with pretty much a blank alarm.yaml as this component can write to your yaml file!!! all you need to define is:
+You will need to copy the following files into your home assistant configuration directory
 
+alarm.yaml	*This files stores your alarm configuration. An options page will be created for this file*
+custom_components/alarm_control_panel/bwalarm.py *The brains of the operation. This is the logic of the custom alarm system*
+panels/alarm.html *This is the interface for the custom alarm component. It's actually optional as the alarm will function without it but recommended for ease of setup*
+www/alarm/[ALL FILES] *These files control how the interface looks and feels*
+www/lib/[ALL FILES] *These files add additional functionality to the interface in order to work*
+www/images/ha.png *An image file used for the interface log*
+
+To get things working with Home Assistant (HA) you will need to adjust your configuration.yaml to instruct HA to use your new custom alarm component, add the following to this file:
+```
+alarm_control_panel: !include alarm.yaml
+```
+You will also need to tell HA where your new panel interface file is. Also add the following to your configuration.yaml:
+```
+panel_custom: !include panel_custom.yaml
+```
+You may need to restart HA if the component doesn't load first time as HA will need to install a dependency (ruamel.yaml).
+
+It's advisable to start with a new alarm.yaml file with the minimum configuration set:
 ```
 platform: bwalarm
 name: House
 ```
+Your new interface can be used to modify your alarm.yaml directly.
 
 The default password to access the settings page is: **HG28!!&dn**
 
@@ -47,7 +66,13 @@ Please test and provide feedback/suggestions.
 - Information/Debug panel
 
 ### Change Log:
-- 22/11/2018:
+- 27/11/18:
+- [FEATURE] Adding some basic error handling which will be enhanced at a later date
+- [FIX BUG] Fixed margin issue in firefox (settings)
+- [REQUEST] Sorted sensors alphabetically
+- [FIX BUG] Fixed clock, serif, weather, passcode display issues
+
+- 22/11/18:
 - Quite a few bugs and issues have been resolved on this release. There has also been a number of changes to the config file layout so you are likely required to start from scratch as the users, themes and panel settings have changed.
 
 - Updated alarm.html to 1.3.3

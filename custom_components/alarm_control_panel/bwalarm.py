@@ -56,6 +56,8 @@ import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
+_LOGGER = logging.getLogger(__name__)
+
 VERSION                            = '1.1.3'
 
 DOMAIN                             = 'alarm_control_panel'
@@ -306,8 +308,6 @@ CONF_VALUE              = 'value'
 CONF_USER               = 'user'
 CONF_COMMAND            = 'command'
 
-_LOGGER = logging.getLogger(__name__)
-
 try:
     from ruamel.yaml                   import YAML
 except Exception as e:
@@ -320,6 +320,7 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     mqtt = None
     if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
         import homeassistant.components.mqtt as mqtt
+
     alarm = BWAlarm(hass, config, mqtt)
     hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
