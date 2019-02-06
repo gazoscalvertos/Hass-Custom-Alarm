@@ -695,13 +695,13 @@ class BWAlarm(alarm.AlarmControlPanel):
         if self._validate_panic_code(code):
             self.process_event(Events.Disarm)
             self._panic_mode = "ACTIVE"
-            self._update_log('HA', LOG.DISARMED, None) #Show a default disarm message incase this is displayed on the interface
+            self._update_log(LOG.DISARMED, 'HA') #Show a default disarm message incase this is displayed on the interface
             # Let HA know that something changed
             self.schedule_update_ha_state()
             return
 
         if not self._validate_code(code):
-            self._update_log('HA', LOG.DISARM_FAIL, None)
+            self._update_log(LOG.DISARM_FAIL, 'HA')
             return
         self.process_event(Events.Disarm)
 
@@ -722,7 +722,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             else:
                 self.process_event(mode)
 
-        self._update_log(user, mode, None)
+        self._update_log(mode, user)
 
     def alarm_arm_home(self, code=None):
         self.alarm_arm(code, Events.ArmHome)
@@ -735,7 +735,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
-        self._update_log('HA', LOG.TRIGGERED, None)
+        self._update_log(LOG.TRIGGERED)
 
     ### Internal processing
     def setsignals(self, alarmMode):
@@ -813,7 +813,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 if self._config.get(CONF_WARNING):
                     self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_WARNING)})
                 self._timeoutat = now() +  datetime.timedelta(seconds=int(self._states[self._armstate][CONF_WARNING_TIME]))
-                self._update_log('HA', LOG.TRIPPED, self._lasttrigger)
+                self._update_log(LOG.TRIPPED, 'HA', self._lasttrigger)
             elif new_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning on alarm")
                 if self._config.get(CONF_ALARM):
@@ -822,7 +822,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                     self._timeoutat = now() + datetime.timedelta(hours=int(24))
                 else:
                     self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_TRIGGER_TIME]))
-                self._update_log('HA', LOG.TRIPPED, self._lasttrigger)
+                self._update_log(LOG.TRIGGERED, '', self._lasttrigger)
             elif new_state == STATE_ALARM_PENDING:
                 _LOGGER.debug("[ALARM] Pending user leaving house")
                 if self._config.get(CONF_WARNING):
@@ -864,7 +864,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         if ((int(self._passcode_attempt_allowed) == -1) or (self._passcodeAttemptNo <= int(self._passcode_attempt_allowed))):
             check = self._code is None or code == self._code or self._validate_user_codes(code)
             if code == self._code:
-                self._update_log('HA', LOG.DISARMED, None)
+                self._update_log(LOG.DISARMED, 'HA')
             return self._validate_code_attempts(check)
         else:
             _LOGGER.warning("[ALARM] Too many passcode attempts, try again later")
@@ -874,7 +874,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         for entity in self._users:
             if entity['enabled'] == True:
                 if entity['code'] == code:
-                    self._update_log(entity['id'], LOG.DISARMED, None)
+                    self._update_log(LOG.DISARMED, entity['id'])
                     return True
         return False
 
@@ -888,7 +888,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self._panel_locked = True
                 self._passcode_timeoutat = now() + datetime.timedelta(seconds=int(self._passcode_attempt_timeout))
                 _LOGGER.warning("[ALARM] Panel locked, too many passcode attempts!")
-                self._update_log('HA', LOG.LOCKED, None)
+                self._update_log(LOG.LOCKED, 'HA')
         self.schedule_update_ha_state()
         return check
 
@@ -900,13 +900,16 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._passcodeAttemptNo = 0
         return check
 
-    def _update_log(self, id, message, entity_id):
+    def _update_log(self, message, id='', entity_id=''):
         self.changedbyuser = id
         if (CONF_ENABLE_LOG in self._config):
             self._log_size = int(self._config[CONF_LOG_SIZE]) if CONF_LOG_SIZE in self._config else 10
             if self._log_size != -1 and len(self._config[CONF_LOGS]) >= self._log_size:
                 self._config[CONF_LOGS].remove(self._config[CONF_LOGS][0])
-            self._config[CONF_LOGS].append([time.time(), id, message.value, entity_id])
+            entity_name = entity_id
+            if entity_id != '':
+              entity_name = self._hass.states.get(entity_id).name
+            self._config[CONF_LOGS].append([time.time(), id, message.value, entity_name])
             self.log_save()
 
     ### Actions from the outside world that affect us, turn into enum events for internal processing
