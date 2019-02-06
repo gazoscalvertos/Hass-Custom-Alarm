@@ -813,7 +813,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 if self._config.get(CONF_WARNING):
                     self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_WARNING)})
                 self._timeoutat = now() +  datetime.timedelta(seconds=int(self._states[self._armstate][CONF_WARNING_TIME]))
-                self._update_log(LOG.TRIPPED, 'HA', self._lasttrigger)
+                self._update_log(LOG.TRIPPED, '', self._lasttrigger)
             elif new_state == STATE_ALARM_TRIGGERED:
                 _LOGGER.debug("[ALARM] Turning on alarm")
                 if self._config.get(CONF_ALARM):
@@ -888,7 +888,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self._panel_locked = True
                 self._passcode_timeoutat = now() + datetime.timedelta(seconds=int(self._passcode_attempt_timeout))
                 _LOGGER.warning("[ALARM] Panel locked, too many passcode attempts!")
-                self._update_log(LOG.LOCKED, 'HA')
+                self._update_log(LOG.LOCKED, '')
         self.schedule_update_ha_state()
         return check
 
