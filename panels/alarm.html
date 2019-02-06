@@ -1832,7 +1832,7 @@
                 return 'Disarm attempt failed, wrong code!';
                 break;
               case 2:
-                return 'The alarm has been triggered! Sensor: ';
+                return 'Alarm has been triggered by ' + entry[3];
                 break;
               case 3:
                 return 'set the alarm in Home mode';
@@ -1841,7 +1841,7 @@
                 return 'set the alarm in Away mode';
                 break;
               case 5:
-                return 'Alarm has been tripped! Sensor:  ';
+                return 'Alarm has been tripped by ' + entry[3];
                 break;
               case 6:
                 return 'Panel Locked';
