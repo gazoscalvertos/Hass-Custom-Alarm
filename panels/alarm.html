@@ -1465,7 +1465,7 @@
 
           this.controls = this.$.controls;
 
-          if (this.alarm.attributes.hide_sidebar == true)  this.closeSidebar();
+          if (this.alarm.attributes.hide_sidebar == true)  this.closeSidebar;
 
           //Determine screensize and set appropriate controls
           this.setupUI();
@@ -2056,7 +2056,7 @@
 
       // Close the sidebar if alarm is set and the option is enabled
       closeSidebar(instance){
-        if (instance) if (instance.alarm.state != 'disarmed')
+        if (instance.alarm.state != 'disarmed')
           instance.fire('hass-close-menu');
       }
 
@@ -2378,7 +2378,7 @@
 
       //Call one of the alarm services
       alarmService(call){
-        this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code });
+        this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entity_id, 'code': this.code });
       }
 
       //Restart Home Assistant
