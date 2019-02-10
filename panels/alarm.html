@@ -99,7 +99,12 @@
             <div id='weather' class='box box-header weather'>
               <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_weather)]]'>
                   <div class='weather-summary shadow'>
-                    <span>[[temp]] &#176;C</span>
+                    <template is='dom-if' if='[[!alarm.attributes.panel.enable_fahrenheit]]'>
+                      <span>[[temp]] &#176;C</span>
+                    </template>
+                    <template is='dom-if' if='[[alarm.attributes.panel.enable_fahrenheit]]'>
+                      <span>[[temp]] &#176;F</span>
+                    </template>
                   </div>
                   <div id='weather-icon' class='weather-summary'>
                     <object id='weather_svg' class='weather-summary' type='image/svg+xml' data='[[weather.attributes.entity_picture]]'></object>
@@ -565,6 +570,14 @@
                         <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_weather)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_weather'></paper-toggle-button>
                       </div>
                       <span class='info-detail'>Enables the weather widget in this panel. A Weather Sensor named: 'sensor.weather_summary' or 'sensor.dark_sky_summary' must exist within your Home Assistant setup</span>
+                    </div>
+
+                    <div class='setting-outer vertical layout'>
+                      <div class='setting-inner horizontal layout'>
+                        <span class='info-header'>Display Fahrenheit: </span>
+                        <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_fahrenheit)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_fahrenheit'></paper-toggle-button>
+                      </div>
+                      <span class='info-detail'>Enable this to display the temperaturein Fahrenheit</span>
                     </div>
 
                     <div class='setting-outer vertical layout'>

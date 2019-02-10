@@ -70,6 +70,7 @@ Please test and provide feedback/suggestions.
 
 ### Change Log:
 - 10/02/19:
+- [REQUEST] Added option to display in fahrenheit
 - [FIX] Panel lockout display
 - [FIX] HA 0.87 compatibility
 - [REQUEST] Included switches into the sensor lists as requested

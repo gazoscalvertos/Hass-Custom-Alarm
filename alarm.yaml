@@ -14,17 +14,18 @@ name: House
 panel:
   camera_update_interval: ''
   cameras: []
-  enable_camera_panel: false
+  enable_camera_panel: 'False'
   enable_clock: 'True'
   enable_clock_12hr: 'True'
-  enable_custom_panel: false
-  enable_floorplan_panel: false
-  enable_sensors_panel: true
+  enable_custom_panel: 'False'
+  enable_floorplan_panel: 'False'
+  enable_sensors_panel: 'True'
   enable_serif_font: 'True'
   enable_weather: 'True'
   hide_passcode: 'True'
   panel_title: Surname Residence
   shadow_effect: 'True'
+  enable_fahrenheit: false
 states:
   armed_away:
     immediate:
