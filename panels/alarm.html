@@ -1,10 +1,10 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.3.5
+  VERSION:  1.3.6
   MODIFIED: 10/02/19
 
   CHANGE LOG:
-  -Added switches into sensors
+  -Fixed panel lockout display
 
   TODO:
   -local styles to css
@@ -29,7 +29,7 @@
   // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
   const _NAME = 'Security Panel';
   const _URL = 'https://github.com/gazoscalvertos/Hass-Custom-Alarm/';
-  const _VERSION = '10/02/19 v1.3.5';
+  const _VERSION = '10/02/19 v1.3.6';
 
   if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
   window.CUSTOM_UI_LIST.push({
@@ -86,7 +86,9 @@
             </div>
 
             <div id='alarm-status' class='box box-header'>
-              <span class='shadow'>[[alarm_state]]</span>
+              <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
+                <span class='shadow'>[[alarm_state]]</span>
+              </template>
               <template is='dom-if' if='[[showCodePanel(alarm)]]'>
                 <template is='dom-if' if='[[alarm.attributes.panel_locked]]'>
                   <span class='shadow'>PANEL LOCKED OUT</span>
@@ -1414,7 +1416,7 @@
           switches:        { type: Array, value: [] },
 
           errors:          { type: Array },
-          version:         { type: String, value: '1.3.5'},
+          version:         { type: String, value: '1.3.6'},
 
           camera_update_interval: { type: Number, value: 5000 }, // ms
 

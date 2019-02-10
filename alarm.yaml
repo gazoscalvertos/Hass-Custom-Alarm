@@ -11,3 +11,86 @@
 
 platform: bwalarm
 name: House
+panel:
+  camera_update_interval: ''
+  cameras: []
+  enable_camera_panel: false
+  enable_clock: 'True'
+  enable_clock_12hr: 'True'
+  enable_custom_panel: false
+  enable_floorplan_panel: false
+  enable_sensors_panel: true
+  enable_serif_font: 'True'
+  enable_weather: 'True'
+  hide_passcode: 'True'
+  panel_title: Surname Residence
+  shadow_effect: 'True'
+states:
+  armed_away:
+    immediate:
+    - switch.skylight
+    - binary_sensor.away_sensor
+    delayed:
+    - binary_sensor.away_delayed_sensor
+    override: []
+    pending_time: 2
+    warning_time: 2
+    trigger_time: 5
+  armed_home:
+    immediate:
+    - binary_sensor.home_sensor
+    delayed:
+    - binary_sensor.home_delayed_sensor
+    override: []
+    pending_time: 2
+    warning_time: 2
+    trigger_time: 5
+  armed_perimeter:
+    immediate:
+    - binary_sensor.perimeter_sensor
+    delayed:
+    - binary_sensor.perimeter_delayed_sensor
+    override: []
+    pending_time: 0
+    warning_time: '2'
+    trigger_time: 600
+users:
+- id: 85a1f1f7b2f247dfafe718d0cfe5026d
+  name: test
+  enabled: false
+  code: 85a1f1f7b2f247dfafe718d0cfe5026d
+  picture: /local/images/ha.png
+- id: 36ad4844cafe4f3491e8e4e2ac38e0ff
+  name: bart
+  enabled: true
+  code: '2345'
+  picture: /local/images/hal.png
+- id: 2820bcde9f974ef18da3b44b1e494cf3
+  name: Legacy API password user
+  enabled: false
+  code: 2820bcde9f974ef18da3b44b1e494cf3
+  picture: /local/images/ha.png
+- id: 9b229b1e281643409c56bcfbb7e0088a
+  name: Legacy API password user
+  enabled: false
+  code: 9b229b1e281643409c56bcfbb7e0088a
+  picture: /local/images/ha.png
+admin_password: a
+code: '1234'
+enable_perimeter_mode: true
+code_to_arm: false
+themes:
+- name: aaa
+  warning_color: '#995BFF'
+  pending_color: '#FF2943'
+  disarmed_color: '#FF22E6'
+  triggered_color: '#FF0000'
+  armed_home_color: '#C1B1FF'
+  armed_away_color: '#FF8686'
+  armed_perimeter_color: '#DAFF9E'
+  active: false
+  action_button_border_color: '#3ED5FF'
+panic_code: '9876'
+enable_log: true
+passcode_attempts: '2'
+passcode_attempts_timeout: '10'

@@ -70,6 +70,8 @@ Please test and provide feedback/suggestions.
 
 ### Change Log:
 - 10/02/19:
+- [FIX] Panel lockout display
+- [FIX] HA 0.87 compatibility
 - [REQUEST] Included switches into the sensor lists as requested
 - [ENHANCEMENT] Modified the layouts due to polymer changes
 
