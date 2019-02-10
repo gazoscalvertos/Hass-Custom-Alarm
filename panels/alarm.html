@@ -1,13 +1,10 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
   https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.3.4
-  MODIFIED: 27/11/18
+  VERSION:  1.3.5
+  MODIFIED: 10/02/19
 
   CHANGE LOG:
-  -added basic error message
-  -fixed margin issue in Firefox
-  -sorted sensors alphabetically
-  -Fixed clock, serif, weather, passcode display issues
+  -Added switches into sensors
 
   TODO:
   -local styles to css
@@ -32,7 +29,7 @@
   // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
   const _NAME = 'Security Panel';
   const _URL = 'https://github.com/gazoscalvertos/Hass-Custom-Alarm/';
-  const _VERSION = '27/11/18 v1.3.4';
+  const _VERSION = '10/02/19 v1.3.5';
 
   if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
   window.CUSTOM_UI_LIST.push({
@@ -67,25 +64,15 @@
 
     <style include='ha-style iron-flex iron-flex-factors'>
     </style>
+    <!-- ha-app-layout has-scrolling-region -->
+    <div id='layout'>
+      <div id='main-title'>
+        <template is='dom-if' if='[[isdisarmed(alarm)]]'>
+          <ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
+        </template>
+        <div id='main-title-text'>[[panel_title]]</div>
+      </div>
 
-    <ha-app-layout has-scrolling-region id='layout'>
-      <app-header slot='header' fixed>
-        <app-toolbar>
-          <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-            <ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
-          </template>
-          <div id='main-title-bar'>
-            <template is='dom-if' if='[[alarm.attributes.settings]]'>
-              <div></div>
-            </template>
-
-            <div main-title id='main-title-text'>[[panel_title]]</div>
-            <template is='dom-if' if='[[alarm.attributes.settings]]'>
-              <div id='settings-icon'><iron-icon on-click='toggleSettings' icon='mdi:settings'></iron-icon></div>
-            </template>
-          </div>
-        </app-toolbar>
-      </app-header>
       <div id='content'>
         <div id='alarm-panel' >
           <div id='status-bar' class='horizontal layout center-justified'>
@@ -99,15 +86,7 @@
             </div>
 
             <div id='alarm-status' class='box box-header'>
-              <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-                <span class='shadow'>Alarm Deactivated</span>
-              </template>
-              <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
-                <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-                  <span class='shadow'>[[computeLabel(alarm.state)]]</span>
-                </template>
-              </template>
-
+              <span class='shadow'>[[alarm_state]]</span>
               <template is='dom-if' if='[[showCodePanel(alarm)]]'>
                 <template is='dom-if' if='[[alarm.attributes.panel_locked]]'>
                   <span class='shadow'>PANEL LOCKED OUT</span>
@@ -134,7 +113,7 @@
 
             <div id='carousel_main' class='content-box'>
               <!-- ###########################################CAROUSEL MAIN############################################### -->
-              <div id='carousel_template' class='carousel-cell carousel-slide-in' style='height: 50vh'>
+              <div id='carousel_template' class='carousel-cell carousel-slide-in'> <!-- TODO style='height: 50vh' -->
 
               </div>
 
@@ -170,11 +149,11 @@
 
                   <template is='dom-if' if='[[!attemptedArm]]'>
 
-                    <template is='dom-if' if='[[requiresCode()]]'>
+                    <!-- <template is='dom-if' if='[[requiresCode()]]'>
                       <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
                           <div id='code-display'>[[display_code]]</div>
                       </template>
-                    </template>
+                    </template> -->
 
                     <div id='codepanel' class='horizontal layout center-justified'>
                       <div>
@@ -379,7 +358,7 @@
                         <div class='settings-nav-text'>Alarm</div>
                       </div>
                       <div class='settings-nav-inner vertical layout' >
-                        <paper-icon-button icon='mdi:radio-tower' title='Alarm Sensors' on-click='carouselClick' data-selection='settings-sensors'></paper-icon-button>
+                        <paper-icon-button id='btn-alarm-sensors' icon='mdi:radio-tower' title='Alarm Sensors' on-click='carouselClick' data-selection='settings-sensors'></paper-icon-button>
                         <div class='settings-nav-text'>Sensors</div>
                       </div>
                       <div class='settings-nav-inner vertical layout' >
@@ -428,7 +407,7 @@
 
                   <!-- ########################################################################### LOGIN ##################################################################################################### -->
                   <div id='set-login' class='carousel-cell remove'>
-                    <h1>Admin Password</h1>
+                    <div class='title'>Settings</div></br>
                     <div class='info-detail'>Enter the admin password defined in your alarm.yaml to access this panel</div>
                     <paper-input class="span11" id="passwordInput" type="password" placeholder="Enter Password..." on-keyup='checkSettingsPassword'></paper-input>
                   </div>
@@ -933,16 +912,25 @@
                       <div class='vertical layout'>
                         <h2>Immediate</h2>
                         <paper-listbox id='sensors-checkboxs' class='vertical layout' attr-for-selected='title' multi selected-values='{{alarm.attributes.states.armed_away.immediate}}' selected-attribute='checked' >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="[[sensor]]" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_away' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
+                        <div>
+                          <div class='detail'>
+                            <paper-listbox id='sensors-checkboxs' class='vertical layout' attr-for-selected='title' multi selected-values='{{alarm.attributes.states.armed_away.immediate}}' selected-attribute='checked' >
+                              <template is='dom-repeat' items='{{switches}}' as='sensor'>
+                                <checkbox type='checkbox' class='checkbox' title="[[sensor]]" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_away' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
+                              </template>
+                            </paper-listbox>
+                          </div>
+                        </div>
                       </div>
 
                       <div class='sensor vertical layout'>
                         <h2>Delayed</h2>
                         <paper-listbox id='sensors-checkboxs1' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_away.delayed}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_away' data-group='delayed' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -951,7 +939,7 @@
                       <div class='vertical layout'>
                         <h2>Override</h2>
                         <paper-listbox id='sensors-checkboxs2' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_away.override}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_away' data-group='override' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -998,7 +986,7 @@
                       <div class='vertical layout'>
                         <h2>Immediate</h2>
                         <paper-listbox id='sensors-checkboxs3' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_home.immediate}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_home' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -1008,7 +996,7 @@
 
                         <h2>Delayed</h2>
                         <paper-listbox id='sensors-checkboxs4' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_home.delayed}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_home' data-group='delayed' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -1018,7 +1006,7 @@
 
                         <h2>Override</h2>
                         <paper-listbox id='sensors-checkboxs5' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_home.override}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_home' data-group='override' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -1072,7 +1060,7 @@
                       <div class='vertical layout'>
                         <h2>Immediate</h2>
                         <paper-listbox id='sensors-checkboxs6' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_perimeter.immediate}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_perimeter' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -1082,7 +1070,7 @@
 
                         <h2>Delayed</h2>
                         <paper-listbox id='sensors-checkboxs7' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_perimeter.delayed}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_perimeter' data-group='delayed' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -1092,7 +1080,7 @@
 
                         <h2>Override</h2>
                         <paper-listbox id='sensors-checkboxs8' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_perimeter.override}} selected-attribute="checked" >
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='sensor'>
+                          <template is='dom-repeat' items='{{sensors}}' as='sensor'>
                             <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_perimeter' data-group='override' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
@@ -1122,7 +1110,7 @@
                       </div>
                       <div class='setting-inner vertical layout'>
                         <paper-listbox id='floorplan-listbox' class='vertical layout' selected='{{alarm.attributes.panel.floorplan}}' attr-for-selected="name" on-selected-item-changed='settingsSave' data-type='listbox' data-setting='panel' data-attribute='floorplan'>
-                          <template is='dom-repeat' items='{{binary_sensors}}' as='bs'>
+                          <template is='dom-repeat' items='{{sensors}}' as='bs'>
                             <paper-item name="[[bs]]" class='list-item' title="{{bs}}">[[computeFriendlyName(bs)]]</paper-item>
                           </template>
                         </paper-listbox>
@@ -1360,7 +1348,7 @@
           </div>
         </div>
       </template>
-    </ha-app-layout>
+    </div>
   </template>
 </dom-module>
 
@@ -1380,6 +1368,7 @@
           settingsUnlock:       { type: Boolean, value: false },
 
           panel_title:          { type: String, value: 'Home Alarm'},
+          alarm_state:          { type: String, value: 'Disarmed'},
 
           carouselMainSelected: { type: Object },
           carouselSettings:     { type: Object },
@@ -1420,10 +1409,12 @@
           camera_time:     { type: String },
           cameras:         { type: Array, value: [] },
 
+          sensors:         { type: Array, value: [] },
           binary_sensors:  { type: Array, value: [] },
+          switches:        { type: Array, value: [] },
 
           errors:          { type: Array },
-          version:         { type: String, value: '1.3.4'},
+          version:         { type: String, value: '1.3.5'},
 
           camera_update_interval: { type: Number, value: 5000 }, // ms
 
@@ -1707,7 +1698,7 @@
         else el = ev;
         var element = this.shadowRoot.querySelector(el);
         if (element) element.classList.remove('remove');
-        this.setCarouselHeight(this.carouselMainSelected);
+        //this.setCarouselHeight(this.carouselMainSelected);
       }
 
       hideDiv(ev){
@@ -1716,7 +1707,7 @@
         else el = ev;
         var element = this.shadowRoot.querySelector(el);
         if (element) element.classList.add('remove');
-        this.setCarouselHeight(this.carouselMainSelected);
+        //this.setCarouselHeight(this.carouselMainSelected);
       }
 
       updateTheme(){
@@ -1792,7 +1783,9 @@
       }
 
       loadSettings(){
+        this.sensors = [];
         this.binary_sensors = [];
+        this.switches = [];
 
         for (var state in this.hass.states) {
           if (state.split('.')[0] == 'camera'){ //find all cameras and add to array
@@ -1801,8 +1794,14 @@
           else if (state.split('.')[0] == 'binary_sensor'){
             this.binary_sensors.push(state);
           }
+          else if (state.split('.')[0] == 'switch'){
+            this.switches.push(state);
+          }
         }
        this.binary_sensors.sort();
+       this.switches.sort();
+       this.sensors.push.apply(this.sensors, this.binary_sensors);
+       this.sensors.push.apply(this.sensors, this.switches);
       }
 
       computeLog(entry, type){
@@ -1939,7 +1938,7 @@
 
         this.carouselChange(this.$.controls);
 
-        this.$.carousel_main.style.height = '40vh';
+        //this.$.carousel_main.style.height = '40vh';
       }
 
       updateWeatherSVG() {
@@ -1995,14 +1994,16 @@
       carouselChange(carouselCell){
         if (this.carouselMainSelected != carouselCell){
           //Remove the current cell
+          this.carouselMainSelected.classList.add('remove');
+          carouselCell.classList.remove('remove');
           this.carouselMainSelected.classList.remove('carousel-slide-in');
-          setTimeout(function(sel) {sel.classList.add('remove');}, 500, this.carouselMainSelected);
+          //setTimeout(function(sel) {sel.classList.add('remove');}, 500, this.carouselMainSelected);
 
           //Unhide the new cell
-          carouselCell.classList.remove('remove');
+          //carouselCell.classList.remove('remove');
 
           //Update the parent div height to match the new selection
-          this.setCarouselHeight(carouselCell);
+          //this.setCarouselHeight(carouselCell);
           //Slidein the new cell
           setTimeout(function(carouselCell) {carouselCell.classList.add('carousel-slide-in');}, 100, carouselCell);
           /*carouselCell.classList.add('carousel-slide-in');*/
@@ -2013,9 +2014,9 @@
       }
 
       //Update the parent div height to match the new selection
-      setCarouselHeight(carouselCell, instance){
-        setTimeout(function(carouselCell, instance) {instance.$.carousel_main.style.height = window.getComputedStyle(carouselCell).getPropertyValue("height");}, 50, carouselCell, this);
-      }
+      // setCarouselHeight(carouselCell, instance){
+      //   setTimeout(function(carouselCell, instance) {instance.$.carousel_main.style.height = window.getComputedStyle(carouselCell).getPropertyValue("height");}, 50, carouselCell, this);
+      // }
 
       //Setup the camera clicks and modal
       setupCameras(root) {
@@ -2068,6 +2069,8 @@
       //Monitors the alarm status for any changes
       monitorAlarm(){
 
+        this.callclearcode(null);
+
         var themeName = null;
 
         this.opensensors(this.alarm, this.allsensors);
@@ -2109,7 +2112,7 @@
         }
         else this.panel_locked = false;
 
-        if (this.carouselMainSelected != null) this.setCarouselHeight(this.carouselMainSelected);
+        //if (this.carouselMainSelected != null) this.setCarouselHeight(this.carouselMainSelected);
       }
 
       requiresCode(){
@@ -2321,6 +2324,7 @@
         if (this.isChecked(this.alarm.attributes.panel.hide_passcode))
           display_digit = '*';
         this.display_code = this.display_code + display_digit;
+        this.alarm_state = this.display_code;
       }
 
       //Reset the display alarm codes
@@ -2328,6 +2332,7 @@
         if (ev) ev.stopPropagation();
         this.code = '';
         this.display_code = '';
+        this.alarm_state = this.computeLabel(this.alarm.state);
       }
 
       //If you require a code to arm the system then force it here

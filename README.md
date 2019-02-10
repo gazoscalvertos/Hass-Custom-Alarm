@@ -65,7 +65,14 @@ Please test and provide feedback/suggestions.
 - Notification of Open Sensors with the option to override
 - Information/Debug panel
 
+### Testing
+- Tested on HA v0.87 and below.
+
 ### Change Log:
+- 10/02/19:
+- [REQUEST] Included switches into the sensor lists as requested
+- [ENHANCEMENT] Modified the layouts due to polymer changes
+
 - 27/11/18:
 - [FEATURE] Adding some basic error handling which will be enhanced at a later date
 - [FIX BUG] Fixed margin issue in firefox (settings)
@@ -90,3 +97,20 @@ Please test and provide feedback/suggestions.
 - integrated HASS users into alarm automatically however these initially are disabled
 - fixed switch breaks on service call
 - fixed themes
+
+## Note!
+Beware, here be dragons! There may be bugs, issues whilst I get this off the ground and there will definately be design problems when used with different size browsers etc. Hopefully we can conquer these in due course!..
+
+## Thanks!
+Thanks to the community for all the input into this.
+
+Consider supporting this project and donate! All funds will go towards bringing new features, hardware support and bug squashing!!
+
+- BTC Address: 1NFeyzpKKiKbBYSmCLQZQLxBqJbhSbqmwd
+- LTC Address: LTUViN3QUESkQk3mG2hvTzhLRQPVAd269f
+- XRP Address: rwuMp76ht6dmGvipxwKr5ZE6VpF7ZKC7qs
+- ETH Address: 0xCbeD2D2cf0434370c1ca126707009b876b736609
+- Paypal: ha.custom.alarm@gmail.com
+
+## Credits
+[A great countdown JS that I have slightly modded](https://github.com/johnschult/jquery.countdown360)
