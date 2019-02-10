@@ -99,10 +99,10 @@
             <div id='weather' class='box box-header weather'>
               <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_weather)]]'>
                   <div class='weather-summary shadow'>
-                    <template is='dom-if' if='[[!alarm.attributes.panel.enable_fahrenheit]]'>
+                    <template is='dom-if' if='[[!isChecked(alarm.attributes.panel.enable_fahrenheit)]]'>
                       <span>[[temp]] &#176;C</span>
                     </template>
-                    <template is='dom-if' if='[[alarm.attributes.panel.enable_fahrenheit]]'>
+                    <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_fahrenheit)]]'>
                       <span>[[temp]] &#176;F</span>
                     </template>
                   </div>
@@ -594,6 +594,14 @@
                         <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sidebar)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sidebar'></paper-toggle-button>
                       </div>
                       <span class='info-detail'>When the alarm is armed the Home Assistant sidebar will be disabled if enabled. This prevents an intruder simply stopping home assistant from the configuration menu. For this to be truly effective use a browser which locks access to the URL function.</span>
+                    </div>
+
+                    <div class='setting-outer vertical layout'>
+                      <div class='setting-inner horizontal layout'>
+                        <span class='info-header'>Hide Sensors When Armed: </span>
+                        <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sensors)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sensors'></paper-toggle-button>
+                      </div>
+                      <span class='info-detail'>When the alarm is armed the sensors panel will be hidden.</span>
                     </div>
 
                     <div class='setting-outer vertical layout'>
@@ -1303,7 +1311,16 @@
           <paper-icon-button icon='mdi:floor-plan' title='Floorplan' on-click='carouselClick' data-selection='floorplan'></paper-icon-button>
         </template>
         <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_sensors_panel)]]' >
-          <paper-icon-button icon='mdi:radio-tower' title='Alarm Sensors' on-click='carouselClick' data-selection='sensors' style$='color: [[computeButtonColor(opencount)]] !important;'></paper-icon-button>
+          <template is='dom-if' if='[[!isdisarmed(alarm)]]' >
+            <template is='dom-if' if='[[!isChecked(alarm.attributes.panel.hide_sensors)]]' >
+              <paper-icon-button icon='mdi:radio-tower' title='Alarm Sensors' on-click='carouselClick' data-selection='sensors' style$='color: [[computeButtonColor(opencount)]] !important;'></paper-icon-button>
+            </template>
+            <template is='dom-if' if='[[isChecked(alarm.attributes.panel.hide_sensors)]]' >
+            </template>
+          </template>
+          <template is='dom-if' if='[[isdisarmed(alarm)]]' >
+              <paper-icon-button icon='mdi:radio-tower' title='Alarm Sensors' on-click='carouselClick' data-selection='sensors' style$='color: [[computeButtonColor(opencount)]] !important;'></paper-icon-button>
+          </template>
         </template>
         <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_camera_panel)]]' >
           <paper-icon-button icon='mdi:cctv' title='Cameras' on-click='carouselClick' data-selection='cameras'></paper-icon-button>
