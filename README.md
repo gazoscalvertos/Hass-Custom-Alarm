@@ -16,10 +16,13 @@ This is very much a community project so if you wish to chip in then please do!!
 You will need to copy the following files into your home assistant configuration directory
 
 alarm.yaml	*This files stores your alarm configuration. An options page will be created for this file*
+
 custom_components/alarm_control_panel/bwalarm.py *The brains of the operation. This is the logic of the custom alarm system*
 panels/alarm.html *This is the interface for the custom alarm component. It's actually optional as the alarm will function without it but recommended for ease of setup*
-www/alarm/[ALL FILES] *These files control how the interface looks and feels*
-www/lib/[ALL FILES] *These files add additional functionality to the interface in order to work*
+
+www/alarm/ [COPY ALL FILES] *These files control how the interface looks and feels*
+
+www/lib/ [COPY ALL FILES] *These files add additional functionality to the interface in order to work*
 www/images/ha.png *An image file used for the interface log*
 
 To get things working with Home Assistant (HA) you will need to adjust your configuration.yaml to instruct HA to use your new custom alarm component, add the following to this file:
