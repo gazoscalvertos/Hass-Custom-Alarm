@@ -305,9 +305,7 @@ try:
 except Exception as e:
     _LOGGER.warning('Import Error: %s. Attempting to download and import', e)
 
-@asyncio.coroutine
-def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
-
+async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     #Setup MQTT if enabled
     mqtt = None
     if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
@@ -918,7 +916,6 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self._passcodeAttemptNo = 0
                 self.schedule_update_ha_state()
 
-    @asyncio.coroutine
     def async_added_to_hass(self):
         """Subscribe mqtt events.
         This method must be run in the event loop and returns a coroutine.
@@ -936,15 +933,15 @@ class BWAlarm(alarm.AlarmControlPanel):
                 #_LOGGER.warning("Disarming %s", payload)
                 #TODO self._hass.states.get('binary_sensor.siren_sensor') #Use this method to relay open states
                 if (self._override_code):
-                    self.alarm_disarm(self._code)
+                    self.async_alarm_disarm(self._code)
                 else:
-                    self.alarm_disarm(payload.split(" ")[1])
+                    self.async_alarm_disarm(payload.split(" ")[1])
             elif payload == self._payload_arm_home:
-                self.alarm_arm_home('')
+                self.async_alarm_arm_home('')
             elif payload == self._payload_arm_away:
-                self.alarm_arm_away('')
+                self.async_alarm_arm_away('')
             elif payload == self._payload_arm_night:
-                self.alarm_arm_night('')
+                self.async_alarm_arm_night('')
             else:
                 _LOGGER.warning("[ALARM/MQTT] Received unexpected payload: %s", payload)
                 return
@@ -952,8 +949,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             return self._mqtt.async_subscribe(
                 self._hass, self._command_topic, message_received, self._qos)
 
-    @asyncio.coroutine
-    def _async_state_changed_listener(self, entity_id, old_state, new_state):
+    async def _async_state_changed_listener(self, entity_id, old_state, new_state):
         """Publish state change to MQTT."""
         if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             state = new_state.state
