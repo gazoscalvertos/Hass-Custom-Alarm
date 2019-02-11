@@ -19,7 +19,7 @@
 
 """
 
-REQUIREMENTS = ['ruamel.yaml==0.15.42']
+REQUIREMENTS = ['ruamel.yaml>=0.15.42']
 
 import asyncio
 import sys
