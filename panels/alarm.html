@@ -2062,7 +2062,7 @@
 
       entityTapped(ev){
         ev.stopPropagation();
-        this.fire('hass-more-info', { entityId: ev.target.getAttribute('data-entity')});
+        this.fire('hass-more-info', { entity_id: ev.target.getAttribute('data-entity')});
       }
 
       //Monitors the alarm status for any changes
