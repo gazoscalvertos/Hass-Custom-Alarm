@@ -11,7 +11,7 @@
 
 """
 
-REQUIREMENTS = ['ruamel.yaml==0.15.42']
+REQUIREMENTS = ['ruamel.yaml>=0.15.42']
 
 import asyncio
 import sys
@@ -686,7 +686,11 @@ class BWAlarm(alarm.AlarmControlPanel):
     @property
     def code_format(self):
         """One or more characters."""
-        return None if self._code is None else '.+'
+        if self._code is None:
+            return None
+        if isinstance(self._code, str) and re.search('^\\d+$', self._code):
+            return alarm.FORMAT_NUMBER
+        return alarm.FORMAT_TEXT
 
     def alarm_disarm(self, code=None):
         #If the provided code matches the panic alarm then deactivate the alarm but set the state of the panic mode to active.
