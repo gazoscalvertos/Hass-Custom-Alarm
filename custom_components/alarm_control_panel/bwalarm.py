@@ -430,7 +430,7 @@ class BWAlarm(alarm.AlarmControlPanel):
               _LOGGER.error("[ALARM] Persistence path %s does not exist.", persistence_path)
            else:
               self._persistence_final_path = os.path.join(persistence_path, "alarm.json")
-              if (self.persistence_load()):
+              if (self.persistence_load() and (self._persistence_list["state"] != STATE_ALARM_DISARMED)):
                   self._state     = self._persistence_list["state"]
                   self._timeoutat = pytz.UTC.localize(datetime.datetime.strptime(self._persistence_list["timeoutat"].split(".")[0].replace("T"," "), '%Y-%m-%d %H:%M:%S')) if self._persistence_list["timeoutat"] != None else None
                   self._returnto  = self._persistence_list["returnto"]
