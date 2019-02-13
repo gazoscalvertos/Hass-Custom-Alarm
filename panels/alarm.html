@@ -1840,7 +1840,7 @@
         switch (type){
           case 'time':
             var t = new Date(entry[0] * 1000);
-            return t.toLocaleString('en-GB', { timeZone: 'UTC' }).split(",")[1] + " - " + t.toLocaleString('en-GB', { timeZone: 'UTC' }).split(",")[0];
+            return t.toLocaleString('en-GB').split(",")[1] + " - " + t.toLocaleString('en-GB').split(",")[0];
             break;
           case 'name':
             for (var user in this.alarm.attributes.users) {
