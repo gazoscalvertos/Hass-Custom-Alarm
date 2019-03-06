@@ -685,8 +685,8 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     @property
     def code_format(self):
-        """One or more characters."""
-        return None if ((self._code is None) or (self._state == STATE_ALARM_DISARMED)) else 'number'
+        """One or more digits."""
+        return None if ((self._code is None) or (self._state == STATE_ALARM_DISARMED)) else alarm.FORMAT_NUMBER
 
     def alarm_disarm(self, code=None):
         #If the provided code matches the panic alarm then deactivate the alarm but set the state of the panic mode to active.
