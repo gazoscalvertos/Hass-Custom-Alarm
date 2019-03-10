@@ -2095,7 +2095,7 @@
 
       entityTapped(ev){
         ev.stopPropagation();
-        this.fire('hass-more-info', { entityId: ev.target.getAttribute('data-entity')});
+        this.fire('hass-more-info', { entity_id: ev.target.getAttribute('data-entity')});
       }
 
       //Monitors the alarm status for any changes
@@ -2415,7 +2415,7 @@
 
       //Call one of the alarm services
       alarmService(call){
-        this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entityId, 'code': this.code });
+        this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entity_id, 'code': this.code });
       }
 
       //Restart Home Assistant
