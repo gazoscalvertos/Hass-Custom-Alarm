@@ -1356,9 +1356,8 @@
               <iron-icon icon='mdi:alert-circle-outline'></iron-icon>
             </div>
             <div>
-              <div id='error-title'>Whoops!</div>
-              <div id='error-header'>Something went wrong with your alarm component!</div>
-              <div id='error-detail'>The following errors have been plucked from the Home Assistant log:</div>
+              <div id='error-title'>This component is not working!</div>
+              <!-- <div id='error-header'>Something went wrong with your alarm component!</div> -->
               <template is='dom-repeat' items='[[items]]'>
                <paper-item on-click='openLog'>
                  <paper-item-body two-line>
@@ -1366,12 +1365,14 @@
                      [[item.message]]
                    </div>
                    <div secondary>
-                     [[formatTime(item.timestamp)]] [[item.source]] ([[item.level]])
+                     <!-- [[formatTime(item.timestamp)]] this is not working --> ([[item.source]]) <!--([[item.level]]) it's always ERROR at the moment anyway -->
                    </div>
                  </paper-item-body>
                </paper-item>
               </template>
 
+              <div id='error-detail'>Check the Home Assistant log for more details.</div>
+              
               <div id='error-version'>
                 <p><span class='info-detail'>Home Assistant: </span><span class='info-header'>v[[hass.config.version]]</span></p>
                 <p><span class='info-detail'>This Panel: </span><span class='info-header'>v[[version]]</span></p>
@@ -1504,8 +1505,9 @@
             this.updating = false;
             this.items = [];
             for (var item in this.errorItems) {
-              if (this.errorItems[item].message.includes("[alarm"))
+              if (this.errorItems[item].level.includes("ERROR") && this.errorItems[item].message.includes("bwalarm")) {
                 this.items.push(this.errorItems[item]);
+              }
             }
           });
         }
