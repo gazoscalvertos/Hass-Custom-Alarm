@@ -1,8 +1,0 @@
-- alias: '[Alarm] Panic Mode'
-  trigger:
-    platform: state
-    entity_id: alarm_control_panel.house
-    value_template: '{{ state.attributes.panic_mode }}'
-    to: 'ACTIVE'
-  action:
-    service: activate_self_defence_robot
