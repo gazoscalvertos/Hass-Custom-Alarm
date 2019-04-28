@@ -1,13 +1,12 @@
 """
   CUSTOM ALARM COMPONENT BWALARM
-  https://github.com/gazoscalvertos/Hass-Custom-Alarm
+  https://github.com/akasma74/Hass-Custom-Alarm
 
-  VERSION:  1.1.4
-  MODIFIED: 10/02/19
-  GazosCalvertos: Yet another take on a custom alarm for Home Assistant
+  VERSION:  1.1.4_ak74
+  MODIFIED: 28/04/19
 
   CHANGE LOG:
-  -Fixed username issue in log
+  - VERSION suffixed with _ak74 (to differentiate from the original one)
 
 """
 
@@ -50,7 +49,7 @@ import homeassistant.helpers.config_validation                       as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-VERSION                            = '1.1.3'
+VERSION                            = '1.1.4_ak74'
 
 DOMAIN                             = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
