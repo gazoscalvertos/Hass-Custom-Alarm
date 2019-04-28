@@ -1,0 +1,8 @@
+{
+  "domain": "bwalarm",
+  "name": "Fork of Yet another take on an alarm",
+  "documentation": "https://github.com/akasma74/Hass-Custom-Alarm",
+  "dependencies": [],
+  "codeowners": [],
+  "requirements": []
+}
