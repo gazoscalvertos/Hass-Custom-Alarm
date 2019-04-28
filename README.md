@@ -9,6 +9,9 @@ Copy the following files/complete folders into your home assistant configuration
 
   custom_components/bwalarm/ *The brains of the operation. This is the logic of the custom alarm system*
   
+  panel_custom.yaml *Needed by HA*
+  **NOTE:** If you already have a panel_custom.yaml for say floorplan then just copy and paste the code from this repo file into your own panel_custom.yaml to prevent floorplan from being overritten.
+  
   panels/alarm.html *This is the interface for the custom alarm component. It's actually optional as the alarm will function without it but recommended for ease of setup*
   
   www/alarm/ *These files control how the interface looks and feels*
@@ -25,6 +28,13 @@ You will also need to tell HA where your new panel interface file is. Also add t
 ```
 panel_custom: !include panel_custom.yaml
 ```
+
+**NOTE:** If you experience issues with the page not displaying then add the following:
+```
+#CONFIGURATION.YAML
+frontend:
+  javascript_version: latest
+```
 You may need to restart HA if the component doesn't load first time as HA will need to install a dependency (ruamel.yaml).
 
 It's advisable to start with a new alarm.yaml file with the minimum configuration set (alarm.yaml from this repo):
@@ -33,6 +43,8 @@ platform: bwalarm
 name: House
 ```
 You can always configure your alarm using web interface or by modifying your alarm.yaml directly.
+
+Please refer to the [configuration description](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/guidance/configuration.md) for more details.
 
 The default password to access the settings page is: **HG28!!&dn**
 
