@@ -27,7 +27,7 @@
    --dark-indigo:       #5771C2;
    --dark-indigo-grey:  #37446B;
 
-        /* THEME - LIGHT */
+   /* THEME - LIGHT */
    --light-background:   white;
    --light-inner:        #f3f3f3;
 
@@ -53,6 +53,8 @@
    --primary-text-color:             'white';
 
    --panel-background-color:         var(--dark-background); /*The background color of the main content section.*/
+
+   /* --panel-outer-background-color:   var(--secondary-background-color); */
    --panel-outer-background-color:   var(--dark-inner); /*The background color of both the status bar and the menu bar*/
    --panel-text-color:               var(--dark-white-text); /*The color of the general text within the panel.*/
 
@@ -95,15 +97,28 @@ app-toolbar {
   background-color: var(--header-background-color);
   color: var(--header-text-color);
 }
-ha-app-layout {
-   background-color: var(--panel-outer-background-color);
+#layout {
+  background-color: var(--panel-outer-background-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
-app-header {
-   background-color: var(--panel-outer-background-color);
-   text-align: center;
+#main-title {
+  text-align: center !important;
+  position: relative !important;
+  display: block !important;
+  background-color: var(--header-background-color);
+  padding: 10px;
 }
-app-toolbar ha-menu-button + [main-title] {
+ha-menu-button + [main-title] {
    margin-left: -50px;
+}
+ha-menu-button {
+    color: var(--header-text-color);
+    float: left;
 }
 a, a:link, a:visited, a:active {
   color: var(--panel-text-color);
@@ -123,6 +138,14 @@ a:hover {
       cursor: pointer;
       padding: 5px;
       font-size: large;
+}
+
+.detail, .show, .hide:target {
+  display: none;
+}
+.hide:target + .show,
+.hide:target ~ .detail {
+  display: block;
 }
 
 #modalError {
@@ -183,7 +206,7 @@ a:hover {
 
 }
 #settings-alarm, #settings-all, #settings-info, #settings-sensors, #settings-cameras, #settings-floorplan, #settings-mqtt {
-  padding-bottom: 100px;
+  /* padding-bottom: 100px; */
 }
 .iron-selected {
   color: var(--title-color);
@@ -196,7 +219,8 @@ a:hover {
 }
 
 .action-button{
-  border: 3px solid var(--action-button-border-color) !important;
+border: 0px solid var(--action-button-border-color) !important;
+/* DS */
 }
 
 .dropdown-content{
@@ -249,13 +273,13 @@ a:hover {
 }
 #carousel_main{
   position: relative;
-  height: 60vh;
+  /* height: 60vh; */
   padding: 15px;
 
-  transition: all 1s ease-in-out;
-  -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
-  -moz-transition: all 1s ease-in-out; /** Firefox **/
-  -o-transition: all 1s ease-in-out; /** Opera **/
+  /* transition: all 1s ease-in-out; */
+  /* -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
+  /* -moz-transition: all 1s ease-in-out; /** Firefox **/
+  /* -o-transition: all 1s ease-in-out; /** Opera **/
 }
 #carousel_settings{
     position: relative;
@@ -263,10 +287,10 @@ a:hover {
 }
 
 .carousel-slide-in {
-    transform: translate(-1600px,0);
-    -webkit-transform: translate(-1600px,0); /** Chrome & Safari **/
-    -o-transform: translate(-1600px,0); /** Opera **/
-    -moz-transform: translate(-1600px,0); /** Firefox **/
+    /* transform: translate(-1600px,0); */
+    /* -webkit-transform: translate(-1600px,0); /** Chrome & Safari **/
+    /* -o-transform: translate(-1600px,0); /** Opera **/
+    /* -moz-transform: translate(-1600px,0); /** Firefox **/
 
 }
 
@@ -275,17 +299,17 @@ a:hover {
 }
 
 .carousel-cell {
-  left: 1600px;
+  /* left: 1600px; */
   top: 0;
-  position: absolute;
+  /* position: absolute; */
 
-  transition: all 1s ease-in-out;
-  -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
-  -moz-transition: all 1s ease-in-out; /** Firefox **/
-  -o-transition: all 1s ease-in-out; /** Opera **/
+  /* transition: all 1s ease-in-out; */
+  /* -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
+  /* -moz-transition: all 1s ease-in-out; /** Firefox **/
+  /* -o-transition: all 1s ease-in-out; /** Opera **/
 
   width: 100%;
-  margin-bottom: 60px;
+  /* margin-bottom: 60px; */
   color: var(--panel-text-color);
 }
 
@@ -300,7 +324,7 @@ ha-label-badge {
    @apply(--layout-self-center);
 }
 .flickity-viewport {
-  transition: height 0.5s;
+  /* transition: height 0.5s; */
 }
 .box {
    display: -webkit-box;
@@ -318,7 +342,7 @@ ha-label-badge {
    width: 100%;
 }
 .title{
-   font-size: xx-large;
+   font-size: x-large;
 }
 .sensor-title{
    font-size: x-large;
@@ -403,11 +427,11 @@ text-align: left;
        margin-top: 10px;
   }
   #main-content {
-    padding-bottom: 30px;
+    /* padding-bottom: 30px; */
   }
-  div.arm paper-button {
-    width: 20vh;
-    height: 20vh;
+  div.arm mwc-button {
+    width: 36vh;
+    height: 36vh;
     margin: 15px;
     font-size: large;
   }
@@ -457,25 +481,35 @@ text-align: left;
       justify-content: center;
       text-align: center;
    }
-   div.arm paper-button {
+   div.arm mwc-button {
     /*  margin-bottom: 10px;*/
    }
-  div.digits paper-button, div.digits paper-icon-button{
+  div.digits mwc-button, div.digits paper-icon-button{
     color: var(--arm-button-text-color);
     border-radius: var(--button-shape);
     min-width: 11vh;
     height: 11vh;
     padding: 0;
-    border: 2px solid var(--arm-button-border-color);
+    border: 0px solid var(--arm-button-border-color); /* DS */
+/*    border: 2px solid var(--button-background-color);*/
     background-color: var(--button-background-color);
     margin: 8px;
+    justify-content: center;/* DS */
+    align-items: center;/* DS */
     font-weight: 400;
+        display: flex;
   }
     #code-display {
        margin-bottom: 15px;
   }
 }
 /* ############## SM > 768 ############### */
+
+#info-panel-selection paper-icon-button {
+ width: 12vw;
+ height: 12vw;
+}
+
 @media screen and (min-width: 768px) {
     .content-box {
       /*height: 100%;*/
@@ -513,23 +547,23 @@ text-align: left;
     text-align: right;
 }
   #main-content {
-    padding-top: 20px;
-    padding-bottom: 120px;
+    /* padding-top: 20px;
+    padding-bottom: 120px; */
   }
   #code-display {
-       margin-top: 20px;
-       margin-bottom: 40px;
+       margin-top: 5px;
+       margin-bottom: 5px;
   }
-  div.arm paper-button {
-    width: 250px;
-    height: 250px;
+  div.arm mwc-button {
+    width: 36vh;
+    height: 36vh;
 /*    line-height: 110px;*/
     margin: 20px;
     padding: 20px;
     font-size: x-large;
 }
   #alarm-status span {
-   font-size: xx-large;
+   font-size: x-large;
 }
   .xs {
     display: none !important;
@@ -562,19 +596,21 @@ text-align: left;
       flex-wrap: wrap;
       text-align: center;
    }
-   div.digits paper-button, div.digits paper-iron-button{
+   div.digits mwc-button, div.digits paper-iron-button{
     border-radius: var(--button-shape);
-    width: 115px;
-    height: 115px;
-    border: 3px solid var(--arm-button-border-color);
+    min-width: 14vh;
+    height: 14vh;
+    border: 0px solid var(--arm-button-border-color); /* DS */
+/*    border: 2px solid var(--button-background-color);*/
     background-color: var(--button-background-color);
-    display: inline-block;
-    line-height: 75px;
-    vertical-align: middle;
-    margin: 10px;
-    padding: 20px;
+    display: flex;
+/*    vertical-align: middle;*/
+    justify-content: center;/* DS */
+    align-items: center;/* DS */
+    margin: 8px;
+    padding: 5px;
     text-align: center;
-    font-size: x-large;
+    font-size: large;
   }
 }
 
@@ -648,12 +684,12 @@ paper-listbox {
   background: unset;
 }
 #content {
-  position: fixed;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   width: 100%;
-  overflow: auto;
-  top: 0;
-  left: 0;
-  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 h1 {
   color: var(--title-color);
@@ -703,14 +739,16 @@ h1 {
 }
 #info-panel-selection {
   color: var(--info-panel-buttons-color);
-  text-align: center;
-  width: 100%;
-/*  padding: 10px 0;*/
   background: var(--panel-outer-background-color);
-  position: fixed;
+  position: relative;
   bottom: 0;
   height: auto;
-/*  max-height: 60px;*/
+  display: inline;
+  flex-wrap: wrap;
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  padding: .5rem 1rem;
 }
 
 #main-content {
@@ -746,10 +784,12 @@ div.code {
 }
 #code-display {
     text-align: center;
-    font-size: xx-large;
+    font-size: x-large;
+/*    font-size: xx-large;*/
     letter-spacing: 5px;
     color: var(--panel-text-color);
-    padding-bottom: 10px;
+    padding-bottom: 5px;
+/*    padding-bottom: 10px;*/
     width: 150px;
     border-bottom: solid;
     border-bottom-width: 1.3px;
@@ -763,43 +803,51 @@ div.code iron-label {
    font-size: x-large;
 }
 
-paper-button {
+mwc-button {
    background: #6b8d9c;
    color: #ffffff;
 }
 
 
-div.arm paper-button {
+div.arm mwc-button {
   background-color: var(--button-background-color);
   border-radius: var(--button-shape);
-  border: 3px solid var(--arm-button-border-color);
+  border: 0px solid var(--arm-button-border-color); /* DS */
+/*  border: 3px solid var(--button-background-color); */
   display: flex;
   color: var(--arm-button-text-color);
+  justify-content: center;/* DS */
+  align-items: center;/* DS */
 }
-div.arm paper-button div {
+div.arm mwc-button div {
   border-radius: var(--button-shape);
   width: 100px;
   height: 100px;
-  border: 3px solid var(--arm-button-border-color);
+  border: 0px solid var(--arm-button-border-color); /* DS */
+/*  border: 3px solid var(--button-background-color);*/
   display: flex;
   line-height: 100px;
   margin: 20px;
   padding: 20px;
+  justify-content: center;/* DS */
+  align-items: center;/* DS */
 }
-div.arm paper-button.big {
+div.arm mwc-button.big {
    width: 68%;
 }
-div.arm paper-button.cancel {
-       border: 3px solid var(--cancel-color);
+div.arm mwc-button.cancel {
+       border: 0px solid var(--cancel-color);
+/*       border: 3px solid var(--cancel-color); DS */
 }
-div.arm paper-button.override {
-       border: 3px solid var(--override-color);
+div.arm mwc-button.override {
+       border: 0px solid var(--override-color);
+/*       border: 3px solid var(--override-color); DS */
 }
 
 div.options {
    padding-top: 10px;
 }
-div.options paper-button{
+div.options mwc-button{
    width: 96.5%;
 }
 .tappable {
@@ -860,28 +908,16 @@ div.options paper-button{
    color: var( --weather-text-color);
 }
 
-#main-title-bar{
-   display: -webkit-box;
-   display: -ms-flexbox;
-   display: flex;                  /* establish flex container */
-   -webkit-box-orient: horizontal;
-   -webkit-box-direction: normal;
-   -ms-flex-direction: row;
-   flex-direction: row;            /* default value; can be omitted */
-   -ms-flex-wrap: nowrap;
-   flex-wrap: nowrap;              /* default value; can be omitted */
-   -webkit-box-pack: justify;
-   -ms-flex-pack: justify;
-   justify-content: space-between; /* switched from default (flex-start, see below) */
-   width: 100%;
-}
-#main-title-bar div{
-}
 #main-title-text{
-   width: 100%;
-   position: relative;
+   flex-wrap: wrap;
+   text-align: center;
+
    font-size: xx-large;
    font-family: var(--font-header);
+   justify-content: space-between;
+
+   padding: .5rem 1rem;
+   color: var(--header-text-color)
 }
 .hide-bar {
    margin-top: -64px;
