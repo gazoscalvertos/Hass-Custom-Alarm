@@ -1,0 +1,86 @@
+- id: alarm_armed_away
+  alias: '[Alarm] Away Mode Armed'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'armed_away'
+  action:
+  - data:
+      message: 'Alarm Away Mode Armed'
+      target: email/example@gmail.com
+    service: notify.pushbullet
+  - data:
+      message: 'The house alarm has been switched on in away mode. Goodbye'
+    service: notify.example_phone_tts
+
+- id: alarm_armed_home
+  alias: '[Alarm] Home Mode Armed'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'armed_home'
+  action:
+  - data:
+      message: 'Alarm Home Mode Armed'
+      target: email/example@gmail.com
+    service: notify.pushbullet
+  - data:
+      message: 'The house alarm has been switched on in home mode. Goodnight'
+    service: notify.example_phone_tts
+
+- id: alarm_arming_away
+  alias: '[Alarm] Away Mode Arming'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'pending'
+  action:
+  - data:
+      message: 'House alarm activating, ensure all doors and windows are closed'
+    service: notify.example_phone_tts
+
+- id: alarm_disarmed
+  alias: '[Alarm] Disarmed'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'disarmed'
+  action:
+  - service: notify.pushbullet
+    data:
+      message: 'Alarm Disabled'
+      target: email/example@gmail.com
+  - service: switch.turn_off
+    entity_id: switch.siren_switch
+  - data:
+      message: 'The house alarm has been Deactivated'
+    service: notify.example_phone_tts
+
+- id: alarm_triggered
+  alias: '[Alarm] Triggered'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'triggered'
+  action:
+  - service: switch.turn_on
+    entity_id: switch.siren_switch
+  - service: notify.pushbullet
+    data:
+      message: 'ALARM TRIGGERED!!! {{ states[states.alarm_control_panel.house.attributes.changed_by.split(".")[0]][ states.alarm_control_panel.house.attributes.changed_by.split(".")[1]].name }}'
+      target: email/example@gmail.com
+
+- id: alarm_warning
+  alias: '[Alarm] Warning'
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.house
+    to: 'warning'
+  action:
+  - service: notify.pushbullet
+    data:
+      message: 'ALARM Warning {{ states[states.alarm_control_panel.house.attributes.changed_by.split(".")[0]][ states.alarm_control_panel.house.attributes.changed_by.split(".")[1]].name }}'
+      target: email/example@gmail.com
+  - data:
+      message: 'Hello, the house alarm has been tripped. Please deactivate'
+    service: notify.example_phone_tts
