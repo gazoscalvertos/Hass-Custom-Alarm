@@ -1,5 +1,9 @@
-# This is a temporary fork of bwalarm
-The original HA thread [here](https://community.home-assistant.io/t/yet-another-take-on-an-alarm-system/32386)
+# bwalarm (akasma74 edition)
+
+## Disclaimer
+This fork was created to maintain the original [bwalarm](https://github.com/gazoscalvertos/Hass-Custom-Alarm) custom component until its author is back.
+Feel free to create a new issue or pull request here **if you downloaded code from my repo**.
+The corresponding HA thread [here](https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666)
 
 ## Installation
 
