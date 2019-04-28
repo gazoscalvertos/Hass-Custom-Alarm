@@ -3,7 +3,7 @@ The original HA thread [here](https://community.home-assistant.io/t/yet-another-
 
 ## Installation
 
-You will need to copy the following files/complete folders into your home assistant configuration directory:
+Copy the following files/complete folders into your home assistant configuration directory:
 
   alarm.yaml	*This file stores your alarm configuration*
 
@@ -17,7 +17,7 @@ You will need to copy the following files/complete folders into your home assist
   
   www/images/ha.png *An image file used for the interface log*
 
-To get things working with Home Assistant (HA) you will need to adjust your configuration.yaml to instruct HA to use your new custom alarm component, add the following to this file:
+To get things working with Home Assistant (HA) you need to add the following to your configuration.yaml:
 ```
 alarm_control_panel: !include alarm.yaml
 ```
@@ -32,7 +32,7 @@ It's advisable to start with a new alarm.yaml file with the minimum configuratio
 platform: bwalarm
 name: House
 ```
-Your new interface can be used to modify your alarm.yaml directly.
+You can always configure your alarm using web interface or by modifying your alarm.yaml directly.
 
 The default password to access the settings page is: **HG28!!&dn**
 
