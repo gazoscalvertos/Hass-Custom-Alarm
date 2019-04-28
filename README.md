@@ -6,6 +6,7 @@ The original HA thread [here](https://community.home-assistant.io/t/yet-another-
 You will need to copy the following files/complete folders into your home assistant configuration directory
 
 alarm.yaml	*This file stores your alarm configuration*
+
 custom_components/bwalarm/ *The brains of the operation. This is the logic of the custom alarm system*
 panels/alarm.html *This is the interface for the custom alarm component. It's actually optional as the alarm will function without it but recommended for ease of setup*
 www/alarm/ *These files control how the interface looks and feels*
