@@ -1,6 +1,4 @@
-# This is a temporary fork of bwalarm!
-## Intro :-)
-
+# This is a temporary fork of bwalarm
 The original HA thread [here](https://community.home-assistant.io/t/yet-another-take-on-an-alarm-system/32386)
 
 ## Installation
