@@ -2,11 +2,11 @@
   CUSTOM ALARM COMPONENT BWALARM
   https://github.com/akasma74/Hass-Custom-Alarm
 
-  VERSION:  1.1.4_ak74
-  MODIFIED: 28/04/19
+  VERSION:  1.1.5_ak74
+  MODIFIED: 01/05/19
 
   CHANGE LOG:
-  - VERSION suffixed with _ak74 (to differentiate from the original one)
+  - message_received(topic, msg, qos) -> message_received(msg)
 
 """
 
@@ -930,24 +930,24 @@ class BWAlarm(alarm.AlarmControlPanel):
             )
 
         @callback
-        def message_received(topic, payload, qos):
+        def message_received(msg):
             """Run when new MQTT message has been received."""
             #_LOGGER.warning("[ALARM] MQTT Topic: %s Payload: %s", topic, payload)
-            if payload.split(" ")[0] == self._payload_disarm:
+            if msg.payload.split(" ")[0] == self._payload_disarm:
                 #_LOGGER.warning("Disarming %s", payload)
                 #TODO self._hass.states.get('binary_sensor.siren_sensor') #Use this method to relay open states
                 if (self._override_code):
                     self.alarm_disarm(self._code)
                 else:
-                    self.alarm_disarm(payload.split(" ")[1])
-            elif payload == self._payload_arm_home:
+                    self.alarm_disarm(msg.payload.split(" ")[1])
+            elif msg.payload == self._payload_arm_home:
                 self.alarm_arm_home('')
-            elif payload == self._payload_arm_away:
+            elif msg.payload == self._payload_arm_away:
                 self.alarm_arm_away('')
-            elif payload == self._payload_arm_night:
+            elif msg.payload == self._payload_arm_night:
                 self.alarm_arm_night('')
             else:
-                _LOGGER.warning("[ALARM/MQTT] Received unexpected payload: %s", payload)
+                _LOGGER.warning("[ALARM/MQTT] Received unexpected payload: %s", msg.payload)
                 return
         if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             return self._mqtt.async_subscribe(
