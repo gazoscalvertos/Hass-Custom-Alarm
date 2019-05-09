@@ -8,6 +8,10 @@
  * @version 2.0.5
  *
  * See usage examples at http://jscolor.com/examples/
+ *
+ * 09.05.2019 onDocumentMouseDown and onDocumentTouchStart functions modified
+ * as per https://community.home-assistant.io/t/yet-another-take-on-an-alarm-system/32386/1390
+ *
  */
 
 
@@ -526,43 +530,55 @@ var jsc = {
 	},
 
 
-	onDocumentMouseDown : function (e) {
+  onDocumentMouseDown : function (e) {
+    if (!e) { e = window.event; }
+    var path = (typeof(e.path) == 'object') ? e.path[0] : null;
+    if(path == null){
+    	return null;
+    }
+    var hasKey = "_jscLinkedInstance" in path;
+    var target = e.explicitOriginalTarget || path;
+    if(hasKey == false){
+    	return null;
+    }
+    if (target._jscLinkedInstance) {
+    	if (target._jscLinkedInstance.showOnClick) {
+  			target._jscLinkedInstance.show();
+  		}
+  	} else if (target._jscControlName) {
+  		jsc.onControlPointerStart(e, target, target._jscControlName, 'touch');
+  	} else {
+  		if (jsc.picker && jsc.picker.owner) {
+  			jsc.picker.owner.hide();
+  		}
+  	}
+  },
 
-		if (!e) { e = window.event; }
-		var target = e.explicitOriginalTarget || e.path[0];
-		if (target._jscLinkedInstance) {
-			if (target._jscLinkedInstance.showOnClick) {
-				target._jscLinkedInstance.show();
-			}
-		} else if (target._jscControlName) {
-			jsc.onControlPointerStart(e, target, target._jscControlName, 'mouse');
-		} else {
-			// Mouse is outside the picker controls -> hide the color picker!
-			if (jsc.picker && jsc.picker.owner) {
-				jsc.picker.owner.hide();
-			}
+
+onDocumentTouchStart : function (e) {
+	if (!e) { e = window.event; }
+	var path = (typeof(e.path) == 'object') ? e.path[0] : null;
+	if(path == null){
+		return null;
+	}
+	var hasKey = "_jscLinkedInstance" in path;
+	var target = e.explicitOriginalTarget || path;
+	if(hasKey == false){
+		return null;
+	}
+	if (target._jscLinkedInstance) {
+		if (target._jscLinkedInstance.showOnClick) {
+
+			target._jscLinkedInstance.show();
 		}
-	},
-
-
-	onDocumentTouchStart : function (e) {
-		if (!e) { e = window.event; }
-
-		var target = e.explicitOriginalTarget || e.path[0];
-
-		if (target._jscLinkedInstance) {
-			if (target._jscLinkedInstance.showOnClick) {
-
-				target._jscLinkedInstance.show();
-			}
-		} else if (target._jscControlName) {
-			jsc.onControlPointerStart(e, target, target._jscControlName, 'touch');
-		} else {
-			if (jsc.picker && jsc.picker.owner) {
-				jsc.picker.owner.hide();
-			}
+	} else if (target._jscControlName) {
+		jsc.onControlPointerStart(e, target, target._jscControlName, 'touch');
+	} else {
+		if (jsc.picker && jsc.picker.owner) {
+			jsc.picker.owner.hide();
 		}
-	},
+	}
+},
 
 
 	onWindowResize : function (e) {
@@ -858,7 +874,7 @@ var jsc = {
 					break;
 				}
 			};
-			
+
 			paletteObj.elm = vmlContainer;
 			paletteObj.draw = drawFunc;
 		}
@@ -929,7 +945,7 @@ var jsc = {
 				grad.color = color1;
 				grad.color2 = color2;
 			};
-			
+
 			sliderObj.elm = vmlContainer;
 			sliderObj.draw = drawFunc;
 		}
