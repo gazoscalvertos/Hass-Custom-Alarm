@@ -1,10 +1,8 @@
 <!-- CUSTOM ALARM COMPONENT PANEL
   https://github.com/akasma74/Hass-Custom-Alarm
-  VERSION:  1.3.6_ak74
-  MODIFIED: 28/04/19
 
   CHANGE LOG:
-  - VERSION suffixed with _ak74 (to differentiate from the original one)
+  - applied PR67 from original Hass-Custom-Alarm
 
 -->
 
@@ -13,7 +11,7 @@
   // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
   const _NAME = 'Security Panel';
   const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
-  const _VERSION = '28/04/19 v1.3.6_ak74';
+  const _VERSION = '11/06/19 v1.3.7_ak74';
 
   if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
   window.CUSTOM_UI_LIST.push({
@@ -1831,7 +1829,7 @@
                 return 'Disarm attempt failed, wrong code!';
                 break;
               case 2:
-                return 'The alarm has been triggered! Sensor: ';
+                return 'Alarm has been triggered by ' + this.computeFriendlyName(entry[3]);
                 break;
               case 3:
                 return 'set the alarm in Home mode';
@@ -1840,7 +1838,7 @@
                 return 'set the alarm in Away mode';
                 break;
               case 5:
-                return 'Alarm has been tripped! Sensor:  ';
+                return 'Alarm has been tripped by ' + this.computeFriendlyName(entry[3]);
                 break;
               case 6:
                 return 'Panel Locked';
@@ -2274,8 +2272,13 @@
 
       //Get the friendly readable name of an entity
       computeFriendlyName(entity) {
-        if (this.hass.states[entity] == null) return 'unknown';
+        console.log("computeFriendlyName(%s)", entity)
+        if (this.hass.states[entity] == null) {
+          console.log("Entity %s: unknown", entity);
+          return 'unknown';
+        }
         var attr = this.hass.states[entity].attributes;
+        console.log("Friendly name: %s", attr.friendly_name);
         return attr.friendly_name;
         }
 
