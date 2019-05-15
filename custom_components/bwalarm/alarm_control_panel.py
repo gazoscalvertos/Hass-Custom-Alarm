@@ -1,13 +1,6 @@
 """
-  CUSTOM ALARM COMPONENT BWALARM
-  https://github.com/akasma74/Hass-Custom-Alarm
-
-  VERSION:  1.1.5_ak74
-  MODIFIED: 01/05/19
-
   CHANGE LOG:
   - message_received(topic, msg, qos) -> message_received(msg)
-
 """
 
 REQUIREMENTS = ['ruamel.yaml==0.15.42']
@@ -49,7 +42,7 @@ import homeassistant.helpers.config_validation                       as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-VERSION                            = '1.1.4_ak74'
+VERSION                            = '1.1.5_ak74'
 
 DOMAIN                             = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
