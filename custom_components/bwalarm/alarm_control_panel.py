@@ -1,6 +1,6 @@
 """
   CHANGE LOG:
-  - message_received(topic, msg, qos) -> message_received(msg)
+  - Alarm is going back to Triggered state if the sensor that caused the alarm is still active
 """
 
 REQUIREMENTS = ['ruamel.yaml==0.15.42']
@@ -42,7 +42,7 @@ import homeassistant.helpers.config_validation                       as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-VERSION                            = '1.1.5_ak74'
+VERSION                            = '1.1.6_ak74'
 
 DOMAIN                             = 'alarm_control_panel'
 #//--------------------SUPPORTED STATES----------------------------
@@ -660,8 +660,8 @@ class BWAlarm(alarm.AlarmControlPanel):
                 return
 
             if new.state != None:
-                _LOGGER.debug("[ALARM] event: entity_id %s, state %s", event.data['entity_id'], new.state)
                 if new.state.lower() in self._supported_statuses_on:
+                    _LOGGER.debug("[ALARM] event: entity_id %s, state %s", event.data['entity_id'], new.state)
                     eid = event.data['entity_id']
                     if eid in self.immediate:
                         self._lasttrigger = eid
@@ -850,6 +850,22 @@ class BWAlarm(alarm.AlarmControlPanel):
             if self._config[CONF_ENABLE_PERSISTENCE]:
                 self.save_alarm_state()
             self.schedule_update_ha_state()
+
+            _LOGGER.debug("[ALARM] old_state: %s, new_state: %s", old_state, new_state)
+            # check if the sensor that triggered the alarm is still in alarm state
+            if old_state == STATE_ALARM_TRIGGERED and new_state != STATE_ALARM_DISARMED:
+                _LOGGER.debug("[ALARM] Checking state of %s..", self._lasttrigger)
+                lasttrigger_state = self._hass.states.get(self._lasttrigger)
+                if (lasttrigger_state != None):
+                    _state = lasttrigger_state.state.lower()
+                    _LOGGER.debug("[ALARM] %s is %s", self._lasttrigger, _state)
+                    if _state in self._supported_statuses_on:
+                        _LOGGER.debug("[ALARM] %s is still in alarm state, trigger the alarm immediately", self._lasttrigger)
+                        self.process_event(Events.ImmediateTrip)
+                    else:
+                        _LOGGER.debug("[ALARM] %s is in normal state, nothing to do", self._lasttrigger)
+                else:
+                    _LOGGER.warning("[ALARM] sensor %s is not found!", self._lasttrigger)
 
     def _validate_code(self, code):
         """Validate given code."""
