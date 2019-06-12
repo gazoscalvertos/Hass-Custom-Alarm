@@ -22,11 +22,19 @@ It supports three variations of arm and disarm commands (actual command names co
 There is an option to disarm the alarm via MQTT message without passcode (Disabled by default).
 
 For example,
+```
   home/alarm/set ARM_AWAY
+```
 arms the Away mode after a configured Pending Time,
+```
   home/alarm/set ARM_HOME 1234
+```
 arms the Home mode using code after a configured Pending Time,
+```
   home/alarm/set DISARM
+```
 disarms the alarm if Disarm Without Code is Enabled or
+```
   home/alarm/set DISARM 1234
+```
 if it is Disabled
