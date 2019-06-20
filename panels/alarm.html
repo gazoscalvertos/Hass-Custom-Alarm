@@ -2,7 +2,13 @@
   https://github.com/akasma74/Hass-Custom-Alarm
 
   CHANGE LOG:
-  - applied PR67 from original Hass-Custom-Alarm
+
+  v1.3.8_ak74
+    - arm mode buttons/keypad appearance changed to look better
+    - minor changes to comments
+
+  v1.3.7_ak74
+    - applied PR67 from original Hass-Custom-Alarm
 
 -->
 
@@ -11,7 +17,8 @@
   // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
   const _NAME = 'Security Panel';
   const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
-  const _VERSION = '11/06/19 v1.3.7_ak74';
+  // don't forget to change HaPanelAlarm.version below!
+  const _VERSION = '12/06/19 v1.3.8_ak74';
 
   if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
   window.CUSTOM_UI_LIST.push({
@@ -109,15 +116,16 @@
               <!-- ###########################################CONTROLS############################################### -->
               <div id='controls' class='carousel-cell remove'>
                 <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-                  <div class='vLayout arm'>
+<!--                  <div class='vLayout arm'> -->
+<!--                  <div class='digits horizontal layout' style='justify-content: center;'> -->
+                  <div class='horizontal layout arm'  style='justify-content: center;'>
                     <template is='dom-if' if='[[!showCodePanel(alarm)]]'>
                       <template is='dom-if' if='[[!attemptedArm]]'>
-                        <template is='dom-if' if='[[alarm.attributes.enable_perimeter_mode]]'>
-                          <mwc-button id='arm-perimeter' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night'>Perimeter</mwc-button>
+                        <template is='dom-if' if='[[alarm.attributes.enable_night_mode]]'>
+                          <mwc-button id='arm-night' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night' raised>Night</mwc-button>
                         </template>
                         <mwc-button id='arm-home' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home' raised>Home</mwc-button>
                         <mwc-button id='arm-away' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away' raised>Away</mwc-button>
-
                       </template>
                     </template>
                     <template is='dom-if' if='[[attemptedArm]]'>
@@ -125,9 +133,15 @@
                         <div style='text-align: center;'>
                           <h1>Open Sensors Found</h1>
                         </div>
+                      <!-- DS -->
+                        <div class='sensors'>
+                        <template is='dom-repeat' items='[[opensensors_for_attempted_arm()]]' as='entity'>
+                          <state-card-display state-obj='[[entity]]' hass='[[hass]]' class='tappable' on-tap='entityTapped' data-entity='[[entity.entity_id]]'></state-card-display>
+                        </template>
+                        <!-- DS -->
                         <div class='horizontal layout'>
-                          <mwc-button id='arm-override' class='override' on-click='callAlarmService' data-call='override' data-arm='attemptArmMode'>Override</mwc-button>
-                          <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel'>Cancel</mwc-button>
+                          <mwc-button id='arm-override' class='override' on-click='callAlarmService' data-call='override' data-arm='attemptArmMode' raised>Override</mwc-button>
+                          <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>Cancel</mwc-button>
                         </div>
                       </div>
                     </template>
@@ -138,51 +152,49 @@
 
                   <template is='dom-if' if='[[!attemptedArm]]'>
 
-                    <!-- <template is='dom-if' if='[[requiresCode()]]'>
+                    <!--<template is='dom-if' if='[[requiresCode()]]'>
                       <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
                           <div id='code-display'>[[display_code]]</div>
                       </template>
-                    </template> -->
+                    </template>-->
 
                     <div id='codepanel' class='horizontal layout center-justified'>
                       <div>
-                        <div class='digits horizontal layout' style='justify-content: flex-start;'>
+                        <div class='digits horizontal layout' style='justify-content: center;'>
                           <template is='dom-if' if='[[requiresCode()]]'>
                             <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-                              <template is='dom-if' if='[[alarm.attributes.enable_perimeter_mode]]'>
-                                <mwc-button id='arm-perimeter1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night'>Perim</mwc-button>
+                              <template is='dom-if' if='[[alarm.attributes.enable_night_mode]]'>
+                                <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night' raised>Night</mwc-button>
                               </template>
+                              <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home' raised>Home</mwc-button>
+                              <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away' raised>Away</mwc-button>
                             </template>
+                          </template>
+                        </div>
+                        <div class='digits horizontal layout' style='justify-content: flex-start;'>
+                          <template is='dom-if' if='[[requiresCode()]]'>
                             <mwc-button on-click='callcode' data-digit=1 raised>1</mwc-button>
                             <mwc-button on-click='callcode' data-digit=2 raised>2</mwc-button>
                             <mwc-button on-click='callcode' data-digit=3 raised>3</mwc-button>
                           </template>
-                          <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
-                            <mwc-button class='sm action-button disarm' on-click='callAlarmService' data-call='disarm' raised>Disarm</mwc-button>
-                              </template>
-
+                          <mwc-button class='sm action-button clear' on-click='callclearcode' raised>Clear</mwc-button>
                         </div>
                         <div class='digits horizontal layout center-justified'>
                           <template is='dom-if' if='[[requiresCode()]]'>
-                            <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-                              <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home' raised>Home</mwc-button>
-                            </template>
                             <mwc-button on-click='callcode' data-digit=4 raised>4</mwc-button>
                             <mwc-button on-click='callcode' data-digit=5 raised>5</mwc-button>
                             <mwc-button on-click='callcode' data-digit=6 raised>6</mwc-button>
                             <mwc-button class='sm'  on-click='callcode' data-digit=0 raised>0</mwc-button>
-
                           </template>
                         </div>
                         <div class='digits horizontal layout'>
                           <template is='dom-if' if='[[requiresCode()]]'>
-                            <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-                              <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away'>Away</mwc-button>
-                            </template>
                             <mwc-button on-click='callcode' data-digit=7 raised>7</mwc-button>
                             <mwc-button on-click='callcode' data-digit=8 raised>8</mwc-button>
                             <mwc-button on-click='callcode' data-digit=9 raised>9</mwc-button>
-                            <mwc-button class='sm action-button clear' on-click='callclearcode' raised>Clear</mwc-button>
+                            <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+                              <mwc-button class='sm action-button disarm' on-click='callAlarmService' data-call='disarm' raised>Disarm</mwc-button>
+                            </template>
                           </template>
                         </div>
                         <div class='xs digits horizontal layout center-justified'>
@@ -506,7 +518,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Alarm Panel Title: </span>
-                        <span class='info-detail'>The text that shows on the header bar. Defaults to 'Home Alarm' if not set</span>
+                        <span class='info-detail'>The text that shows on the header bar.<br>Default: Home Alarm</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='panel_title' value='{{alarm.attributes.panel.panel_title}}' placeholder='Panel Title'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='panel' data-attribute='panel_title' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -527,7 +539,7 @@
                         <span class='info-header'>Clock 12 Hour Mode?: </span>
                         <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_clock_12hr)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_clock_12hr'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>Changes the clock to 12hour mode when enabled. Default False which shows 24hr mode</span>
+                      <span class='info-detail'>Changes the clock to 12hour mode when enabled.<br>Default: Disabled (i.e 24hr mode)</span>
                     </div>
 
                     <div class='setting-outer vertical layout'>
@@ -583,7 +595,7 @@
                         <span class='info-header'>Shadow Text Effect: </span>
                         <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.shadow_effect)}}' on-change='settingsSave' data-setting='panel' data-attribute='shadow_effect'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>Enables the shadow text effect in this panel. Defaults to false</span>
+                      <span class='info-detail'>Enables the shadow text effect in this panel.<br>Default: Disabled</span>
                     </div>
 
                     <div class='setting-outer vertical layout'>
@@ -591,7 +603,7 @@
                         <span class='info-header'>Serif Font: </span>
                         <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_serif_font)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_serif_font'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>Enables the 'Lobster' serif font on the title, time and weather within this panel. Default False</span>
+                      <span class='info-detail'>Enables the 'Lobster' serif font on the title, time and weather within this panel.<br>Default: Disabled</span>
                     </div>
 
                     <div>
@@ -659,13 +671,13 @@
                         <span class='info-header'>Alarm Persistence: </span>
                         <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_persistence}}' on-change='settingsSave' data-setting='root' data-attribute='enable_persistence'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>When enabled the alarm state is persistently saved when eith Home Assistant or the underlying host is restarted. This is useful in the event of power loss. Default False.</span>
+                      <span class='info-detail'>When enabled, the alarm state is persistently saved when eith Home Assistant or the underlying host is restarted. This is useful in the event of power loss.<br>Default: Disabled</span>
                     </div>
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
-                        <span class='info-header'>Master Code: </span>
-                        <span class='info-detail'>Set/Reset the master passcode to arm/disarm your alarm</span>
+                        <span class='info-header'>Master Passcode: </span>
+                        <span class='info-detail'>Set the master passcode to arm/disarm your alarm</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='code' type="password" placeholder='Master Passcode'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='root' data-attribute='code' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -676,7 +688,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Panic Code: </span>
-                        <span class='info-detail'>Set/Reset the panic code to arm/disarm your alarm. This is a special code which disarms the alarm when used yet sets a panic state within HA. It can therefore be used in conjunction with automations for example notifiying the authorities or someone who is able to help. To the intruder the alarm appears to have disarmed as normal.</span>
+                        <span class='info-detail'>Set the panic code to arm/disarm your alarm. This is a special code which disarms the alarm when used yet sets a panic state within HA. It can therefore be used in conjunction with automations for example notifiying the authorities or someone who is able to help. To the intruder the alarm appears to have disarmed as normal.</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='panic_code' type="password" placeholder='Panic Code'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='root' data-attribute='panic_code' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -686,16 +698,16 @@
 
                     <div class='setting-outer vertical layout'>
                       <div class='setting-inner horizontal layout'>
-                        <span class='info-header'>Require a code to set the alarm: </span>
+                        <span class='info-header'>Require a passcode to set the alarm: </span>
                         <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.code_to_arm}}' on-change='settingsSave' data-setting='root' data-attribute='code_to_arm'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>If enabled a valid code is required to arm the alarm.</span>
+                      <span class='info-detail'>When enabled, a valid master/user passcode is required to arm the alarm. If 'override' is used as a passcode, set the alarm immediately (ignores appropriate Pending Time) regardless of this setting</span>
                     </div>
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
-                        <span class='info-header'>Passcode Attempts: </span>
-                        <span class='info-detail'>Amount of allowed passcode attempts before the panel locks out. Defaults to -1 which means infinite attempts</span>
+                        <span class='info-header'>Disarm Attempts: </span>
+                        <span class='info-detail'>Amount of allowed disarm attempts before the panel locks out.<br>Default: -1 (infinite attempts)</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='passcode_attempts' value='{{alarm.attributes.passcode_attempts}}' placeholder='Passcode Attempts'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='root' data-attribute='passcode_attempts' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -705,8 +717,8 @@
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
-                        <span class='info-header'>Passcode Attempts Timeout: </span>
-                        <span class='info-detail'>Amount of time in seconds after the panel is locked before a user is allowed to try again. Defaults to 15 minutes.</span>
+                        <span class='info-header'>Disarm Attempts Timeout: </span>
+                        <span class='info-detail'>Amount of time in seconds after the panel is locked before a user is allowed to try again.<br>Default: 15 minutes</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='passcode_attempts_timeout' value='{{alarm.attributes.passcode_attempts_timeout}}' placeholder='Passcode Attempts Timeout'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='root' data-attribute='passcode_attempts_timeout' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -719,13 +731,13 @@
                         <span class='info-header'>Enable Log: </span>
                         <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_log}}' on-change='settingsSave' data-setting='root' data-attribute='enable_log'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>When enabled the alarm records a log, permissions must be granted to HA to allow the log file to be saved in the configuration directory as alarm_log.json. Default Disabled.</span>
+                      <span class='info-detail'>When enabled the alarm records a log, permissions must be granted to HA to allow the log file to be saved in the configuration directory as alarm_log.json.<br>Default: Disabled</span>
                     </div>
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>log Size: </span>
-                        <span class='info-detail'>Amount of records which can be saved and displayed. Defaults to 10 records.</span>
+                        <span class='info-detail'>Amount of records which can be saved and displayed.<br>Default: 10 records</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='log_size' value='{{alarm.attributes.log_size}}' placeholder='Log Size'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='root' data-attribute='log_size' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -737,7 +749,7 @@
                     <h1>User Specific Codes</h1>
 
                     <div class='setting-outer vertical layout'>
-                      <span class='info-detail'>This setting provides the ability to configure user specific accounts that are able to control your alarm. If logging is enabled then these users will be captured as part of the log. Home Assistant users using the new authentication system introcuded in v0.70 will be automatically imported.</span>
+                      <span class='info-detail'>This setting provides the ability to configure user specific accounts that are able to control your alarm. If logging is enabled then these users will be captured as part of the log. Home Assistant users using the new authentication system introduced in v0.70 will be automatically imported.</span>
                     </div>
 
                     <template is='dom-repeat' items='[[alarm.attributes.users]]' as='user'>
@@ -865,7 +877,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Pending (Exit) Time: </span>
-                        <span class='info-detail'>Grace time in seconds before the alarm is armed. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Exit Time'. Default is 25 seconds</span>
+                        <span class='info-detail'>Grace time in seconds before the alarm is armed. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Exit Time'.<br>Default: 25 seconds</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='armed_away-pending_time' value='[[alarm.attributes.states.armed_away.pending_time]]' placeholder='Pending Time'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_away' data-attribute='pending_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -876,7 +888,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Warning (Entry) Time: </span>
-                        <span class='info-detail'>Grace time in seconds before the alarm is triggered. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Entry Time'. Default is 25 seconds</span>
+                        <span class='info-detail'>Grace time in seconds before the alarm is triggered. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Entry Time'.<br>Default: 25 seconds</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='armed_away-warning_time' value='[[alarm.attributes.states.armed_away.warning_time]]' placeholder='Warning Time'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_away' data-attribute='warning_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -887,7 +899,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Trigger Time: </span>
-                        <span class='info-detail'>The amount of time in seconds the alarm stays triggered before returning to its previous state. Default is 300 seconds</span>
+                        <span class='info-detail'>The amount of time in seconds the alarm stays triggered before returning to its previous state.<br>Default: 300 seconds</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='armed_away-trigger_time' value='[[alarm.attributes.states.armed_away.trigger_time]]' placeholder='Trigger Time'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_away' data-attribute='trigger_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -940,7 +952,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Pending (Exit) Time: </span>
-                        <span class='info-detail'>Grace time in seconds before the alarm is armed. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Exit Time'. Default is 25 seconds</span>
+                        <span class='info-detail'>Grace time in seconds before the alarm is armed. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Exit Time'.<br>Default: 25 seconds</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='armed_home-pending_time' value='[[alarm.attributes.states.armed_home.pending_time]]' placeholder='Pending Time'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_home' data-attribute='pending_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -952,7 +964,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Warning (Entry) Time: </span>
-                        <span class='info-detail'>Grace time in seconds before the alarm is triggered. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Entry Time'. Default is 25 seconds</span>
+                        <span class='info-detail'>Grace time in seconds before the alarm is triggered. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Entry Time'.<br>Default: 25 seconds</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='armed_home-warning_time' value='[[alarm.attributes.states.armed_home.warning_time]]' placeholder='Warning Time'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_home' data-attribute='warning_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -963,7 +975,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Trigger Time: </span>
-                        <span class='info-detail'>The amount of time in seconds the alarm stays triggered before returning to its previous state. Default is 300 seconds</span>
+                        <span class='info-detail'>The amount of time in seconds the alarm stays triggered before returning to its previous state.<br>Default: 300 seconds</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='armed_home-trigger_time' value='[[alarm.attributes.states.armed_home.trigger_time]]' placeholder='Trigger Time'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_home' data-attribute='trigger_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -1002,23 +1014,23 @@
                       </div>
                     </div>
 
-                    <h1>Perimeter Mode</h1>
+                    <h1>Night (perimeter) Mode</h1>
 
                     <div class='setting-outer vertical layout'>
                       <div class='setting-inner horizontal layout'>
-                        <span class='info-header'>Enable Perimeter Mode: </span>
-                        <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_perimeter_mode}}' on-change='settingsSave' data-setting='root' data-attribute='enable_perimeter_mode'></paper-toggle-button>
+                        <span class='info-header'>Enable Night Mode: </span>
+                        <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_night_mode}}' on-change='settingsSave' data-setting='root' data-attribute='enable_night_mode'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>Enable perimeter mode. Default is False</span>
+                      <span class='info-detail'>Enable night mode.<br>Default: Disabled</span>
                     </div>
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Pending (Exit) Time: </span>
-                        <span class='info-detail'>Grace time in seconds before the alarm is armed. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Exit Time'. Default is 25 seconds</span>
+                        <span class='info-detail'>Grace time in seconds before the alarm is armed. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Exit Time'.<br>Default: 25 seconds</span>
                         <div class='setting-input horizontal layout'>
-                          <paper-input id='armed_perimeter-pending_time' value='[[alarm.attributes.states.armed_perimeter.pending_time]]' placeholder='Pending Time'></paper-input>
-                          <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_perimeter' data-attribute='pending_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          <paper-input id='armed_night-pending_time' value='[[alarm.attributes.states.armed_night.pending_time]]' placeholder='Pending Time'></paper-input>
+                          <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_night' data-attribute='pending_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                         </div>
                       </div>
                     </div>
@@ -1026,10 +1038,10 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Warning (Entry) Time: </span>
-                        <span class='info-detail'>Grace time in seconds before the alarm is triggered. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Entry Time'. Default is 25 seconds</span>
+                        <span class='info-detail'>Grace time in seconds before the alarm is triggered. Any sensor tripped within this time period will not trigger the alarm. Also known as 'Entry Time'.<br>Default: 25 seconds</span>
                         <div class='setting-input horizontal layout'>
-                          <paper-input id='armed_perimeter-warning_time' value='[[alarm.attributes.states.armed_perimeter.warning_time]]' placeholder='Warning Time'></paper-input>
-                          <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_perimeter' data-attribute='warning_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          <paper-input id='armed_night-warning_time' value='[[alarm.attributes.states.armed_night.warning_time]]' placeholder='Warning Time'></paper-input>
+                          <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_night' data-attribute='warning_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                         </div>
                       </div>
                     </div>
@@ -1037,10 +1049,10 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Trigger Time: </span>
-                        <span class='info-detail'>The amount of time in seconds the alarm stays triggered before returning to its previous state. Default is 300 seconds</span>
+                        <span class='info-detail'>The amount of time in seconds the alarm stays triggered before returning to its previous state.<br>Default: 300 seconds</span>
                         <div class='setting-input horizontal layout'>
-                          <paper-input id='armed_perimeter-trigger_time' value='[[alarm.attributes.states.armed_perimeter.trigger_time]]' placeholder='Trigger Time'></paper-input>
-                          <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_perimeter' data-attribute='trigger_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          <paper-input id='armed_night-trigger_time' value='[[alarm.attributes.states.armed_night.trigger_time]]' placeholder='Trigger Time'></paper-input>
+                          <paper-icon-button data-type='input_text' data-setting='states' data-mode='armed_night' data-attribute='trigger_time' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                         </div>
                       </div>
                     </div>
@@ -1048,9 +1060,9 @@
                     <div class='horizontal layout'>
                       <div class='vertical layout'>
                         <h2>Immediate</h2>
-                        <paper-listbox id='sensors-checkboxs6' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_perimeter.immediate}} selected-attribute="checked" >
+                        <paper-listbox id='sensors-checkboxs6' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_night.immediate}} selected-attribute="checked" >
                           <template is='dom-repeat' items='{{sensors}}' as='sensor'>
-                            <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_perimeter' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
+                            <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_night' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
                       </div>
@@ -1058,9 +1070,9 @@
                       <div class='vertical layout'>
 
                         <h2>Delayed</h2>
-                        <paper-listbox id='sensors-checkboxs7' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_perimeter.delayed}} selected-attribute="checked" >
+                        <paper-listbox id='sensors-checkboxs7' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_night.delayed}} selected-attribute="checked" >
                           <template is='dom-repeat' items='{{sensors}}' as='sensor'>
-                            <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_perimeter' data-group='delayed' >[[computeFriendlyName(sensor)]]</checkbox>
+                            <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_night' data-group='delayed' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
                       </div>
@@ -1068,9 +1080,9 @@
                       <div class='vertical layout'>
 
                         <h2>Override</h2>
-                        <paper-listbox id='sensors-checkboxs8' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_perimeter.override}} selected-attribute="checked" >
+                        <paper-listbox id='sensors-checkboxs8' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_night.override}} selected-attribute="checked" >
                           <template is='dom-repeat' items='{{sensors}}' as='sensor'>
-                            <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_perimeter' data-group='override' >[[computeFriendlyName(sensor)]]</checkbox>
+                            <checkbox type='checkbox' class='checkbox' title="{{sensor}}" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_night' data-group='override' >[[computeFriendlyName(sensor)]]</checkbox>
                           </template>
                         </paper-listbox>
                       </div>
@@ -1121,7 +1133,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Update Interval: </span>
-                        <span class='info-detail'>The time in seconds the camera image updates. Default is 5 seconds</span>
+                        <span class='info-detail'>The time in seconds the camera image updates.<br>Default: 5 seconds</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='camera_update_interval' value='{{alarm.attributes.panel.camera_update_interval}}' placeholder='Update Interval'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='panel' data-attribute='camera_update_interval' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -1145,13 +1157,13 @@
                         <span class='info-header'>Enable MQTT:</span>
                         <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.mqtt.enable_mqtt}}' on-change='settingsSave' data-setting='mqtt' data-attribute='enable_mqtt'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>(RESTART REQUIRED) Enabling this allows you to send and receive MQTT messages to interact with your alarm</span>
+                      <span class='info-detail'>Enabling this allows you to send and receive MQTT messages to interact with your alarm. Restart Home Assistant for the changes to take effect.<br>Default: Disabled</span>
                     </div>
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>QOS: </span>
-                        <span class='info-detail'>Quality of Service. The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.</span>
+                        <span class='info-detail'>Quality of Service. The maximum QoS level for subscribing and publishing to MQTT messages.<br>Default: 0</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='qos' value='{{alarm.attributes.mqtt.qos}}' placeholder='QOS'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='qos' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -1162,7 +1174,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>State Topic: </span>
-                        <span class='info-detail'>The MQTT topic HA will publish state updates to. Default is 'home/alarm'</span>
+                        <span class='info-detail'>The MQTT topic HA will publish state updates to.<br>Default: home/alarm</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='state_topic' value='{{alarm.attributes.mqtt.state_topic}}' placeholder='State Topic'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='state_topic' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -1173,7 +1185,7 @@
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
                         <span class='info-header'>Command Topic: </span>
-                        <span class='info-detail'>The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state. Default is 'home/alarm/set'</span>
+                        <span class='info-detail'>The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.<br>Default: home/alarm/set</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='command_topic' value='{{alarm.attributes.mqtt.command_topic}}' placeholder='Command Topic'></paper-input>
                           <paper-icon-button data-type='imput_text' data-setting='mqtt' data-attribute='command_topic' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -1183,19 +1195,19 @@
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
-                        <span class='info-header'>Payload Disarm: </span>
-                        <span class='info-detail'>The payload to disarm this Alarm Panel. Default is 'DISARM'.</span>
+                        <span class='info-header'>Arm Night command: </span>
+                        <span class='info-detail'>Command to set armed-night mode on this Alarm Panel.<br>Default: ARM_NIGHT</span>
                         <div class='setting-input horizontal layout'>
-                          <paper-input id='payload_disarm' value='{{alarm.attributes.mqtt.payload_disarm}}' placeholder='Payload Disarm'></paper-input>
-                          <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_disarm' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          <paper-input id='payload_arm_night' value='{{alarm.attributes.mqtt.payload_arm_night}}' placeholder='Payload Night'></paper-input>
+                          <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_arm_night' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                         </div>
                       </div>
                     </div>
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
-                        <span class='info-header'>Payload Arm Home: </span>
-                        <span class='info-detail'>The payload to set armed-home mode on this Alarm Panel. Default is 'ARM_HOME'.</span>
+                        <span class='info-header'>Arm Home command: </span>
+                        <span class='info-detail'>Command to set armed-home mode on this Alarm Panel.<br>Default: ARM_HOME</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='payload_arm_home' value='{{alarm.attributes.mqtt.payload_arm_home}}' placeholder='Payload Disarm'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_arm_home' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -1205,8 +1217,8 @@
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
-                        <span class='info-header'>Payload Arm Away: </span>
-                        <span class='info-detail'>The payload to set armed-away mode on this Alarm Panel. Default is 'ARM_AWAY'.</span>
+                        <span class='info-header'>Arm Away command: </span>
+                        <span class='info-detail'>Command to set armed-away mode on this Alarm Panel.<br>Default: ARM_AWAY</span>
                         <div class='setting-input horizontal layout'>
                           <paper-input id='payload_arm_away' value='{{alarm.attributes.mqtt.payload_arm_away}}' placeholder='Payload Away'></paper-input>
                           <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_arm_away' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -1216,21 +1228,21 @@
 
                     <div class='setting-outer horizontal layout'>
                       <div class='setting-inner vertical layout'>
-                        <span class='info-header'>Payload Arm Perimeter: </span>
-                        <span class='info-detail'>The payload to set armed-perimeter mode on this Alarm Panel. Default is 'ARM_NIGHT'.</span>
+                        <span class='info-header'>Disarm command: </span>
+                        <span class='info-detail'>Command to disarm this Alarm Panel.<br>Default: DISARM</span>
                         <div class='setting-input horizontal layout'>
-                          <paper-input id='payload_arm_night' value='{{alarm.attributes.mqtt.payload_arm_night}}' placeholder='Payload Perimeter'></paper-input>
-                          <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_arm_night' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          <paper-input id='payload_disarm' value='{{alarm.attributes.mqtt.payload_disarm}}' placeholder='Payload Disarm'></paper-input>
+                          <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_disarm' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                         </div>
                       </div>
                     </div>
 
                     <div class='setting-outer vertical layout'>
                       <div class='setting-input horizontal layout'>
-                        <span class='info-header'>Override Code:</span>
+                        <span class='info-header'>Disarm Without Passcode:</span>
                         <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.mqtt.override_code}}' on-change='settingsSave' data-setting='mqtt' data-attribute='override_code'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>If true allows MQTT commands to disarm the alarm without a valid code. False by default.</span>
+                      <span class='info-detail'>If enabled, allows MQTT command to disarm the alarm without a passcode.<br>Default: Disabled</span>
                     </div>
 
                     <div class='setting-outer vertical layout'>
@@ -1238,7 +1250,7 @@
                         <span class='info-header'>Pending On Warning:</span>
                         <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.mqtt.pending_on_warning}}' on-change='settingsSave' data-setting='mqtt' data-attribute='pending_on_warning'></paper-toggle-button>
                       </div>
-                      <span class='info-detail'>Broadcast Pending state when the alarm is tripped instead of the default Warning state. This is to allow integration with other MQTT panels which use this state. False by default.</span>
+                      <span class='info-detail'>Broadcast Pending state when the alarm is tripped instead of the default Warning state. This is to allow integration with other MQTT panels which use this state.<br>Default: Disabled</span>
                     </div>
 
                   </div>
@@ -1403,21 +1415,23 @@
           panel_locked:         { type: Boolean, value: false },
 
           cameraFeedSrc:        { type: String },
-          camera_time:     { type: String },
-          cameras:         { type: Array, value: [] },
+          camera_time:          { type: String },
+          cameras:              { type: Array, value: [] },
 
-          sensors:         { type: Array, value: [] },
-          binary_sensors:  { type: Array, value: [] },
-          switches:        { type: Array, value: [] },
+          sensors:              { type: Array, value: [] },
+          binary_sensors:       { type: Array, value: [] },
+          switches:             { type: Array, value: [] },
 
-          errors:          { type: Array },
-          version:         { type: String, value: '1.3.6_ak74'},
+          errors:               { type: Array },
+          version:              { type: String, value: '1.3.8_ak74'},
 
           camera_update_interval: { type: Number, value: 5000 }, // ms
 
-          settingColors: { type: Array, value: [] },
-          selectedUser:  { type: Object, value: null},
+          settingColors:        { type: Array, value: [] },
+          selectedUser:         { type: Object, value: null},
 
+          // internal constants
+          INT_ATTR_STATE_CHECK_BEFORE_ARM: { type: String, value: '_check_before_arm'},
         }
       }
 
@@ -1537,9 +1551,9 @@
           'color': (theme != null && theme.armed_away_color != null) ? theme.armed_away_color : 'black'};
 
         this.settingColors[6] = {
-          'name':'armed_perimeter_color', 'header':'Armed in \'Perimeter\' Mode', 'theme':themeName,
-          'description':'When the alarm is set in \'Perimeter Mode\' the panel will display this color in both the top header background and the centre panel background',
-          'color': (theme != null && theme.armed_perimeter_color != null) ? theme.armed_perimeter_color  : 'black'};
+          'name':'armed_night_color', 'header':'Armed in \'Night\' Mode', 'theme':themeName,
+          'description':'When the alarm is set in \'Night Mode\' the panel will display this color in both the top header background and the centre panel background',
+          'color': (theme != null && theme.armed_night_color != null) ? theme.armed_night_color  : 'black'};
 
         this.settingColors[7] = {
           'name':'panel_background_color', 'header':'Panel Background', 'theme':themeName,
@@ -1826,7 +1840,7 @@
                 return 'disarmed the alarm';
                 break;
               case 1:
-                return 'Disarm attempt failed, wrong code!';
+                return 'Disarm attempt failed, wrong passcode!';
                 break;
               case 2:
                 return 'Alarm has been triggered by ' + this.computeFriendlyName(entry[3]);
@@ -1844,7 +1858,7 @@
                 return 'Panel Locked';
                 break;
               case 8:
-                return 'set the alarm in Perimeter mode';
+                return 'set the alarm in Night mode';
                 break;
             }
             break;
@@ -1897,7 +1911,7 @@
           var states = {
             'armed_away' : {'immediate':[], 'delayed':[], 'override':[], 'pending_time': 0, 'warning_time': 0, 'trigger_time': 600},
             'armed_home' : {'immediate':[], 'delayed':[], 'override':[], 'pending_time': 0, 'warning_time': 0, 'trigger_time': 600},
-            'armed_perimeter' : {'immediate':[], 'delayed':[], 'override':[], 'pending_time': 0, 'warning_time': 0, 'trigger_time': 600}
+            'armed_night' : {'immediate':[], 'delayed':[], 'override':[], 'pending_time': 0, 'warning_time': 0, 'trigger_time': 600}
           };
           this.settingsUpdate('states', states);
         }
@@ -2055,7 +2069,7 @@
 
       // Close the sidebar if alarm is set and the option is enabled
       closeSidebar(instance){
-        if (instance.alarm.state != 'disarmed')
+        if ( instance.alarm != null && instance.alarm.state != 'disarmed')
           instance.fire('hass-close-menu');
       }
 
@@ -2066,6 +2080,7 @@
 
       //Monitors the alarm status for any changes
       monitorAlarm(){
+        console.log("monitorAlarm");
 
         this.callclearcode(null);
 
@@ -2217,23 +2232,38 @@
         return alarm.state == 'disarmed';
       }
 
-      // Get open sensors
-      opensensors(alarm, all)   {
+      // Return a list of open sensors built from sensors
+      opensensors(alarm, sensors)   {
         var ret = [];
-        if (all != null){
-          ret = all.filter(function (e){ return alarm.attributes.supported_statuses_on.indexOf(e.state.toLowerCase()) > -1; });
-          this.opencount = ret.length;
-          return ret;
+
+        if (sensors != null)
+          ret = sensors.filter(function (e){ return alarm.attributes.supported_statuses_on.indexOf(e.state.toLowerCase()) > -1; });
+
+        this.opencount = ret.length;
+
+//        if (ret.length > 0)
+//          console.log("%i opensensors:", ret.length);
+//        ret.forEach(function (obj) {console.log("\t" + obj.entity_id + ":" + obj.state);});
+
+        return ret;
+      }
+
+      opensensors_for_attempted_arm() {
+        if (this.attemptedArm == true) {
+          var arm_state = this.service_name2arm_state(this.attemptArmMode);
+          return this.opensensors(this.alarm, this.computeSensors(this.hass, this.alarm.attributes.states[arm_state][this.INT_ATTR_STATE_CHECK_BEFORE_ARM]) );
         }
+        else
+          return []
       }
 
       // Get closed sensors
-      closedsensors(alarm, all)   {
+      closedsensors(alarm, sensors)   {
         var ret = [];
-        if (all == false){
+        if (sensors == false){
           return false;
         } else {
-          ret = all.filter(function (e){ return alarm.attributes.supported_statuses_off.indexOf(e.state.toLowerCase()) > -1; });
+          ret = sensors.filter(function (e){ return alarm.attributes.supported_statuses_off.indexOf(e.state.toLowerCase()) > -1; });
           return ret;
         }
       }
@@ -2265,20 +2295,20 @@
           case 'pending':       return 'leave';
           case 'warning':       return 'warning';
           case 'triggered':     return 'triggered';
-          case 'armed_perimeter': return 'perimeter';
+          case 'armed_night':   return 'night';
         }
         return state;
       }
 
       //Get the friendly readable name of an entity
       computeFriendlyName(entity) {
-        console.log("computeFriendlyName(%s)", entity)
+        //console.log("computeFriendlyName(%s)", entity)
         if (this.hass.states[entity] == null) {
-          console.log("Entity %s: unknown", entity);
+          console.log("Unknown entity \"%s\"", entity);
           return 'unknown';
         }
         var attr = this.hass.states[entity].attributes;
-        console.log("Friendly name: %s", attr.friendly_name);
+        //console.log("Friendly name: %s", attr.friendly_name);
         return attr.friendly_name;
         }
 
@@ -2356,8 +2386,18 @@
           //Check for open sensors before arming the alarm.
           case 'arm':
             this.attemptArmMode = ev.target.getAttribute('data-arm');
-            if ( this.checkOpenSensors(this.attemptArmMode) )
+            try {
+              if ( this.hasOpenSensors(this.attemptArmMode) ) {
+                //display the warning message and shake
+                this.attemptedArm = true;
+                this.$.content.classList.add('shake');
+                return;
+              }
+            }
+            catch(err) {
+              console.log("Error: " + err);
               return;
+            }
             this.alarmService(this.attemptArmMode);
             break;
 
@@ -2386,7 +2426,13 @@
 
       //Call one of the alarm services
       alarmService(call){
-        this.hass.callService('alarm_control_panel', call, {'entity_id': this.alarm.entity_id, 'code': this.code });
+        var data = {"entity_id": this.alarm.entity_id, "code": this.code}
+
+        // add extra parameters only to service calls that support them: arm_xxx_ext
+        if (call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night')
+          data["ignore_open_sensors"] = "True"  // no need to check as the panel already called openSensors
+
+        this.hass.callService('bwalarm', call, data);
       }
 
       //Restart Home Assistant
@@ -2663,28 +2709,29 @@
 
       //Call the service to update the yaml file
       settingsUpdate(setting, value){
-        this.hass.callService('alarm_control_panel', 'ALARM_YAML_SAVE', {'configuration': setting, 'value': value });
+        this.hass.callService('bwalarm', 'ALARM_YAML_SAVE', {'configuration': setting, 'value': value });
       }
 
       //Call the service to update the yaml file
       settingsUpdateUser(user, command){
-        this.hass.callService('alarm_control_panel', 'ALARM_YAML_USER', {'user': user, 'command': command });
+        this.hass.callService('bwalarm', 'ALARM_YAML_USER', {'user': user, 'command': command });
       }
 
       //Check if there are open sensors
-      checkOpenSensors(call){
+      checkOpenSensors_orig(call){
         //check to see how many open sensors there are, if none arm alarm
         if (this.opencount == 0) return false;
 
         for (var sensor in this.allsensors){
           //is it open?
           //yes
+          // TODO: IT DOES NOT SEEM TO SUPPORT CUSTOM ON STATES, CHANGE!!
           if (['on', 'open', 'true', 'detected', 'unlocked'].indexOf(this.allsensors[sensor].state.toLowerCase()) > -1){
           //is it in the override list?
             var overrideMode = '';
             if (call == 'alarm_arm_home') var overrideMode = 'armed_home';
             if (call == 'alarm_arm_away') var overrideMode = 'armed_away';
-            if (call == 'alarm_arm_night') var overrideMode = 'armed_perimeter';
+            if (call == 'alarm_arm_night') var overrideMode = 'armed_night';
 
             //No: return so display message
             if (this.alarm.attributes.states[overrideMode].override.indexOf(this.allsensors[sensor].entity_id) == -1){
@@ -2698,7 +2745,39 @@
             }
           }
         }
+      }
 
+      service_name2arm_state(service_name) {
+        switch(service_name) {
+          case 'alarm_arm_home':  return 'armed_home';
+          case 'alarm_arm_away':  return 'armed_away';
+          case 'alarm_arm_night': return 'armed_night';
+          default:
+            msg = "service_name2arm_state: invalid service name \"" + service_name + "\"";
+            console.log(msg);
+            throw msg;
+        }
+      }
+
+      hasOpenSensors(service_name) {
+        var FNAME = 'hasOpenSensors'
+        //check to see how many open sensors there are, if none arm alarm
+        if (this.opencount == 0) {
+          //console.log(FNAME + "(" + service_name + "): opencount == 0, return False");
+          return false;
+        }
+
+        var arm_state = this.service_name2arm_state(service_name);
+        var sensors = this.computeSensors(this.hass, this.alarm.attributes.states[arm_state][this.INT_ATTR_STATE_CHECK_BEFORE_ARM]);
+        for (var index in sensors) {
+          var sensor = sensors[index];
+          if (this.alarm.attributes.supported_statuses_on.indexOf(sensor.state.toLowerCase()) > -1) {
+            //console.log(FNAME + "(" + service_name + "): " + sensor + " is " + sensor.state + ", return True");
+            return true;
+          }
+        }
+
+        //console.log(FNAME + "(" + service_name + "): return False");
         return false;
       }
 
