@@ -1,5 +1,17 @@
 """
   CHANGE LOG:
+1.1.7_ak74
+  - Arm/Disarm with MQTT commands, including codes, code_to_arm and override
+  - alarm_arm/alarm_disarm revision
+  - debug/info/warning logging added/changed
+  - fixed duplicate reaction to state change
+  - fixed bug #3 (https://github.com/akasma74/Hass-Custom-Alarm/issues/3)
+  - Perimeter -> Night migration
+  - change DOMAIN from alarm_control_panel to bwalarm (affects service calls from HA automations)
+  - changed_by() returns the original trigger and resets upon DISARM/coming back to ARM_XXX state (after trigger time)
+  - persistence file now exists in all but DISARMED states
+
+1.1.6_ak74
   - Alarm is going back to Triggered state if the sensor that caused the alarm is still active
 """
 
@@ -15,17 +27,31 @@ import os
 import re
 import json
 import pytz
-import copy
 import hashlib
 import time
 import uuid
 
+from collections import OrderedDict
+
 from homeassistant.const         import (
-    STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_DISARMED,
-    STATE_ALARM_PENDING, STATE_ALARM_TRIGGERED, CONF_PLATFORM, CONF_NAME,
-    CONF_CODE, CONF_PENDING_TIME, CONF_TRIGGER_TIME, CONF_DISARM_AFTER_TRIGGER,
-    CONF_DELAY_TIME, EVENT_STATE_CHANGED, EVENT_TIME_CHANGED,
-    STATE_ON, STATE_OFF)
+    # SERVICES
+    SERVICE_ALARM_ARM_NIGHT, SERVICE_ALARM_ARM_HOME, SERVICE_ALARM_ARM_AWAY, SERVICE_ALARM_DISARM,
+    # STATES
+    STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
+    STATE_ALARM_ARMED_NIGHT, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_AWAY,
+    STATE_ALARM_TRIGGERED,
+    # CONFIG PARAMETERS
+    CONF_PLATFORM, CONF_NAME, CONF_CODE,
+    CONF_PENDING_TIME, CONF_DELAY_TIME, CONF_TRIGGER_TIME,
+    CONF_DISARM_AFTER_TRIGGER,
+    STATE_ON, STATE_OFF,
+    ATTR_ENTITY_ID, ATTR_CODE,
+    EVENT_STATE_CHANGED, EVENT_TIME_CHANGED
+    )
+
+from homeassistant.components.alarm_control_panel         import (
+    ALARM_SERVICE_SCHEMA
+    )
 
 from operator                    import attrgetter
 from homeassistant.core          import callback
@@ -42,16 +68,26 @@ import homeassistant.helpers.config_validation                       as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-VERSION                            = '1.1.6_ak74'
+VERSION                            = '1.1.7_ak74'
+DOMAIN                             = 'bwalarm'
 
-DOMAIN                             = 'alarm_control_panel'
+#//------------ INTERNAL ATTRIBUTES ------------
+INT_ATTR_STATE_CHECK_BEFORE_ARM = '_check_before_arm'
+
 #//--------------------SUPPORTED STATES----------------------------
-STATE_ALARM_WARNING                = 'warning'
-STATE_ALARM_ARMED_PERIMETER        = 'armed_perimeter'
-SUPPORTED_STATES                   = [STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
-                                     STATE_ALARM_TRIGGERED, STATE_ALARM_WARNING, STATE_ALARM_ARMED_PERIMETER]
+OBSOLETE_STATE_ALARM_ARMED_PERIMETER    = 'armed_perimeter'
+STATE_ALARM_WARNING                 = 'warning'
+#STATE_ALARM_ARMED_NIGHT             = 'armed_night'
 
-SUPPORTED_PENDING_STATES           = [STATE_ALARM_ARMED_AWAY, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_PERIMETER]
+SUPPORTED_PENDING_STATES            = [STATE_ALARM_ARMED_NIGHT, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_AWAY]
+
+SUPPORTED_STATES                    = [STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
+                                        STATE_ALARM_WARNING, STATE_ALARM_TRIGGERED] + SUPPORTED_PENDING_STATES
+
+
+# example from https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/manual/alarm_control_panel.py
+# SUPPORTED_PRETRIGGER_STATES = [state for state in SUPPORTED_STATES
+#                               if state != STATE_ALARM_TRIGGERED]
 
 #//-------------------STATES TO CHECK------------------------------
 STATE_TRUE                         = 'true'
@@ -104,7 +140,8 @@ CONF_ALARM                         = 'alarm'
 CONF_WARNING                       = 'warning'
 
 #//----------------------OPTIONAL MODES------------------------------
-CONF_ENABLE_PERIMETER_MODE         = 'enable_perimeter_mode'
+OBSOLETE_CONF_ENABLE_PERIMETER_MODE         = 'enable_perimeter_mode'    # OBSOLETE, DELETE
+CONF_ENABLE_NIGHT_MODE             = 'enable_night_mode'
 CONF_ENABLE_PERSISTENCE            = 'enable_persistence'
 
 #//----------------------PANEL RELATED------------------------------
@@ -157,7 +194,26 @@ class Events(enum.Enum):
     Timeout                  = 5
     Disarm                   = 6
     Trigger                  = 7
-    ArmPerimeter             = 8
+    ArmNight                 = 8
+
+EATTR_SERVICE   = 'service'
+EATTR_STATE     = 'state'
+
+event2name = {
+    Events.ArmNight: {
+        EATTR_SERVICE   :   SERVICE_ALARM_ARM_NIGHT,
+        EATTR_STATE     :   STATE_ALARM_ARMED_NIGHT
+        },
+    Events.ArmHome: {
+        EATTR_SERVICE   :   SERVICE_ALARM_ARM_HOME,
+        EATTR_STATE     :   STATE_ALARM_ARMED_HOME
+        },
+    Events.ArmAway: {
+        EATTR_SERVICE   :   SERVICE_ALARM_ARM_AWAY,
+        EATTR_STATE     :   STATE_ALARM_ARMED_AWAY
+        }
+    }
+#event2name = {Events.ArmHome: 'armed_home', Events.ArmAway: 'armed_away', Events.ArmNight: 'armed_night'}
 
 class LOG(enum.Enum):
     DISARMED = 0 #'disarmed the alarm'
@@ -250,7 +306,7 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(CONF_STATES):                                     vol.Schema({cv.slug: _state_schema()}),
     vol.Optional(STATE_ALARM_ARMED_AWAY, default={}):              _state_schema(),  #state specific times ###REMOVE###
     vol.Optional(STATE_ALARM_ARMED_HOME, default={}):              _state_schema(),  #state specific times ###REMOVE###
-    vol.Optional(STATE_ALARM_ARMED_PERIMETER, default={}):         _state_schema(), #state specific times ###REMOVE###
+    vol.Optional(STATE_ALARM_ARMED_NIGHT, default={}):         _state_schema(), #state specific times ###REMOVE###
     # vol.Optional(STATE_ALARM_DISARMED, default={}):                _state_schema(STATE_ALARM_DISARMED),    #state specific times ###REMOVE###
     # vol.Optional(STATE_ALARM_TRIGGERED, default={}):               _state_schema(STATE_ALARM_TRIGGERED),   #state specific times ###REMOVE###
 
@@ -264,7 +320,8 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(CONF_LOGS):                                       vol.Schema([cv.string]),
     #---------------------------LOG RELATED------------------------------
 
-    vol.Optional(CONF_ENABLE_PERIMETER_MODE, default=False):       cv.boolean,    # Enable perimeter mode?
+    vol.Optional(OBSOLETE_CONF_ENABLE_PERIMETER_MODE, default=False):       cv.boolean,    # Enable perimeter mode?  # OBSOLETE, DELETE!
+    vol.Optional(CONF_ENABLE_NIGHT_MODE, default=False):           cv.boolean,    # Enable perimeter mode?
     vol.Optional(CONF_ENABLE_PERSISTENCE, default=False):          cv.boolean,    # Enables persistence for alarm state
     vol.Optional(CONF_CODE_TO_ARM, default=False):                 cv.boolean,    # Require code to arm alarm?
 
@@ -283,6 +340,17 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     #-----------------------------END------------------------------------
 }, _state_validator))
 
+ATTR_IGNORE_OPEN_SENSORS        =   'ignore_open_sensors'
+CONST_DEF_IGNORE_OPEN_SENSORS   =   False
+
+# TODO: extend it properly using ALARM_SERVICE_SCHEMA
+EXTENDED_ALARM_SERVICE_SCHEMA = vol.Schema({
+    vol.Optional(ATTR_ENTITY_ID): cv.comp_entity_ids,
+    vol.Optional(ATTR_CODE): cv.string,
+    vol.Optional(ATTR_IGNORE_OPEN_SENSORS, default=CONST_DEF_IGNORE_OPEN_SENSORS):          cv.boolean
+})
+
+
 SERVICE_YAML_SAVE  = 'ALARM_YAML_SAVE'
 SERVICE_YAML_USER  = 'ALARM_YAML_USER'
 
@@ -297,19 +365,34 @@ try:
 except Exception as e:
     _LOGGER.warning('Import Error: %s. Attempting to download and import', e)
 
-@asyncio.coroutine
-def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+def str2bool(string) -> bool:
+    """ Convert True/False string info boolean True/False or returns its input """
+    d = {'True': True, 'False': False}
+    return d.get(string, string)
 
+async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     #Setup MQTT if enabled
     mqtt = None
     if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
         import homeassistant.components.mqtt as mqtt
 
-    alarm = BWAlarm(hass, config, mqtt)
-    hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
-    hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
-    hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.passcode_timeout_listener)
-    async_add_devices([alarm])
+    # redefine arm_xxx service calls to accept additional attributes
+    @callback
+    def async_alarm_arm_home(service):
+        alarm.async_alarm_arm_home(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
+
+    @callback
+    def async_alarm_arm_away(service):
+        # service.endity_id ignored for simplicity, chage?
+        alarm.alarm_arm_away(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
+
+    @callback
+    def async_alarm_arm_night(service):
+        alarm.alarm_arm_night(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
+
+    @callback
+    def async_alarm_disarm(service):
+        alarm.alarm_disarm(service.data.get(ATTR_CODE))
 
     @callback
     def alarm_yaml_save(service):
@@ -319,6 +402,16 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     def alarm_yaml_user(service):
         alarm.settings_user(service.data.get(CONF_USER), service.data.get(CONF_COMMAND))
 
+    alarm = BWAlarm(hass, config, mqtt)
+    hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
+    hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
+    hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.passcode_timeout_listener)
+    async_add_devices([alarm])
+
+    hass.services.async_register(DOMAIN, SERVICE_ALARM_ARM_HOME, async_alarm_arm_home, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_ALARM_ARM_AWAY, async_alarm_arm_away, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_ALARM_ARM_NIGHT, async_alarm_arm_night, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_YAML_SAVE, alarm_yaml_save)
     hass.services.async_register(DOMAIN, SERVICE_YAML_USER, alarm_yaml_user)
 
@@ -326,15 +419,18 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def __init__(self, hass, config, mqtt):
         #------------------------------Initalize the alarm system----------------------------------
-        self._config                 = config
+        self._config                 = config   # it holds data imported from yaml on startup and is used to return component's attributes in device_state_attributes
         self._mqtt                   = mqtt
         self._hass                   = hass
 
         self.init_variables()
-
         self._updateUI = False
 
     def init_variables(self):
+        # basically transfers data from self._config (i.e yaml) and persistence (alarm.json) into internal current settings (self._states etc)
+        FNAME = '[INIT_VARIABLES]'
+
+        _LOGGER.debug("{} begin".format(FNAME))
         #-------------------------------------STATE SPECIFIC--------------------------------------------------
         self._supported_statuses_on  = self._config.get(CONF_CUSTOM_SUPPORTED_STATUSES_ON,  []) + SUPPORTED_STATUSES_ON
         self._supported_statuses_off = self._config.get(CONF_CUSTOM_SUPPORTED_STATUSES_OFF, []) + SUPPORTED_STATUSES_OFF
@@ -343,11 +439,13 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._returnto               = STATE_ALARM_DISARMED
         self._armstate               = STATE_ALARM_DISARMED
 
-        self._allsensors             = []
+        self._allsensors             = set()
         self._states                 = {}
+
         for state in self._config.get(CONF_STATES, {}):
+            _LOGGER.debug("{} {}: init {}".format(FNAME, CONF_STATES, state))
             self._states[state]      = self._config[CONF_STATES][state]
-            self._allsensors = set(self._allsensors) | set(self._states[state]['immediate']) | set(self._states[state]['delayed']) | set(self._states[state]['override'])
+            self._allsensors |= set(self._states[state][CONF_IMMEDIATE]) | set(self._states[state][CONF_DELAYED]) # no need to include override sensors, they're already there
 
         #-------------------------------------SENSORS--------------------------------------------------
         self.immediate               = None
@@ -356,7 +454,16 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._opensensors            = None
 
         #------------------------------------CORE ALARM RELATED-------------------------------------
-        self._enable_perimeter_mode  = self._config[CONF_ENABLE_PERIMETER_MODE]
+        # deal with obsolete enable_perimeter_mode parameter
+        # assume it's old yaml and first init (as we delete it then)
+        if OBSOLETE_CONF_ENABLE_PERIMETER_MODE in self._config.keys():
+            # import value only if it's True (False it will be anyway as default)
+            if self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]:
+                _LOGGER.debug("{} core: parameter {} is obsolete, set {} to {} and delete the former".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, CONF_ENABLE_NIGHT_MODE, self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
+                self._config[CONF_ENABLE_NIGHT_MODE] = copy.deepcopy(self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE])
+            del self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]
+
+        self._enable_night_mode      = self._config[CONF_ENABLE_NIGHT_MODE]
         self._panic_mode             = 'deactivated'
         self._lasttrigger            = ""
         self._timeoutat              = None
@@ -396,10 +503,10 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._config[CONF_LOGS]  = []
             self._log_size = self._config.get(CONF_LOG_SIZE, 10)
 
-            # Get the log file or create one if it doesnt exist
+            # Get the log file or create one if it does not exist
             log_path       = self._hass.config.path()
             if not os.path.isdir(log_path):
-               _LOGGER.error("[ALARM] Activity Log path %s does not exist.", log_path)
+               _LOGGER.error("{} logging: Activity Log path {} does not exist".format(FNAME, log_path))
             else:
                self._log_final_path = os.path.join(log_path, "alarm_log.json")
                self.log_load()
@@ -416,44 +523,78 @@ class BWAlarm(alarm.AlarmControlPanel):
         #------------------------------------PERSISTENCE----------------------------------------------------
         self._persistence_list  = json.loads('{}')
         if (self._config[CONF_ENABLE_PERSISTENCE]):
-           persistence_path     = self._hass.config.path()
+            persistence_path = self._hass.config.path()
+            if os.path.isdir(persistence_path):
+                self._persistence_final_path = os.path.join(persistence_path, "alarm.json")
+                if (self.persistence_load() and (self._persistence_list["state"] != STATE_ALARM_DISARMED) ):
+                    self._state     = self._persistence_list["state"]
+                    self._timeoutat = pytz.UTC.localize(datetime.datetime.strptime(self._persistence_list["timeoutat"].split(".")[0].replace("T"," "), '%Y-%m-%d %H:%M:%S')) if self._persistence_list["timeoutat"] != None else None
+                    self._returnto  = self._persistence_list["returnto"]
+                    self._armstate  = self._persistence_list["armstate"]
 
-           if not os.path.isdir(persistence_path):
-              _LOGGER.error("[ALARM] Persistence path %s does not exist.", persistence_path)
-           else:
-              self._persistence_final_path = os.path.join(persistence_path, "alarm.json")
-              if (self.persistence_load() and (self._persistence_list["state"] != STATE_ALARM_DISARMED) ):
-                  self._state     = self._persistence_list["state"]
-                  self._timeoutat = pytz.UTC.localize(datetime.datetime.strptime(self._persistence_list["timeoutat"].split(".")[0].replace("T"," "), '%Y-%m-%d %H:%M:%S')) if self._persistence_list["timeoutat"] != None else None
-                  self._returnto  = self._persistence_list["returnto"]
-                  self._armstate  = self._persistence_list["armstate"]
+                    _LOGGER.debug("{} persistence: state:{}, timeoutat: {}, returnto: {}, armstate: {}".format(FNAME, self._state, self._timeoutat, self._returnto, self._armstate))
 
-                  for self._armstate in SUPPORTED_PENDING_STATES:
-                      self._states    = self._persistence_list["states"]
-                      self.immediate  = self._states[self._state]["immediate"]
-                      self.delayed    = self._states[self._state]["delayed"]
-                      self.override   = self._states[self._state]["override"]
+                    if (self._armstate == STATE_ALARM_WARNING or self._armstate == STATE_ALARM_TRIGGERED or self._armstate == STATE_ALARM_PENDING):
+                        _LOGGER.debug("{} persistence: init states, immediate, delayed and override from {} state".format(FNAME, self._returnto))
+                        self._states    = self._persistence_list[CONF_STATES]
+                        self.immediate  = self._states[self._returnto][CONF_IMMEDIATE]
+                        self.delayed    = self._states[self._returnto][CONF_DELAYED]
+                        self.override   = self._states[self._returnto][CONF_OVERRIDE]
+                    elif self._armstate in SUPPORTED_PENDING_STATES:
+                        self._states    = self._persistence_list[CONF_STATES]
+                        self.immediate  = self._states[self._armstate][CONF_IMMEDIATE]
+                        self.delayed    = self._states[self._armstate][CONF_DELAYED]
+                        self.override   = self._states[self._armstate][CONF_OVERRIDE]
+                    else:
+                        ## raise exception?
+                        _LOGGER.error("{} persistence: Invalid armstate: {}".format(FNAME, self._armstate))
+            else:
+                _LOGGER.error("{} persistence: path \"{}\" does not exist".format(FNAME, persistence_path))
 
-                  if (self._armstate == STATE_ALARM_WARNING or self._armstate == STATE_ALARM_TRIGGERED or self._armstate == STATE_ALARM_PENDING):
-                      self._states    = self._persistence_list["states"]
-                      self.immediate  = self._states[self._returnto]["immediate"]
-                      self.delayed    = self._states[self._returnto]["delayed"]
-                      self.override   = self._states[self._returnto]["override"]
+        # to migrate settings from obsolete armed_perimeter state to armed_night
+        if OBSOLETE_STATE_ALARM_ARMED_PERIMETER in self._states.keys():
+            _LOGGER.debug("{} init state {} with infomation from obsolete state {} and update appropriate config".format(FNAME, STATE_ALARM_ARMED_NIGHT, OBSOLETE_STATE_ALARM_ARMED_PERIMETER))
+            self._states[STATE_ALARM_ARMED_NIGHT] = copy.deepcopy(self._states[OBSOLETE_STATE_ALARM_ARMED_PERIMETER])
+            self._config[CONF_STATES][STATE_ALARM_ARMED_NIGHT] = copy.deepcopy(self._config[CONF_STATES][OBSOLETE_STATE_ALARM_ARMED_PERIMETER])
+
+            _LOGGER.debug("{} delete obsolete state {} from imported config and states".format(FNAME, OBSOLETE_STATE_ALARM_ARMED_PERIMETER))
+            del self._config[CONF_STATES][OBSOLETE_STATE_ALARM_ARMED_PERIMETER]
+            del self._states[OBSOLETE_STATE_ALARM_ARMED_PERIMETER]
+
+        # create lists of sensors to check for every state
+        arm_states_dict = self._config[CONF_STATES]
+        for state in arm_states_dict.keys():
+            state_config = arm_states_dict[state]
+            # convert to sets first as it's easier to merge (|) and remove (-)
+            state_config[INT_ATTR_STATE_CHECK_BEFORE_ARM] = list( (set(state_config[CONF_IMMEDIATE]) | set(state_config[CONF_DELAYED])) - set(state_config[CONF_OVERRIDE]) )
+
+        _LOGGER.debug("{} end".format(FNAME))
+
 
     # Alarm properties
     @property
     def should_poll(self) -> bool: return False
+
     @property
     def name(self) -> str:         return self._config[CONF_NAME]
+
+    #"""Last change triggered by."""
     @property
     def changed_by(self) -> str:   return self._lasttrigger
+
     @property
     def state(self) -> str:        return self._state
+
+    @property
+    def code_format(self):
+        """Regex for code format or None if no code is required."""
+        # affects Lovelace keypad presence (None means no keypad)
+    #        return None if self._code is None else '.+'
+        return None if ((self._code is None) or (self._state == STATE_ALARM_DISARMED)) else alarm.FORMAT_NUMBER
+
     @property
     def device_state_attributes(self):
-
         results = {
-
             'immediate':                self.immediate,
             'delayed':                  self.delayed,
             'ignored':                  self.ignored,
@@ -470,7 +611,8 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             'arm_state':                self._armstate,
 
-            'enable_perimeter_mode':    self._config[CONF_ENABLE_PERIMETER_MODE],
+#            'enable_perimeter_mode':    self._config[CONF_ENABLE_NIGHT_MODE],   # OBSOLETE, CAN WE REMOVE IT?
+            'enable_night_mode':        self._config[CONF_ENABLE_NIGHT_MODE],
             'enable_persistence':       self._config[CONF_ENABLE_PERSISTENCE],
 
             'enable_log':               self._config[CONF_ENABLE_LOG],
@@ -505,35 +647,49 @@ class BWAlarm(alarm.AlarmControlPanel):
         if (CONF_MQTT in self._config):
             results[CONF_MQTT] = self._config[CONF_MQTT]
 
-        if ('states' in self._config):
-            results['states'] = self._config['states']
+        if (CONF_STATES in self._config):
+            results[CONF_STATES] = self._config[CONF_STATES]
 
         return results;
 
     def yaml_load(self):
+        FNAME = '[LOAD_YAML]'
         try:
             self.yaml = YAML()
-            with open(self._hass.config.path() + "/alarm.yaml") as stream:
+            filename = self._hass.config.path() + "/alarm.yaml"
+            with open(filename) as stream:
                 try:
+                    _LOGGER.debug("{} File \"{}\" loaded successfully".format(FNAME, filename))
                     return self.yaml.load(stream)
                 except self.yaml.YAMLError as exc:
                     print(exc)
             return None
         except Exception as e:
-            _LOGGER.warning(e);
+            _LOGGER.warning("{} Error loading file \"{}\": {}".format(FNAME, filename, str(e)));
 
-
-    def settings_save(self, configuration=None, value=None):
+    def settings_save(self, key=None, value=None):
         """Push the alarm state to the given value."""
+        # it is called on change of every parameter
+
+        FNAME = '[SAVE_SETTINGS]'
+        _LOGGER.debug("{} key: \"{}\", value: \"{}\"".format(FNAME, key if key else '', value if value else ''))
+
+        key = key.lower()
+
+        # update runtime config
+        self._config[key] = value
+        # load WHOLE config from yaml into loaded config
         self._yaml_content = self.yaml_load()
-
-        configuration = configuration.lower()
-
-        self._config[configuration] = value
-        self._yaml_content[configuration] = value
-
-        _LOGGER.debug("Set the yaml entry %s to %s", configuration, value)
-
+        if self._yaml_content:
+            # and update it as well (as it is different to runtime config!!!)
+            if key == CONF_STATES:
+                _LOGGER.debug("{} {} value received, clean it up".format(FNAME, key))
+                self._yaml_content[key] = self._clean_states_info(value)
+            else:
+                self._yaml_content[key] = value
+        else:
+            _LOGGER.error("{} yaml_load failed!".format(FNAME))
+        # and now save the whole loaded config (not runtime one!!!)
         self.settings_yaml_save()
 
     def settings_user(self, user=None, command=None):
@@ -574,179 +730,308 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.settings_yaml_save()
 
     def settings_yaml_save(self):
-        #Trigger a GUI update
+        """ Save the whole loaded config and trigger a GUI update """
+
+        FNAME = '[SAVE_SETTINGS_YAML]'
+        _LOGGER.debug("{} begin".format(FNAME))
         self._updateUI = not self._updateUI
 
-        with open(self._hass.config.path() + "/alarm.yaml", 'w') as fil:
+        # as it saves loaded config, make sure it is consistent with runtime config
+        self._replace_obsolete_settings(self._config, self._yaml_content)
+        # this magic required to get a proper representation of OrderedDict in generated yaml
+        self.yaml.Representer.add_representer(OrderedDict, self.yaml.Representer.represent_dict)
+
+        filename = self._hass.config.path() + "/alarm.yaml"
+        with open(filename, 'w') as fil:
             self.yaml.dump(self._yaml_content, fil)
+
+        _LOGGER.debug("{} settings saved to file \"{}\"".format(FNAME, filename))
 
         self.init_variables()
         self.schedule_update_ha_state()
+        _LOGGER.debug("{} end".format(FNAME))
+
+    def _replace_obsolete_settings(self, current_settings, loaded_settings):
+        # it is required to get clear loaded config from obsolete stuff
+        # and make sure new stuff is there as well
+
+        FNAME = '[REPLACE_OBSOLETE_SETTINGS]'
+
+        # if CONF_ENABLE_NIGHT_MODE parameter is not in yaml, add it
+        if CONF_ENABLE_NIGHT_MODE in current_settings.keys() and CONF_ENABLE_NIGHT_MODE not in loaded_settings.keys():
+            _LOGGER.debug("{} add core parameter {}: {}".format(FNAME, CONF_ENABLE_NIGHT_MODE, current_settings[CONF_ENABLE_NIGHT_MODE]))
+            loaded_settings[CONF_ENABLE_NIGHT_MODE] = copy.deepcopy(current_settings[CONF_ENABLE_NIGHT_MODE])
+
+        # if STATE_ALARM_ARMED_NIGHT state is not in yaml, add it
+        if STATE_ALARM_ARMED_NIGHT in current_settings[CONF_STATES].keys() and STATE_ALARM_ARMED_NIGHT not in loaded_settings[CONF_STATES].keys():
+            _LOGGER.debug("{} add state {}".format(FNAME, STATE_ALARM_ARMED_NIGHT))
+            loaded_settings[CONF_STATES][STATE_ALARM_ARMED_NIGHT] = copy.deepcopy(current_settings[CONF_STATES][STATE_ALARM_ARMED_NIGHT])
+
+        # delete obsolete records
+        if OBSOLETE_CONF_ENABLE_PERIMETER_MODE in loaded_settings.keys():
+            _LOGGER.debug("{} deleting obsolete core parameter {}: {}".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
+            del loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]
+
+        if OBSOLETE_STATE_ALARM_ARMED_PERIMETER in loaded_settings[CONF_STATES].keys():
+            _LOGGER.debug("{} delete obsolete state {}".format(FNAME, OBSOLETE_STATE_ALARM_ARMED_PERIMETER))
+            del loaded_settings[CONF_STATES][OBSOLETE_STATE_ALARM_ARMED_PERIMETER]
 
 
-    ### LOAD persistence previously saved
     def persistence_load(self):
-        try:
-           if os.path.isfile(self._persistence_final_path):  #Find the persistence JSON file and load. Once found update the alarm_control_panel object
-              self._persistence_list = json.load(open(self._persistence_final_path, 'r'))
-              return True
-           else: #No persistence file found
-              _LOGGER.warning("[ALARM] Persistence file doesnt exist")
-              return False
-              #self._persistence_list = json.loads('{"state":"disarmed", "timeoutat":null, "returnto":null, "immediate":[], "delayed":[], "override":[], "states":{}, "armstate":"disarmed"}')
+        """ LOAD persistence from file """
+        FNAME = '[LOAD_PERSISTENCE]'
 
-        except Exception as e:
-           _LOGGER.error("[ALARM] Persistence error occured loading: %s", str(e))
-
-    ### UPDATE persistence
-    def persistence_save(self, persistence):
-        if persistence is not None: #Check we have something to save [TODO] validate this is a persistence object
-            self._persistence_list = persistence
+        filename = self._persistence_final_path
+        if os.path.exists(filename):
             try:
-               if self._persistence_list is not None: #Check we have genuine persistence to save if so dump to file
-                  with open(self._persistence_final_path, 'w') as fil:
-                     fil.write(json.dumps(self._persistence_list, ensure_ascii=False))
-               else:
-                  _LOGGER.error("[ALARM] No persistence to save!")
+                if os.path.isfile(filename):
+                    # avoid empty files as they cause JSON error
+                    if os.path.getsize(filename):
+                        self._persistence_list = json.load(open(filename, 'r'))
+                        _LOGGER.debug("{} File \"{}\" loaded successfully".format(FNAME, filename))
+                        return True
+                    else:
+                        _LOGGER.warning("{} Ignored empty file \"{}\"".format(FNAME, filename))
+                        return False
+                else:
+                    _LOGGER.warning("{} Cannot use file \"{}\": not a regular file".format(FNAME, filename))
+                    return False
             except Exception as e:
-               _LOGGER.error("[ALARM] Persistence Error occured saving: %s", str(e))
+                _LOGGER.error("{} Error occured while loading file \"{}\": {}".format(FNAME, filename, str(e)))
+        else:
+            # no worries, it only exists in pending modes
+            #_LOGGER.info("{} File \"{}\" does not exist".format(FNAME, filename))
+            return False
 
-    ### LOAD activity log previously saved
+    def _clean_states_info(self, arm_states_dict):
+        FNAME = '[CLEAN_STATES_INFO]'
+        _LOGGER.debug("{} remove {} from states".format(FNAME, INT_ATTR_STATE_CHECK_BEFORE_ARM))
+
+        states_dict = copy.deepcopy(arm_states_dict)
+        # remove check_before_arm lists from each state
+        for state in states_dict:
+            # it deletes an entry
+            states_dict[state].pop(INT_ATTR_STATE_CHECK_BEFORE_ARM, None)
+            #_LOGGER.debug("{} state {}: {} removed".format(FNAME, state, INT_ATTR_STATE_CHECK_BEFORE_ARM))
+
+        return states_dict
+
+    def persistence_save(self, persistence):
+        """ SAVE persistence to file """
+        FNAME = '[SAVE_PERSISTENCE]'
+
+        if persistence: #Check we have something to save [TODO] validate this is a persistence object
+            self._persistence_list = persistence
+            filename = self._persistence_final_path
+            try:
+                if self._persistence_list: #Check we have genuine persistence to save if so dump to file
+                    with open(filename, 'w') as fil:
+                        fil.write(json.dumps(self._persistence_list, ensure_ascii=False))
+                        _LOGGER.debug("{} File \"{}\" saved successfully".format(FNAME, filename))
+                else:
+                    _LOGGER.error("{} No data to save".format(FNAME))
+            except Exception as e:
+               _LOGGER.error("{} Error occured while saving file \"{}\": {}".format(FNAME, filename, str(e)))
+
+    def persistence_remove(self):
+        """ REMOVE persistence file """
+        FNAME = '[REMOVE_PERSISTENCE]'
+
+        filename = self._persistence_final_path
+        try:
+            if os.path.exists(filename):
+                os.remove(filename)
+                _LOGGER.debug("{} File {} removed".format(FNAME, filename))
+            else:
+                _LOGGER.info("{} File {} does not exist".format(FNAME, filename))
+        except Exception as e:
+           _LOGGER.error("{} Error occured while removing file \"{}\": {}".format(FNAME, filename, str(e)))
+
+    def save_alarm_state(self):
+        """ Save alarm state """
+        FNAME = '[SAVE_ALARM_STATE]'
+
+        _LOGGER.debug("{} ({}) begin".format(FNAME, self._state))
+        self._persistence_list["state"]     = self._state
+        self._persistence_list["timeoutat"] = self._timeoutat.isoformat() if self._timeoutat else None
+        self._persistence_list["returnto"]  = self._returnto
+        self._persistence_list[CONF_STATES]  = self._clean_states_info(self._states)
+        self._persistence_list["armstate"]  = self._armstate
+        self.persistence_save(self._persistence_list)
+        _LOGGER.debug("{} ({}) end".format(FNAME, self._state))
+
     def log_load(self):
+        """ LOAD activity log previously saved """
+        FNAME = '[LOAD_LOG]'
+
         try:
            if os.path.isfile(self._log_final_path):  #Find the log file and load.
               self._config[CONF_LOGS] = json.load(open(self._log_final_path, 'r'))
            else: #No log file found
-              _LOGGER.warning("[ALARM] Activity log file doesnt exist")
+              _LOGGER.warning("[ALARM] Activity log file does not exist")
               self._config[CONF_LOGS] = []
               self.log_save()
         except Exception as e:
            _LOGGER.error("[ALARM] Error occured loading: %s", str(e))
 
-    ### UPDATE activity log
     def log_save(self):
+        """ UPDATE activity log """
+        FNAME = '[SAVE_LOG]'
+
         try:
            if self._config[CONF_LOGS] is not []: #Check we have genuine log to save if so dump to file
               with open(self._log_final_path, 'w') as fil:
                  fil.write(json.dumps(self._config[CONF_LOGS], ensure_ascii=False))
            else:
-              _LOGGER.error("[ALARM] No log to save!")
+              _LOGGER.error("{} No log to save".format(FNAME))
         except Exception as e:
-           _LOGGER.error("[ALARM] Log Error occured saving: %s", str(e))
+           _LOGGER.error("{} Error occured saving file \"{}\": {}".format(FNAME, self._log_final_path, str(e)))
 
+    def has_open_sensors(self, arm_state):
+        """ Returns True if there are open sensors for that mode and they are not in override section"""
+        FNAME = '[HAS_OPEN_SENSORS]'
 
-    ### Save alarm state
-    def save_alarm_state(self):
-        self._persistence_list["state"]     = self._state
-        self._persistence_list["timeoutat"] = self._timeoutat.isoformat() if self._timeoutat != None else None
-        self._persistence_list["returnto"]  = self._returnto
-        self._persistence_list["states"]  = self._states
-        self._persistence_list["armstate"]  = self._armstate
-        self.persistence_save(self._persistence_list)
+        # iterate over all but override registered sensors of that state (ready-made list)
+        for entity_id in self._config[CONF_STATES][arm_state][INT_ATTR_STATE_CHECK_BEFORE_ARM]:
+            state = self._hass.states.get(entity_id)
+            if state and state.state.lower() in self._supported_statuses_on:
+                _LOGGER.debug("{}({}) {} is {}".format(FNAME, arm_state, entity_id, state.state))
+                return True
 
-    ### Actions from the outside world that affect us, turn into enum events for internal processing
-    def time_change_listener(self, eventignored):
-        """ I just treat the time events as a periodic check, its simpler then (re-/un-)registration """
-        if self._timeoutat is not None:
-            if now() > self._timeoutat:
-                self._timeoutat = None
-                self.process_event(Events.Timeout)
+        _LOGGER.debug("{}({}) all clear".format(FNAME, arm_state))
+        return False
 
-    def state_change_listener(self, event):
-        """ Something changed, we only care about things turning on at this point """
-        if self._state != STATE_ALARM_DISARMED:
-            new = event.data.get('new_state', None)
-            if new is None:
-                return
+    def alarm_arm(self, event, code, ignore_open_sensors):
+        FNAME = "[ALARM_ARM]"
+        einfo = event2name[event]
+        service = einfo[EATTR_SERVICE]
+        state = einfo[EATTR_STATE]
 
-            if new.state != None:
-                if new.state.lower() in self._supported_statuses_on:
-                    _LOGGER.debug("[ALARM] event: entity_id %s, state %s", event.data['entity_id'], new.state)
-                    eid = event.data['entity_id']
-                    if eid in self.immediate:
-                        self._lasttrigger = eid
-                        self.process_event(Events.ImmediateTrip)
-                    elif eid in self.delayed:
-                        self._lasttrigger = eid
-                        self.process_event(Events.DelayedTrip)
+        _LOGGER.debug("{} (service: {}, passcode: \"{}\", ignore_open_sensors: {}) begin".format(FNAME, service, code, ignore_open_sensors))
+        if not isinstance(ignore_open_sensors, bool):
+            _LOGGER.error("{} ignore_open_sensors must be bool, got {}".format(FNAME, type(ignore_open_sensors)))
+            return False
 
-    # def check_open_sensors(self):
-    #     for sensor in self._allsensors:
-    #         if self._hass.states.get(sensor).state != None:
-    #             if self._hass.states.get(sensor).state in self._supported_statuses_on:
-    #                 _LOGGER.error(self._hass.states.get(sensor)) # do summit
+        # for MQTT or service calls as Control Panel always sends ignore_open_sensors = True (it checks them itself atm)
+        if not ignore_open_sensors and self.has_open_sensors(state):
+            _LOGGER.info("{} Failed to {}: opens sensors detected".format(FNAME, service))
+            return False
 
-    @property
-    def code_format(self):
-#        """One or more characters."""
-#        return None if self._code is None else '.+'
-        return None if ((self._code is None) or (self._state == STATE_ALARM_DISARMED)) else alarm.FORMAT_NUMBER
+        admin_id = 'HA'
+        user_id = ''
+        arm_immediately = False    # makes sense only for non-GUI calls (MQTT message/service call)
 
-    def alarm_disarm(self, code=None):
-        #If the provided code matches the panic alarm then deactivate the alarm but set the state of the panic mode to active.
-        if self._validate_panic_code(code):
-            self.process_event(Events.Disarm)
-            self._panic_mode = "ACTIVE"
-            self._update_log(None, LOG.DISARMED, None) #Show a default disarm message incase this is displayed on the interface
-            # Let HA know that something changed
-            self.schedule_update_ha_state()
-            return
-
-        if not self._validate_code(code):
-            self._update_log(None, LOG.DISARM_FAIL, None)
-            return
-        self.process_event(Events.Disarm)
-
-    def alarm_arm(self, code, mode):
-        user = 'HA'
-        if code == "override": #ARM THE ALARM IMMEDIATELY
-            self.process_event(mode, True)
-        else:
-            for entity in self._users:
-                if entity['enabled'] == True:
-                    if entity['code'] == code:
-                        user = entity['id']
-                        self.process_event(mode)
-
-            if self._config[CONF_CODE_TO_ARM]:
-                if code == self._code:
-                    self.process_event(mode)
+        # if code provided, try to match it with user
+        if code:
+            if code == self._code:
+                user_id = admin_id
+                _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, user_id))
+            elif code == "override":
+                arm_immediately = True
+                user_id = admin_id
+                _LOGGER.info("{} {} the alarm immediately as {}".format(FNAME, service, user_id))
             else:
-                self.process_event(mode)
+                # is it one of the users?
+                for entity in self._users:
+                    if entity['enabled'] and entity['code'] == code:
+                        user_id = entity['id']
+                        _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, entity['name']))
 
-        self._update_log(user, mode, None)
+                # code does not match any known code
+                # arm as HA
+                if not user_id:
+                    user_id = admin_id
+                    _LOGGER.warning("{} Ignored invalid passcode \"{}\", {} the alarm as {}".format(FNAME, code, service, user_id))
+        else:
+            user_id = admin_id
+            _LOGGER.info("{} no passcode supplied, {} the alarm as {}".format(FNAME, service, user_id))
 
-    def alarm_arm_home(self, code=None):
-        self.alarm_arm(code, Events.ArmHome)
+        self.process_event(event, arm_immediately)
+        self._update_log(user_id, event)
+        _LOGGER.debug("{} (service: {}, passcode: \"{}\", ignore_open_sensors: {}) end".format(FNAME, service, code, ignore_open_sensors))
+        return True
 
-    def alarm_arm_away(self, code=None):
-        self.alarm_arm(code, Events.ArmAway)
+    def alarm_arm_home(self, code, ignore_open_sensors):
+        return self.alarm_arm(Events.ArmHome, code, ignore_open_sensors)
 
-    def alarm_arm_night(self, code=None):
-        self.alarm_arm(code, Events.ArmPerimeter)
+    def alarm_arm_away(self, code, ignore_open_sensors):
+        return self.alarm_arm(Events.ArmAway, code, ignore_open_sensors)
+
+    def alarm_arm_night(self, code, ignore_open_sensors):
+        return self.alarm_arm(Events.ArmNight, code, ignore_open_sensors)
+
+    # required for MQTT commands
+    def async_alarm_arm_home(self, code, ignore_open_sensors):
+        return self._hass.async_add_executor_job(self.alarm_arm_home, code, ignore_open_sensors)
+
+    # required for MQTT commands
+    def async_alarm_arm_away(self, code, ignore_open_sensors):
+        return self._hass.async_add_executor_job(self.alarm_arm_away, code, ignore_open_sensors)
+
+    # required for MQTT commands
+    def async_alarm_arm_night(self, code, ignore_open_sensors):
+        return self._hass.async_add_executor_job(self.alarm_arm_night, code, ignore_open_sensors)
 
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
-        self._update_log(None, LOG.TRIGGERED, None)
+        self._update_log(None, LOG.TRIGGERED)
+
+    def alarm_disarm(self, code):
+        FNAME = "[ALARM_DISARM]"
+
+        _LOGGER.debug("{} (passcode: \"{}\") begin".format(FNAME, code))
+
+        #If the provided code matches the panic alarm then deactivate the alarm but set the state of the panic mode to active.
+        if self._validate_panic_code(code):
+            _LOGGER.warning("{} passcode matches the panic code, disarm but activate panic mode!".format(FNAME))
+            self.process_event(Events.Disarm)
+            self._panic_mode = "ACTIVE"
+            self._update_log(None, LOG.DISARMED) #Show a default disarm message incase this is displayed on the interface
+            # Let HA know that something changed
+            self.schedule_update_ha_state()
+            _LOGGER.debug("{} (passcode: \"{}\") end (return True)".format(FNAME, code))
+            return True
+
+        if not self._validate_code(code):
+            _LOGGER.error("{} Failed to disarm: invalid passcode \"{}\"".format(FNAME, code))
+            self._update_log(None, LOG.DISARM_FAIL)
+            _LOGGER.debug("{} (passcode: \"{}\") end (return False)".format(FNAME, code))
+            return False
+
+        self.process_event(Events.Disarm)
+        _LOGGER.debug("{} (passcode: \"{}\") end (return True)".format(FNAME, code))
+        return True
 
     ### Internal processing
-    def setsignals(self, alarmMode):
+    def setsignals(self, state):
         """ Figure out what to sense and how """
-        self.immediate = self._states[alarmMode]['immediate'].copy()
-        self.delayed   = self._states[alarmMode]['delayed'].copy()
-        self.override  = self._states[alarmMode]['override'].copy()
+        FNAME = '[SETSIGNALS]'
+        _LOGGER.debug("{} {}".format(FNAME, state))
+
+        self.immediate = self._states[state][CONF_IMMEDIATE].copy()
+        self.delayed   = self._states[state][CONF_DELAYED].copy()
+        self.override  = self._states[state][CONF_OVERRIDE].copy()
+        # TODO?
         self.ignored   = set(self._allsensors) - (set(self.immediate) | set(self.delayed))
+        # make room for a trigger
+        self._lasttrigger = ''
 
     def clearsignals(self):
         """ Clear all our signals, we aren't listening anymore """
+        FNAME = '[CLEARSIGNALS]'
+        _LOGGER.debug("{}".format(FNAME))
+
         self._panic_mode = "deactivated"
         self._armstate = STATE_ALARM_DISARMED
         self.immediate = set()
         self.delayed = set()
         self.ignored = self._allsensors.copy()
         self._timeoutat = None
+        # makes no sense when DISARMED?
+        self._lasttrigger = ''
 
     def process_event(self, event, override_pending_time=False):
+        FNAME = '[PROCESS_EVENT]'
         old_state = self._state
 
         #Update the state of the alarm panel
@@ -773,20 +1058,20 @@ class BWAlarm(alarm.AlarmControlPanel):
                     self._state = STATE_ALARM_ARMED_AWAY
                 self._armstate = STATE_ALARM_ARMED_AWAY
 
-            elif event == Events.ArmPerimeter:
-                if (datetime.timedelta(seconds=int(self._states[STATE_ALARM_ARMED_PERIMETER][CONF_PENDING_TIME])) and override_pending_time == False):
-                    self._armstate = STATE_ALARM_ARMED_PERIMETER
+            elif event == Events.ArmNight:
+                if (datetime.timedelta(seconds=int(self._states[STATE_ALARM_ARMED_NIGHT][CONF_PENDING_TIME])) and override_pending_time == False):
+                    self._armstate = STATE_ALARM_ARMED_NIGHT
                     self._state = STATE_ALARM_PENDING
                 else:
-                    self._state = STATE_ALARM_ARMED_PERIMETER
-                self._armstate = STATE_ALARM_ARMED_PERIMETER
+                    self._state = STATE_ALARM_ARMED_NIGHT
+                self._armstate = STATE_ALARM_ARMED_NIGHT
 
         elif old_state == STATE_ALARM_PENDING:
             if   event == Events.Timeout:       self._state = self._armstate
 
         elif old_state == STATE_ALARM_ARMED_HOME or \
              old_state == STATE_ALARM_ARMED_AWAY or \
-             old_state == STATE_ALARM_ARMED_PERIMETER:
+             old_state == STATE_ALARM_ARMED_NIGHT:
             if   event == Events.ImmediateTrip: self._state = STATE_ALARM_TRIGGERED
             elif event == Events.DelayedTrip:   self._state = STATE_ALARM_WARNING
 
@@ -798,16 +1083,16 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         new_state = self._state
         if old_state != new_state:
-            _LOGGER.debug("[ALARM] Alarm changing from {} to {}".format(old_state, new_state))
+            _LOGGER.debug("{} state changes from {} to {}".format(FNAME, old_state, new_state))
             # Things to do on entering state
             if new_state == STATE_ALARM_WARNING:
-                _LOGGER.debug("[ALARM] Turning on warning")
+                _LOGGER.debug("{} Turning on warning".format(FNAME))
                 if self._config.get(CONF_WARNING):
                     self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_WARNING)})
                 self._timeoutat = now() +  datetime.timedelta(seconds=int(self._states[self._armstate][CONF_WARNING_TIME]))
                 self._update_log(None, LOG.TRIPPED, self._lasttrigger)
             elif new_state == STATE_ALARM_TRIGGERED:
-                _LOGGER.debug("[ALARM] Turning on alarm")
+                _LOGGER.debug("{} Turning on alarm".format(FNAME))
                 if self._config.get(CONF_ALARM):
                     self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_ALARM)})
                 if (self._states[self._armstate][CONF_TRIGGER_TIME] == -1):
@@ -816,7 +1101,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                     self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_TRIGGER_TIME]))
                 self._update_log(None, LOG.TRIPPED, self._lasttrigger)
             elif new_state == STATE_ALARM_PENDING:
-                _LOGGER.debug("[ALARM] Pending user leaving house")
+                _LOGGER.debug("{} Pending user leaving house".format(FNAME))
                 if self._config.get(CONF_WARNING):
                     self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_on', {'entity_id':self._config.get(CONF_WARNING)})
                 self._timeoutat = now() + datetime.timedelta(seconds=int(self._states[self._armstate][CONF_PENDING_TIME]))
@@ -828,99 +1113,148 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif new_state == STATE_ALARM_ARMED_AWAY:
                 self._returnto = new_state
                 self.setsignals(STATE_ALARM_ARMED_AWAY)
-            elif new_state == STATE_ALARM_ARMED_PERIMETER:
+            elif new_state == STATE_ALARM_ARMED_NIGHT:
                 self._returnto = new_state
-                self.setsignals(STATE_ALARM_ARMED_PERIMETER)
+                self.setsignals(STATE_ALARM_ARMED_NIGHT)
             elif new_state == STATE_ALARM_DISARMED:
                 self._returnto = new_state
                 self.clearsignals()
 
             # Things to do on leaving state
             if old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING:
-                _LOGGER.debug("[ALARM] Turning off warning")
+                _LOGGER.debug("{} Turning off warning".format(FNAME))
                 if self._config.get(CONF_WARNING):
                     self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_WARNING)})
 
             elif old_state == STATE_ALARM_TRIGGERED:
-                _LOGGER.debug("[ALARM] Turning off alarm")
+                _LOGGER.debug("{} Turning off alarm".format(FNAME))
                 if self._config.get(CONF_ALARM):
                     self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_ALARM)})
 
-            # Let HA know that something changed
+            # if persistence enabled
             if self._config[CONF_ENABLE_PERSISTENCE]:
-                self.save_alarm_state()
+                # remove persistence file as it makes no sense when disarmed
+                if new_state == STATE_ALARM_DISARMED:
+                    self.persistence_remove()
+                else:
+                    self.save_alarm_state()
+            # Let HA know that something changed
             self.schedule_update_ha_state()
 
-            _LOGGER.debug("[ALARM] old_state: %s, new_state: %s", old_state, new_state)
             # check if the sensor that triggered the alarm is still in alarm state
-            if old_state == STATE_ALARM_TRIGGERED and new_state != STATE_ALARM_DISARMED:
-                _LOGGER.debug("[ALARM] Checking state of %s..", self._lasttrigger)
+            if old_state == STATE_ALARM_TRIGGERED and new_state != STATE_ALARM_DISARMED and self._lasttrigger:
+                _LOGGER.debug("{} Checking state of {}..".format(FNAME, self._lasttrigger))
                 lasttrigger_state = self._hass.states.get(self._lasttrigger)
                 if (lasttrigger_state != None):
                     _state = lasttrigger_state.state.lower()
-                    _LOGGER.debug("[ALARM] %s is %s", self._lasttrigger, _state)
+                    _LOGGER.debug("{} {} is {}".format(FNAME, self._lasttrigger, _state))
                     if _state in self._supported_statuses_on:
-                        _LOGGER.debug("[ALARM] %s is still in alarm state, trigger the alarm immediately", self._lasttrigger)
+                        _LOGGER.info("{} {} is still in alarm state, trigger the alarm immediately".format(FNAME, self._lasttrigger))
                         self.process_event(Events.ImmediateTrip)
                     else:
-                        _LOGGER.debug("[ALARM] %s is in normal state, nothing to do", self._lasttrigger)
+                        _LOGGER.debug("{} {} is in normal state, nothing to do".format(FNAME, self._lasttrigger))
                 else:
-                    _LOGGER.warning("[ALARM] sensor %s is not found!", self._lasttrigger)
+                    _LOGGER.info("{} sensor {} is not found!".format(FNAME, self._lasttrigger))
 
     def _validate_code(self, code):
         """Validate given code."""
+        FNAME = '[VALIDATE_CODE]'
+
         if ((int(self._passcode_attempt_allowed) == -1) or (self._passcodeAttemptNo <= int(self._passcode_attempt_allowed))):
             check = self._code is None or code == self._code or self._validate_user_codes(code)
             if code == self._code:
-                self._update_log(None, LOG.DISARMED, None)
+                self._update_log(None, LOG.DISARMED)
             return self._validate_code_attempts(check)
         else:
-            _LOGGER.warning("[ALARM] Too many passcode attempts, try again later")
+            _LOGGER.info("{} Too many passcode attempts, try again later".format(FNAME))
             return False
 
     def _validate_user_codes(self, code):
+        FNAME = '[VALIDATE_USER_CODES]'
+
         for entity in self._users:
-            if entity['enabled'] == True:
-                if entity['code'] == code:
-                    self._update_log(entity['id'], LOG.DISARMED, None)
-                    return True
+            if entity['enabled'] and entity['code'] == code:
+                self._update_log(entity['id'], LOG.DISARMED)
+                return True
         return False
 
     def _validate_code_attempts(self, check):
+        FNAME = '[VALIDATE_CODE_ATTEMPTS]'
+
         if check:
             self._passcodeAttemptNo = 0
         else:
-            _LOGGER.debug("[ALARM] Invalid code given")
+            _LOGGER.info("{} Invalid passcode".format(FNAME))
             self._passcodeAttemptNo += 1
             if (int(self._passcode_attempt_allowed) != -1 and self._passcodeAttemptNo > int(self._passcode_attempt_allowed)):
                 self._panel_locked = True
                 self._passcode_timeoutat = now() + datetime.timedelta(seconds=int(self._passcode_attempt_timeout))
-                _LOGGER.warning("[ALARM] Panel locked, too many passcode attempts!")
-                self._update_log(None, LOG.LOCKED, None)
+                _LOGGER.info("{} Panel locked, too many passcode attempts!".format(FNAME))
+                self._update_log(None, LOG.LOCKED)
+
         self.schedule_update_ha_state()
         return check
 
     def _validate_panic_code(self, code):
         """Validate given code."""
+        FNAME = '[VALIDATE_PANIC_CODE]'
+
         check = code == self._panic_code
         if check:
-            _LOGGER.warning("[ALARM] PANIC MODE ACTIVATED!!!")
+            _LOGGER.info("{} PANIC MODE ACTIVATED!".format(FNAME))
             self._passcodeAttemptNo = 0
         return check
 
-    def _update_log(self, id, message, entity_id):
-        if (id == None or id == ''):
-            id = 'HA'
-        self.changedbyuser = id
+    def _update_log(self, user_id, event, entity_id=None):
+        FNAME = '[UODATE_LOG]'
+
+        # entity_id is an active sensor's id
+        if not user_id:
+            user_id = 'HA'
+        self.changedbyuser = user_id
         if (CONF_ENABLE_LOG in self._config):
             self._log_size = int(self._config[CONF_LOG_SIZE]) if CONF_LOG_SIZE in self._config else 10
             if self._log_size != -1 and len(self._config[CONF_LOGS]) >= self._log_size:
                 self._config[CONF_LOGS].remove(self._config[CONF_LOGS][0])
-            self._config[CONF_LOGS].append([time.time(), id, message.value, entity_id])
+            self._config[CONF_LOGS].append([time.time(), user_id, event.value, entity_id])
             self.log_save()
+
+    #### Listeners ####
+    def state_change_listener(self, event):
+        """ Something changed, we only care about things turning on at this point """
+        FNAME = '[STATE_CHANGE_LISTENER]'
+
+#        _LOGGER.debug("state_change_listener: event {}".format(event))
+        # makes sense only in pending states
+        # do not modify _lasttrigger if it's not empty to preserve the original trigger
+        if self._state in SUPPORTED_PENDING_STATES and not self._lasttrigger:
+            new_state = event.data.get('new_state', None)
+            if new_state and new_state.state:
+                if new_state.state.lower() in self._supported_statuses_on:
+                    eid = event.data['entity_id']
+                    if eid in self.immediate:
+                        _LOGGER.debug("{} immediate: {} is {}".format(FNAME, event.data['entity_id'], new_state.state))
+                        self._lasttrigger = eid
+                        self.process_event(Events.ImmediateTrip)
+                    elif eid in self.delayed:
+                        _LOGGER.debug("{} delayed: {} is {}".format(FNAME, event.data['entity_id'], new_state.state))
+                        self._lasttrigger = eid
+                        self.process_event(Events.DelayedTrip)
+
+    ### Actions from the outside world that affect us, turn into enum events for internal processing
+    def time_change_listener(self, eventignored):
+        """ I just treat the time events as a periodic check, its simpler then (re-/un-)registration """
+        FNAME = '[TIME_CHANGE_LISTENER]'
+
+        if self._timeoutat is not None:
+            if now() > self._timeoutat:
+                self._timeoutat = None
+                self.process_event(Events.Timeout)
 
     ### Actions from the outside world that affect us, turn into enum events for internal processing
     def passcode_timeout_listener(self, eventignored):
+        FNAME = '[PASSCODE_TIME_LISTENER]'
+
         if self._passcode_timeoutat is not None:
             if now() > self._passcode_timeoutat:
                 self._panel_locked = False
@@ -928,48 +1262,101 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self._passcodeAttemptNo = 0
                 self.schedule_update_ha_state()
 
+    async def _async_state_changed_listener(self, entity_id, old_state, new_state):
+        """Publish state change to MQTT."""
+
+        # publish only if MQTT enabled
+        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
+            FNAME = '[ASYNC_STATE_CHANGE_LISTENER]'
+
+            old_state_name = old_state.state if old_state else ''
+            new_state_name = new_state.state if new_state else ''
+#            _LOGGER.debug("{} Got old_state: \"{}\", new_state: \"{}\"".format(FNAME, old_state_name, new_state_name))
+
+            # publish only if the state changed
+            if new_state_name and new_state_name != old_state_name:
+                _LOGGER.debug("{} old_state: \"{}\", new_state: \"{}\"".format(FNAME, old_state_name, new_state_name))
+                state_name = STATE_ALARM_PENDING if (new_state_name == STATE_ALARM_WARNING and self._pending_on_warning) else new_state_name
+                _LOGGER.debug("{} mqtt.publish(topic={}, state={}, qos={}, retain={})".format(FNAME, self._state_topic, state_name, self._qos, True))
+                self._mqtt.async_publish(self._hass, self._state_topic, state_name, self._qos, True)
+
+    #### MQTT support####
     @asyncio.coroutine
     def async_added_to_hass(self):
         """Subscribe mqtt events.
         This method must be run in the event loop and returns a coroutine.
         """
+
+        @callback
+        def message_received(msg):
+            """Run when new MQTT message has been received."""
+            FNAME = '[MESSAGE_RECEIVED]'
+            _LOGGER.debug("{} payload: \"{}\"".format(FNAME, msg.payload))
+
+            # assume the message is always like
+            # command _JSON_dict_
+            # where _JSON_dict_ is optional
+            command, sep, params = msg.payload.partition(" ")
+            code = None
+            ignore_open_sensors = CONST_DEF_IGNORE_OPEN_SENSORS
+
+            if params:
+                _LOGGER.debug("{} parameters to import: \"{}\"".format(FNAME, params))
+                try:
+                    data = json.loads(params)
+                    if isinstance(data, dict):
+                        _LOGGER.debug("{} valid JSON received".format(FNAME))
+                        # extract data from json
+                        # TODO: if ATTR_ENTITY_ID in data.keys():
+                        if ATTR_CODE in data.keys():
+                            _LOGGER.debug("{} {}: \"{}\"".format(FNAME, ATTR_CODE, data[ATTR_CODE]))
+                            code = str(data[ATTR_CODE])
+                        if ATTR_IGNORE_OPEN_SENSORS in data.keys():
+                            _LOGGER.debug("{} {}: {}".format(FNAME, ATTR_IGNORE_OPEN_SENSORS, data[ATTR_IGNORE_OPEN_SENSORS]))
+                            ignore_open_sensors = str2bool(data[ATTR_IGNORE_OPEN_SENSORS])
+                    else:
+                        _LOGGER.warning("{} Only JSON parameters supported, ignore: \"{}\"".format(FNAME, params))
+                except Exception as e:
+                   _LOGGER.error("{} Exception: {}".format(FNAME, e))
+
+                #_LOGGER.debug("{} extracting parameters: end".format(FNAME))
+
+            #_LOGGER.debug("{} command: \"{}\", code: \"{}\", ignore_open_sensors: {}".format(FNAME, command, code, ignore_open_sensors))
+
+            if command == self._payload_arm_home:
+                self.async_alarm_arm_home(code, ignore_open_sensors)
+            elif command == self._payload_arm_away:
+                self.async_alarm_arm_away(code, ignore_open_sensors)
+            elif command == self._payload_arm_night:
+                if self._enable_night_mode:
+                    self.async_alarm_arm_night(code, ignore_open_sensors)
+                else:
+                    _LOGGER.error("{} {} disabled".format(FNAME, command))
+                    return
+            elif command == self._payload_disarm:
+                # True if master/user code required to disarm the alarm
+                code_to_disarm = not self._override_code
+                _LOGGER.debug("{} require passcode to disarm option: {}".format(FNAME, 'Enabled' if code_to_disarm else 'Disabled'))
+
+                # if code required but there is no code, that's not allowed
+                if code_to_disarm and not code:
+                    _LOGGER.error("{} Failed to {}: passcode required".format(FNAME, command))
+                    return
+                elif not code_to_disarm:
+                    if code:
+                        _LOGGER.warning("{} Ignore unexpected passcode \"{}\"".format(FNAME, code))
+                    code = self._code
+                # safe to disarm with a code or admin code (override mode, no need to supply one externally)
+                _LOGGER.info("{} {} with{}".format(FNAME, command, " passcode \"" + code + "\"" if code_to_disarm else "out passcode (override mode)"))
+                self.async_alarm_disarm(code)
+            else:
+                _LOGGER.error("{} Ignoring unsupported command \"{}\"".format(FNAME, command))
+                return
+
         if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             async_track_state_change(
                 self._hass, self.entity_id, self._async_state_changed_listener
             )
 
-        @callback
-        def message_received(msg):
-            """Run when new MQTT message has been received."""
-            #_LOGGER.warning("[ALARM] MQTT Topic: %s Payload: %s", topic, payload)
-            if msg.payload.split(" ")[0] == self._payload_disarm:
-                #_LOGGER.warning("Disarming %s", payload)
-                #TODO self._hass.states.get('binary_sensor.siren_sensor') #Use this method to relay open states
-                if (self._override_code):
-                    self.alarm_disarm(self._code)
-                else:
-                    self.alarm_disarm(msg.payload.split(" ")[1])
-            elif msg.payload == self._payload_arm_home:
-                self.alarm_arm_home('')
-            elif msg.payload == self._payload_arm_away:
-                self.alarm_arm_away('')
-            elif msg.payload == self._payload_arm_night:
-                self.alarm_arm_night('')
-            else:
-                _LOGGER.warning("[ALARM/MQTT] Received unexpected payload: %s", msg.payload)
-                return
-        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             return self._mqtt.async_subscribe(
                 self._hass, self._command_topic, message_received, self._qos)
-
-    @asyncio.coroutine
-    def _async_state_changed_listener(self, entity_id, old_state, new_state):
-        """Publish state change to MQTT."""
-        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
-            state = new_state.state
-            if (self._pending_on_warning == True and state == STATE_ALARM_WARNING):
-                state = STATE_ALARM_PENDING
-
-            self._mqtt.async_publish(self._hass, self._state_topic, state, self._qos, True)
-
-            _LOGGER.debug("[ALARM/MQTT] State changed")
