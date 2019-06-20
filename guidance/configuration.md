@@ -10,7 +10,7 @@
 
 - alarm: automation.alarm_triggered **#[REQUIRED, String] The automation to fire when the alarm has been triggered**
 - warning: automation.alarm_warning **#[OPTIONAL, String] The automation to fire when the alarm has been tripped**
-#### [OPTIONAL SETTINGS] 
+#### [OPTIONAL SETTINGS]
 - clock: True  **#[OPTIONAL, Boolean] False by default. True enables a clock in the center of the status bar**
 - perimeter_mode: True **#[OPTIONAL, Boolean] False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors**
 - weather: True **#[OPTIONAL, Boolean] False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary**
@@ -28,10 +28,10 @@
 - **armed_perimeter:** #[OPTIONAL]
     **pending_time:** 10 #[OPTIONAL] State specific setting if not defined inherits from above top level time
     **trigger_time:** 300 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately
     immediate:
       - binary_sensor.your_sensors
-    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered
     delayed:
       - binary_sensor.your_sensors
     #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
@@ -41,10 +41,10 @@
 - **armed_home:** #[REQUIRED]
     **pending_time:** 10 #[OPTIONAL] State specific setting if not defined inherits from above top level time
     **trigger_time:** 300 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately
     immediate:
       - binary_sensor.your_sensors
-    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered
     delayed:
       - binary_sensor.your_sensors
     #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
@@ -54,10 +54,10 @@
 - **armed_away:** #[REQUIRED]
     **pending_time:** 25 #[OPTIONAL] State specific setting if not defined inherits from above top level time
     **trigger_time:** 600 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately 
+    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately
     immediate:
       - binary_sensor.your_sensors
-    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered 
+    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered
     delayed:
       - binary_sensor.your_sensors
     #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
@@ -88,7 +88,7 @@
 - triggered_colour: 'red' #[OPTIONAL, string]
 
 ### [CUSTOM STATUSES]
--custom_supported_statuses_on: #[OPTIONAL, list of strings] CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. This is to be used when the state of the device is not recognised by the panel. Examples are provided below 
+-custom_supported_statuses_on: #[OPTIONAL, list of strings] CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. This is to be used when the state of the device is not recognised by the panel. Examples are provided below
   - 'running' #EXAMPLE
 -custom_supported_statuses_off:
   - 'not_running' #EXAMPLE

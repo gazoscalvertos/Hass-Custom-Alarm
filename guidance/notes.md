@@ -14,6 +14,12 @@ alarm_arm_instant:
     data:
       code: 'override'
 ```
+Arm modes
+There are Night (perimeter), Home and Away arm modes. They can be used as follows:
+Night: only entry/exit doors would trigger an alarm + outbuilding motion
+Home: all DOWNSTAIRS sensors would trigger an alarm
+Away: any/all sensors would trigger an alarm, entry/exit doors would be a delayed alarm
+The corresponding service calls are alarm_arm_perimeter, alarm_arm_home and alarm_arm_night.
 
 MQTT
 
@@ -22,19 +28,11 @@ It supports three variations of arm and disarm commands (actual command names co
 There is an option to disarm the alarm via MQTT message without passcode (Disabled by default).
 
 For example,
-```
   home/alarm/set ARM_AWAY
-```
 arms the Away mode after a configured Pending Time,
-```
   home/alarm/set ARM_HOME 1234
-```
 arms the Home mode using code after a configured Pending Time,
-```
   home/alarm/set DISARM
-```
 disarms the alarm if Disarm Without Code is Enabled or
-```
   home/alarm/set DISARM 1234
-```
 if it is Disabled
