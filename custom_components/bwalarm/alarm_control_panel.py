@@ -15,6 +15,7 @@
   - Alarm is going back to Triggered state if the sensor that caused the alarm is still active
 """
 
+# For legacy installations, this is not used in HA > 0.93
 REQUIREMENTS = ['ruamel.yaml==0.15.42']
 
 import asyncio
@@ -382,6 +383,23 @@ def str2bool(string) -> bool:
     return d.get(string, string)
 
 async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+
+    # Set up a static enpoint to serve files
+    resources = hass.config.path('custom_components/bwalarm/resources')
+    hass.http.register_static_path("/bwalarm", resources)
+
+    # Register the panel
+    url = "/api/panel_custom/alarm"
+    hass.http.register_static_path(url, "{}/panel.html".format(resources))
+    await hass.components.panel_custom.async_register_panel(
+        webcomponent_name='alarm',
+        frontend_url_path="alarm",
+        html_url=url,
+        sidebar_title='Alarm',
+        sidebar_icon='mdi:shield-home',
+        config={"alarmid": "alarm_control_panel.house"},
+    )
+
     #Setup MQTT if enabled
     mqtt = None
     if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
