@@ -56,6 +56,7 @@ from homeassistant.components.alarm_control_panel         import (
 
 from operator                    import attrgetter
 from homeassistant.core          import callback
+#from homeassistant.components    import websocket_api
 from homeassistant.util.dt       import utcnow                       as now
 from homeassistant.loader        import bind_hass
 from homeassistant.helpers.event import async_track_point_in_time
@@ -71,6 +72,16 @@ _LOGGER = logging.getLogger(__name__)
 
 VERSION                            = '1.1.7_ak74'
 DOMAIN                             = 'bwalarm'
+
+# The type of the message
+#WS_STATE_BWALARM_OPENSENSORS = DOMAIN + '/opensensors'
+# The schema for the message
+#SCHEMA_WEBSOCKET_GET_OPENSENSORS = \
+#    websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend({
+#        'type': WS_STATE_BWALARM_OPENSENSORS,
+        # The entity that we want to retrieve the thumbnail for.
+#        'state': cv.string
+#    })
 
 #//------------ INTERNAL ATTRIBUTES ------------
 INT_ATTR_STATE_CHECK_BEFORE_ARM = '_check_before_arm'
@@ -420,6 +431,15 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     def alarm_yaml_user(service):
         alarm.settings_user(service.data.get(CONF_USER), service.data.get(CONF_COMMAND))
 
+#    @callback
+#    def websocket_handle_get_opensensors(hass, connection, msg):
+#        async def send_opensensors():
+#            _LOGGER.debug("websocket_handle_get_opensensors: msg: {}".format(msg))
+#            connection.send_result(
+#                msg['id'], msg['state'] + ': 1st floor - safe'
+#                )
+#        hass.async_add_job(send_opensensors())
+
     alarm = BWAlarm(hass, config, mqtt)
     hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
@@ -432,6 +452,10 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     hass.services.async_register(DOMAIN, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_YAML_SAVE, alarm_yaml_save)
     hass.services.async_register(DOMAIN, SERVICE_YAML_USER, alarm_yaml_user)
+
+#    hass.components.websocket_api.async_register_command(
+#        WS_STATE_BWALARM_OPENSENSORS, websocket_handle_get_opensensors,
+#        SCHEMA_WEBSOCKET_GET_OPENSENSORS)
 
 class BWAlarm(alarm.AlarmControlPanel):
 
@@ -472,12 +496,12 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._opensensors            = None
 
         #------------------------------------CORE ALARM RELATED-------------------------------------
-        # deal with obsolete enable_perimeter_mode parameter
+        # deal with obsolete enable_perimeter_mode attribute
         # assume it's old yaml and first init (as we delete it then)
         if OBSOLETE_CONF_ENABLE_PERIMETER_MODE in self._config.keys():
             # import value only if it's True (False it will be anyway as default)
             if self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]:
-                _LOGGER.debug("{} core: parameter {} is obsolete, set {} to {} and delete the former".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, CONF_ENABLE_NIGHT_MODE, self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
+                _LOGGER.debug("{} core: attribute {} is obsolete, set {} to {} and delete the former".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, CONF_ENABLE_NIGHT_MODE, self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
                 self._config[CONF_ENABLE_NIGHT_MODE] = copy.deepcopy(self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE])
             del self._config[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]
 
@@ -687,7 +711,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def settings_save(self, key=None, value=None):
         """Push the alarm state to the given value."""
-        # it is called on change of every parameter
+        # it is called on change of every entry
 
         FNAME = '[SAVE_SETTINGS]'
         _LOGGER.debug("{} key: \"{}\", value: \"{}\"".format(FNAME, key if key else '', value if value else ''))
@@ -775,9 +799,9 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         FNAME = '[REPLACE_OBSOLETE_SETTINGS]'
 
-        # if CONF_ENABLE_NIGHT_MODE parameter is not in yaml, add it
+        # if CONF_ENABLE_NIGHT_MODE attibute is not in yaml, add it
         if CONF_ENABLE_NIGHT_MODE in current_settings.keys() and CONF_ENABLE_NIGHT_MODE not in loaded_settings.keys():
-            _LOGGER.debug("{} add core parameter {}: {}".format(FNAME, CONF_ENABLE_NIGHT_MODE, current_settings[CONF_ENABLE_NIGHT_MODE]))
+            _LOGGER.debug("{} add core attribute {}: {}".format(FNAME, CONF_ENABLE_NIGHT_MODE, current_settings[CONF_ENABLE_NIGHT_MODE]))
             loaded_settings[CONF_ENABLE_NIGHT_MODE] = copy.deepcopy(current_settings[CONF_ENABLE_NIGHT_MODE])
 
         # if STATE_ALARM_ARMED_NIGHT state is not in yaml, add it
@@ -787,7 +811,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         # delete obsolete records
         if OBSOLETE_CONF_ENABLE_PERIMETER_MODE in loaded_settings.keys():
-            _LOGGER.debug("{} deleting obsolete core parameter {}: {}".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
+            _LOGGER.debug("{} deleting obsolete core attribute {}: {}".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
             del loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]
 
         if OBSOLETE_STATE_ALARM_ARMED_PERIMETER in loaded_settings[CONF_STATES].keys():
@@ -1287,12 +1311,13 @@ class BWAlarm(alarm.AlarmControlPanel):
         if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
             FNAME = '[ASYNC_STATE_CHANGE_LISTENER]'
 
+            # empty name means HA just started
             old_state_name = old_state.state if old_state else ''
             new_state_name = new_state.state if new_state else ''
 #            _LOGGER.debug("{} Got old_state: \"{}\", new_state: \"{}\"".format(FNAME, old_state_name, new_state_name))
 
-            # publish only if the state changed
-            if new_state_name and new_state_name != old_state_name:
+            # publish only if the state changed (not on start)
+            if old_state_name and new_state_name and new_state_name != old_state_name:
                 _LOGGER.debug("{} old_state: \"{}\", new_state: \"{}\"".format(FNAME, old_state_name, new_state_name))
                 state_name = STATE_ALARM_PENDING if (new_state_name == STATE_ALARM_WARNING and self._pending_on_warning) else new_state_name
                 _LOGGER.debug("{} mqtt.publish(topic={}, state={}, qos={}, retain={})".format(FNAME, self._state_topic, state_name, self._qos, True))
@@ -1319,7 +1344,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             ignore_open_sensors = CONST_DEF_IGNORE_OPEN_SENSORS
 
             if params:
-                _LOGGER.debug("{} parameters to import: \"{}\"".format(FNAME, params))
+                _LOGGER.debug("{} atributes to import: \"{}\"".format(FNAME, params))
                 try:
                     data = json.loads(params)
                     if isinstance(data, dict):
@@ -1333,11 +1358,11 @@ class BWAlarm(alarm.AlarmControlPanel):
                             _LOGGER.debug("{} {}: {}".format(FNAME, ATTR_IGNORE_OPEN_SENSORS, data[ATTR_IGNORE_OPEN_SENSORS]))
                             ignore_open_sensors = str2bool(data[ATTR_IGNORE_OPEN_SENSORS])
                     else:
-                        _LOGGER.warning("{} Only JSON parameters supported, ignore: \"{}\"".format(FNAME, params))
+                        _LOGGER.warning("{} Only JSON attributess supported, ignore: \"{}\"".format(FNAME, params))
                 except Exception as e:
                    _LOGGER.error("{} Exception: {}".format(FNAME, e))
 
-                #_LOGGER.debug("{} extracting parameters: end".format(FNAME))
+                #_LOGGER.debug("{} extracting attributes: end".format(FNAME))
 
             #_LOGGER.debug("{} command: \"{}\", code: \"{}\", ignore_open_sensors: {}".format(FNAME, command, code, ignore_open_sensors))
 
