@@ -1,5 +1,9 @@
 """
   CHANGE LOG:
+
+v1.1.8_ak74
+    - disable save settings if alarm not disabled
+
 1.1.7_ak74
   - Arm/Disarm with MQTT commands, including codes, code_to_arm and override
   - alarm_arm/alarm_disarm revision
@@ -56,7 +60,6 @@ from homeassistant.components.alarm_control_panel         import (
 
 from operator                    import attrgetter
 from homeassistant.core          import callback
-#from homeassistant.components    import websocket_api
 from homeassistant.util.dt       import utcnow                       as now
 from homeassistant.loader        import bind_hass
 from homeassistant.helpers.event import async_track_point_in_time
@@ -70,21 +73,11 @@ import homeassistant.helpers.config_validation                       as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-VERSION                            = '1.1.7_ak74'
+VERSION                            = '1.1.8_ak74'
 DOMAIN                             = 'bwalarm'
 
-# The type of the message
-#WS_STATE_BWALARM_OPENSENSORS = DOMAIN + '/opensensors'
-# The schema for the message
-#SCHEMA_WEBSOCKET_GET_OPENSENSORS = \
-#    websocket_api.BASE_COMMAND_MESSAGE_SCHEMA.extend({
-#        'type': WS_STATE_BWALARM_OPENSENSORS,
-        # The entity that we want to retrieve the thumbnail for.
-#        'state': cv.string
-#    })
-
 #//------------ INTERNAL ATTRIBUTES ------------
-INT_ATTR_STATE_CHECK_BEFORE_ARM = '_check_before_arm'
+INT_ATTR_STATE_CHECK_BEFORE_ARM = 'check_before_arm'
 
 #//--------------------SUPPORTED STATES----------------------------
 OBSOLETE_STATE_ALARM_ARMED_PERIMETER    = 'armed_perimeter'
@@ -93,13 +86,7 @@ STATE_ALARM_WARNING                 = 'warning'
 
 SUPPORTED_PENDING_STATES            = [STATE_ALARM_ARMED_NIGHT, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_AWAY]
 
-SUPPORTED_STATES                    = [STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
-                                        STATE_ALARM_WARNING, STATE_ALARM_TRIGGERED] + SUPPORTED_PENDING_STATES
-
-
-# example from https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/manual/alarm_control_panel.py
-# SUPPORTED_PRETRIGGER_STATES = [state for state in SUPPORTED_STATES
-#                               if state != STATE_ALARM_TRIGGERED]
+SUPPORTED_STATES                    = [STATE_ALARM_DISARMED, STATE_ALARM_PENDING, STATE_ALARM_WARNING, STATE_ALARM_TRIGGERED] + SUPPORTED_PENDING_STATES
 
 #//-------------------STATES TO CHECK------------------------------
 STATE_TRUE                         = 'true'
@@ -225,7 +212,6 @@ event2name = {
         EATTR_STATE     :   STATE_ALARM_ARMED_AWAY
         }
     }
-#event2name = {Events.ArmHome: 'armed_home', Events.ArmAway: 'armed_away', Events.ArmNight: 'armed_night'}
 
 class LOG(enum.Enum):
     DISARMED = 0 #'disarmed the alarm'
@@ -277,10 +263,6 @@ USER_SCHEMA = vol.Schema([{
             vol.Required(CONF_CODE):                                     cv.string,
             vol.Optional(CONF_ENABLED, default=True):                    cv.boolean,
             vol.Optional(CONF_DISABLE_ANIMATIONS, default=False):        cv.boolean
-            # vol.Optional(CONF_HOME_PERM, default=True):                  cv.boolean,
-            # vol.Optional(CONF_AWAY_PERM, default=True):                  cv.boolean,
-            # vol.Optional(CONF_PERI_PERM, default=True):                  cv.boolean
-            ##ADD TIME BASED SETTINGS
 }])
 
 THEMES_SCHEMA = vol.Schema([{
@@ -319,8 +301,6 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(STATE_ALARM_ARMED_AWAY, default={}):              _state_schema(),  #state specific times ###REMOVE###
     vol.Optional(STATE_ALARM_ARMED_HOME, default={}):              _state_schema(),  #state specific times ###REMOVE###
     vol.Optional(STATE_ALARM_ARMED_NIGHT, default={}):         _state_schema(), #state specific times ###REMOVE###
-    # vol.Optional(STATE_ALARM_DISARMED, default={}):                _state_schema(STATE_ALARM_DISARMED),    #state specific times ###REMOVE###
-    # vol.Optional(STATE_ALARM_TRIGGERED, default={}):               _state_schema(STATE_ALARM_TRIGGERED),   #state specific times ###REMOVE###
 
     #------------------------------GUI-----------------------------------
     vol.Optional(CONF_PANEL):                                        PANEL_SCHEMA,
@@ -355,13 +335,9 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
 ATTR_IGNORE_OPEN_SENSORS        =   'ignore_open_sensors'
 CONST_DEF_IGNORE_OPEN_SENSORS   =   False
 
-# TODO: extend it properly using ALARM_SERVICE_SCHEMA
-EXTENDED_ALARM_SERVICE_SCHEMA = vol.Schema({
-    vol.Optional(ATTR_ENTITY_ID): cv.comp_entity_ids,
-    vol.Optional(ATTR_CODE): cv.string,
+EXTENDED_ALARM_SERVICE_SCHEMA = alarm.ALARM_SERVICE_SCHEMA.extend({
     vol.Optional(ATTR_IGNORE_OPEN_SENSORS, default=CONST_DEF_IGNORE_OPEN_SENSORS):          cv.boolean
 })
-
 
 SERVICE_YAML_SAVE  = 'ALARM_YAML_SAVE'
 SERVICE_YAML_USER  = 'ALARM_YAML_USER'
@@ -412,7 +388,7 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
 
     @callback
     def async_alarm_arm_away(service):
-        # service.endity_id ignored for simplicity, chage?
+        # service.endity_id ignored for simplicity, change?
         alarm.alarm_arm_away(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
 
     @callback
@@ -431,15 +407,6 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     def alarm_yaml_user(service):
         alarm.settings_user(service.data.get(CONF_USER), service.data.get(CONF_COMMAND))
 
-#    @callback
-#    def websocket_handle_get_opensensors(hass, connection, msg):
-#        async def send_opensensors():
-#            _LOGGER.debug("websocket_handle_get_opensensors: msg: {}".format(msg))
-#            connection.send_result(
-#                msg['id'], msg['state'] + ': 1st floor - safe'
-#                )
-#        hass.async_add_job(send_opensensors())
-
     alarm = BWAlarm(hass, config, mqtt)
     hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
@@ -452,10 +419,6 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     hass.services.async_register(DOMAIN, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_YAML_SAVE, alarm_yaml_save)
     hass.services.async_register(DOMAIN, SERVICE_YAML_USER, alarm_yaml_user)
-
-#    hass.components.websocket_api.async_register_command(
-#        WS_STATE_BWALARM_OPENSENSORS, websocket_handle_get_opensensors,
-#        SCHEMA_WEBSOCKET_GET_OPENSENSORS)
 
 class BWAlarm(alarm.AlarmControlPanel):
 
@@ -714,6 +677,12 @@ class BWAlarm(alarm.AlarmControlPanel):
         # it is called on change of every entry
 
         FNAME = '[SAVE_SETTINGS]'
+
+        # only save changes if the alarm is disarmed to avoid any issues
+        if self._state != STATE_ALARM_DISARMED:
+            _LOGGER.warning("{} alarm is not disarmed, no changes to settings allowed".format(FNAME))
+            return
+
         _LOGGER.debug("{} key: \"{}\", value: \"{}\"".format(FNAME, key if key else '', value if value else ''))
 
         key = key.lower()
@@ -723,12 +692,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         # load WHOLE config from yaml into loaded config
         self._yaml_content = self.yaml_load()
         if self._yaml_content:
-            # and update it as well (as it is different to runtime config!!!)
-            if key == CONF_STATES:
-                _LOGGER.debug("{} {} value received, clean it up".format(FNAME, key))
-                self._yaml_content[key] = self._clean_states_info(value)
-            else:
-                self._yaml_content[key] = value
+            self._yaml_content[key] = value
         else:
             _LOGGER.error("{} yaml_load failed!".format(FNAME))
         # and now save the whole loaded config (not runtime one!!!)
@@ -776,12 +740,30 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         FNAME = '[SAVE_SETTINGS_YAML]'
         _LOGGER.debug("{} begin".format(FNAME))
+
         self._updateUI = not self._updateUI
 
         # as it saves loaded config, make sure it is consistent with runtime config
         self._replace_obsolete_settings(self._config, self._yaml_content)
         # this magic required to get a proper representation of OrderedDict in generated yaml
         self.yaml.Representer.add_representer(OrderedDict, self.yaml.Representer.represent_dict)
+
+# don't need it as disabe save settings if alarm not disarmed
+#        if CONF_ENABLE_PERSISTENCE in self._yaml_content.keys():
+            # delete persistence file if persictence is disabled AND it's in one of pending states
+            # as otherwise the file is already removed automatically
+#            if not self._yaml_content[CONF_ENABLE_PERSISTENCE] and self._state in SUPPORTED_PENDING_STATES:
+#                _LOGGER.debug("{} persistence disabled, remove the file".format(FNAME))
+#                self.persistence_remove()
+
+        # make sure internal data structures do not go public
+        # use self._clean_states_info(self._yaml_content[CONF_STATES]) instead?
+        states_dict = self._yaml_content[CONF_STATES]
+        for state in states_dict.keys():
+            state_config = states_dict[state]
+            if INT_ATTR_STATE_CHECK_BEFORE_ARM in state_config.keys():
+                _LOGGER.error("{} state {}: {} found, remove before saving".format(FNAME, state, INT_ATTR_STATE_CHECK_BEFORE_ARM))
+                state_config.pop(INT_ATTR_STATE_CHECK_BEFORE_ARM, None)
 
         filename = self._hass.config.path() + "/alarm.yaml"
         with open(filename, 'w') as fil:
@@ -811,7 +793,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         # delete obsolete records
         if OBSOLETE_CONF_ENABLE_PERIMETER_MODE in loaded_settings.keys():
-            _LOGGER.debug("{} deleting obsolete core attribute {}: {}".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
+            _LOGGER.debug("{} delete obsolete core attribute {}: {}".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
             del loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]
 
         if OBSOLETE_STATE_ALARM_ARMED_PERIMETER in loaded_settings[CONF_STATES].keys():
@@ -833,7 +815,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                         _LOGGER.debug("{} File \"{}\" loaded successfully".format(FNAME, filename))
                         return True
                     else:
-                        _LOGGER.warning("{} Ignored empty file \"{}\"".format(FNAME, filename))
+                        _LOGGER.warning("{} Ignore empty file \"{}\"".format(FNAME, filename))
                         return False
                 else:
                     _LOGGER.warning("{} Cannot use file \"{}\": not a regular file".format(FNAME, filename))
@@ -983,7 +965,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 # arm as HA
                 if not user_id:
                     user_id = admin_id
-                    _LOGGER.warning("{} Ignored invalid passcode \"{}\", {} the alarm as {}".format(FNAME, code, service, user_id))
+                    _LOGGER.warning("{} Ignore invalid passcode \"{}\", {} the alarm as {}".format(FNAME, code, service, user_id))
         else:
             user_id = admin_id
             _LOGGER.info("{} no passcode supplied, {} the alarm as {}".format(FNAME, service, user_id))
@@ -1393,7 +1375,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 _LOGGER.info("{} {} with{}".format(FNAME, command, " passcode \"" + code + "\"" if code_to_disarm else "out passcode (override mode)"))
                 self.async_alarm_disarm(code)
             else:
-                _LOGGER.error("{} Ignoring unsupported command \"{}\"".format(FNAME, command))
+                _LOGGER.error("{} Ignore unsupported command \"{}\"".format(FNAME, command))
                 return
 
         if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
