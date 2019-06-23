@@ -5,7 +5,7 @@ This fork was created to maintain the original [bwalarm](https://github.com/gazo
 Feel free to create a new issue or pull request here **if you downloaded code from my repo**.
 The corresponding HA thread [here](https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666)
 
-## Installation
+## How to - installation
 
 Copy the following files/complete folders into your home assistant configuration directory:
 ```
@@ -37,9 +37,10 @@ The default password to access the settings page is: **HG28!!&dn**
 
 For more details please refer to the [configuration description](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/guidance/configuration.md).
 
-## Update procedure
+## How to - update
+Currently the update process is pretty much similar to installation - you copy a new release archive/clone the repository from here and save the files into custom_components/bwalarm/ folder.
 Soon the component will be supported by [HASC](https://github.com/custom-components/hacs) and there will be no need to update it manually.
 However, you need to keep in ming that the component's code is loaded on Home Assistent startup and the panels' code is cached by browser.
-Therefore, evety time you upgrade no matter how, you HAVE to clear chache of ALL of your browsers and then restart Home Assistant. 
+Therefore, evety time you update no matter how, you HAVE to clear chache of ALL of your browsers and then restart Home Assistant. 
 
 Please test and provide feedback/suggestions.
