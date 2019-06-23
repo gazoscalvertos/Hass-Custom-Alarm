@@ -37,4 +37,9 @@ The default password to access the settings page is: **HG28!!&dn**
 
 For more details please refer to the [configuration description](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/guidance/configuration.md).
 
+## Update procedure
+Soon the component will be supported by [HASC](https://github.com/custom-components/hacs) and there will be no need to update it manually.
+However, you need to keep in ming that the component's code is loaded on Home Assistent startup and the panels' code is cached by browser.
+Therefore, evety time you upgrade no matter how, you hHAVE to clear chache of ALL of your browsers and then restart Home Assistant. 
+
 Please test and provide feedback/suggestions.
