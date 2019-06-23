@@ -567,7 +567,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             del self._states[OBSOLETE_STATE_ALARM_ARMED_PERIMETER]
 
         # create lists of sensors to check for every state
-        arm_states_dict = self._config[CONF_STATES]
+        arm_states_dict = self._config.get(CONF_STATES, {})
         for state in arm_states_dict.keys():
             state_config = arm_states_dict[state]
             # convert to sets first as it's easier to merge (|) and remove (-)
@@ -748,17 +748,9 @@ class BWAlarm(alarm.AlarmControlPanel):
         # this magic required to get a proper representation of OrderedDict in generated yaml
         self.yaml.Representer.add_representer(OrderedDict, self.yaml.Representer.represent_dict)
 
-# don't need it as disabe save settings if alarm not disarmed
-#        if CONF_ENABLE_PERSISTENCE in self._yaml_content.keys():
-            # delete persistence file if persictence is disabled AND it's in one of pending states
-            # as otherwise the file is already removed automatically
-#            if not self._yaml_content[CONF_ENABLE_PERSISTENCE] and self._state in SUPPORTED_PENDING_STATES:
-#                _LOGGER.debug("{} persistence disabled, remove the file".format(FNAME))
-#                self.persistence_remove()
-
         # make sure internal data structures do not go public
         # use self._clean_states_info(self._yaml_content[CONF_STATES]) instead?
-        states_dict = self._yaml_content[CONF_STATES]
+        states_dict = self._yaml_content.get(CONF_STATES, {})
         for state in states_dict.keys():
             state_config = states_dict[state]
             if INT_ATTR_STATE_CHECK_BEFORE_ARM in state_config.keys():
@@ -787,7 +779,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             loaded_settings[CONF_ENABLE_NIGHT_MODE] = copy.deepcopy(current_settings[CONF_ENABLE_NIGHT_MODE])
 
         # if STATE_ALARM_ARMED_NIGHT state is not in yaml, add it
-        if STATE_ALARM_ARMED_NIGHT in current_settings[CONF_STATES].keys() and STATE_ALARM_ARMED_NIGHT not in loaded_settings[CONF_STATES].keys():
+        if CONF_STATES in current_settings.keys() and STATE_ALARM_ARMED_NIGHT in current_settings[CONF_STATES].keys() and CONF_STATES in loaded_settings.keys() and STATE_ALARM_ARMED_NIGHT not in loaded_settings[CONF_STATES].keys():
             _LOGGER.debug("{} add state {}".format(FNAME, STATE_ALARM_ARMED_NIGHT))
             loaded_settings[CONF_STATES][STATE_ALARM_ARMED_NIGHT] = copy.deepcopy(current_settings[CONF_STATES][STATE_ALARM_ARMED_NIGHT])
 
@@ -796,7 +788,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             _LOGGER.debug("{} delete obsolete core attribute {}: {}".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
             del loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]
 
-        if OBSOLETE_STATE_ALARM_ARMED_PERIMETER in loaded_settings[CONF_STATES].keys():
+        if CONF_STATES in loaded_settings.keys() and OBSOLETE_STATE_ALARM_ARMED_PERIMETER in loaded_settings[CONF_STATES].keys():
             _LOGGER.debug("{} delete obsolete state {}".format(FNAME, OBSOLETE_STATE_ALARM_ARMED_PERIMETER))
             del loaded_settings[CONF_STATES][OBSOLETE_STATE_ALARM_ARMED_PERIMETER]
 
