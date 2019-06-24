@@ -2,6 +2,7 @@ Users
 The component supports multiple users. To avoid any collisions they should have different names and passcodes.
 
 Options
+
 The components can be configured to request a passcode to set the alarm to prevent unauthorized access (Disabled by default).
 The passcode can be either master passcode or user passcode.
 There is a special code 'override' that can be used to arm immediately, i.e without waiting for Pendind Time configured. It works even if Request passcode to set the alarm is Disabled.
@@ -14,6 +15,7 @@ alarm_arm_instant:
     data:
       code: 'override'
 ```
+
 Arm modes
 There are Night (perimeter), Home and Away arm modes. They can be used as follows:
 Night: only entry/exit doors would trigger an alarm + outbuilding motion
