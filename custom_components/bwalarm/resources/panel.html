@@ -1,27 +1,11 @@
-<!-- CUSTOM ALARM COMPONENT PANEL
-  https://github.com/akasma74/Hass-Custom-Alarm
-
-  CHANGE LOG:
-
-  v1.3.9_ak74
-    - Settings icon is visible only in disarmed state, hence no settings change when armed
-
-  v1.3.8_ak74
-    - arm mode buttons/keypad appearance changed to look better
-    - minor changes to comments
-
-  v1.3.7_ak74
-    - applied PR67 from original Hass-Custom-Alarm
-
--->
-
+<!-- Panel for bwalarm integration  -->
 <script>
   {
     // show the version of your custom UI in the HA dev info panel (HA 0.66.0+):
-    const _NAME = 'Security Panel';
+    const _NAME = 'Alarm Panel';
     const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
     // don't forget to change HaPanelAlarm.version below!
-    const _VERSION = '22/06/19 v1.3.9_ak74';
+    const _VERSION = 'v1.7.0b';
 
     if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
     window.CUSTOM_UI_LIST.push({
@@ -473,9 +457,8 @@
                       <div>
                         <h1>Your Versions:</h1>
                         <div>
+                          <p><span class='info-header'>This integration: </span><span class='info-detail'>[[version]]</span></p>
                           <p><span class='info-header'>Home Assistant: </span><span class='info-detail'>v[[hass.config.version]]</span></p>
-                          <p><span class='info-header'>This Panel: </span><span class='info-detail'>v[[version]]</span></p>
-                          <p><span class='info-header'>Component (Bwalarm): </span><span class='info-detail'>v[[alarm.attributes.bwalarm_version]]</span></p>
                           <p><span class='info-header'>Python: </span><span class='info-detail'>v([[alarm.attributes.py_version]])</span></p>
                         </div>
                       </div>
@@ -674,7 +657,7 @@
                           <span class='info-header'>Alarm Persistence: </span>
                           <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_persistence}}' on-change='settingsSave' data-setting='root' data-attribute='enable_persistence'></paper-toggle-button>
                         </div>
-                        <span class='info-detail'>When enabled, the alarm state is persistently saved when eith Home Assistant or the underlying host is restarted. This is useful in the event of power loss.<br>Default: Disabled</span>
+                        <span class='info-detail'>When enabled, the alarm state is persistently saved when either Home Assistant or the underlying host is restarted. This is useful in the event of power loss.<br>Default: Disabled</span>
                       </div>
 
                       <div class='setting-outer horizontal layout'>
@@ -710,7 +693,7 @@
                       <div class='setting-outer horizontal layout'>
                         <div class='setting-inner vertical layout'>
                           <span class='info-header'>Disarm Attempts: </span>
-                          <span class='info-detail'>Amount of allowed disarm attempts before the panel locks out.<br>Default: -1 (infinite attempts)</span>
+                          <span class='info-detail'>Amount of allowed disarm attempts before the panel locks out.<br>Default: -1 (no limit)</span>
                           <div class='setting-input horizontal layout'>
                             <paper-input id='passcode_attempts' value='{{alarm.attributes.passcode_attempts}}' placeholder='Passcode Attempts'></paper-input>
                             <paper-icon-button data-type='input_text' data-setting='root' data-attribute='passcode_attempts' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
@@ -817,10 +800,10 @@
                           <div class='setting-inner vertical layout'>
 
                             <span class='info-header'>Badge: </span>
-                            <span class='info-detail'>Enter the location and name of your image. Ensure you upload your image to your HA server under the folders [HA config]/www/images. then use filename /bwalarm/images/myimage.jpg.</span>
+                            <span class='info-detail'>Filename of your picture. You can use standard pictures from [[alarm.attributes.default_images_path]] or your own ones from [[alarm.attributes.override_images_path]]</span>
                             <div class='setting-input horizontal layout'>
-                              <state-badge id='user-badge' style='background-image: url("/bwalarm/images/ha.png"); margin-top: auto; margin-bottom: auto; margin-right: 15px;'></state-badge>
-                              <paper-input id='user-picture' placeholder='Image path i.e. /bwalarm/images/myimage.jpg' on-change="loadPreviewImage" ></paper-input>
+                              <state-badge id='user-badge' style='background-image: url("[[default_icon_path]]"); margin-top: auto; margin-bottom: auto; margin-right: 15px;'></state-badge>
+                              <paper-input id='user-picture' placeholder='Icon name i.e. myimage.jpg' on-input="loadPreviewImage" ></paper-input>
                             </div>
                           </div>
                         </div>
@@ -920,15 +903,6 @@
                               <checkbox type='checkbox' class='checkbox' title="[[sensor]]" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_away' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
                             </template>
                           </paper-listbox>
-                          <div>
-                            <div class='detail'>
-                              <paper-listbox id='sensors-checkboxs' class='vertical layout' attr-for-selected='title' multi selected-values='{{alarm.attributes.states.armed_away.immediate}}' selected-attribute='checked' >
-                                <template is='dom-repeat' items='{{switches}}' as='sensor'>
-                                  <checkbox type='checkbox' class='checkbox' title="[[sensor]]" on-click='settingsSave' data-setting='sensor_select' data-mode='armed_away' data-group='immediate' >[[computeFriendlyName(sensor)]]</checkbox>
-                                </template>
-                              </paper-listbox>
-                            </div>
-                          </div>
                         </div>
 
                         <div class='sensor vertical layout'>
@@ -997,7 +971,6 @@
                         </div>
 
                         <div class='vertical layout'>
-
                           <h2>Delayed</h2>
                           <paper-listbox id='sensors-checkboxs4' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_home.delayed}} selected-attribute="checked" >
                             <template is='dom-repeat' items='{{sensors}}' as='sensor'>
@@ -1007,7 +980,6 @@
                         </div>
 
                         <div class='vertical layout'>
-
                           <h2>Override</h2>
                           <paper-listbox id='sensors-checkboxs5' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_home.override}} selected-attribute="checked" >
                             <template is='dom-repeat' items='{{sensors}}' as='sensor'>
@@ -1071,7 +1043,6 @@
                         </div>
 
                         <div class='vertical layout'>
-
                           <h2>Delayed</h2>
                           <paper-listbox id='sensors-checkboxs7' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_night.delayed}} selected-attribute="checked" >
                             <template is='dom-repeat' items='{{sensors}}' as='sensor'>
@@ -1081,7 +1052,6 @@
                         </div>
 
                         <div class='vertical layout'>
-
                           <h2>Override</h2>
                           <paper-listbox id='sensors-checkboxs8' class='vertical layout' attr-for-selected="title" multi selected-values={{alarm.attributes.states.armed_night.override}} selected-attribute="checked" >
                             <template is='dom-repeat' items='{{sensors}}' as='sensor'>
@@ -1339,24 +1309,27 @@
                 <iron-icon icon='mdi:alert-circle-outline'></iron-icon>
               </div>
               <div>
-                <div id='error-title'>This component is not working!</div>
-                <template is='dom-repeat' items='[[items]]'>
-                 <paper-item on-click='openLog'>
-                   <paper-item-body two-line>
-                     <div class="row">
-                       [[item.message]]
-                     </div>
-                     <div secondary>
-                       <!-- [[formatTime(item.timestamp)]] this is not working --> ([[item.source]]) <!--([[item.level]]) it's always ERROR at the moment anyway -->
-                     </div>
-                   </paper-item-body>
-                 </paper-item>
-                </template>
-                <div id='error-header'>Check the Home Assistant log for more details.</div>
+                <div id='error-title'>This component is not working</div>
+	              <!-- <div id='error-header'>Something went wrong with your alarm component!</div> -->
+	              <template is='dom-repeat' items='[[items]]'>
+	               <paper-item on-click='openLog'>
+	                 <paper-item-body two-line>
+	                   <div class="row">
+	                     [[item.message]]
+	                   </div>
+	                   <div secondary>
+	                     [[formatTime(item.timestamp)]] [[item.source]] ([[item.level]])
+	                     <!-- [[formatTime(item.timestamp)]] this is not working --> ([[item.source]]) <!--([[item.level]]) it's always ERROR at the moment anyway -->
+	                   </div>
+	                 </paper-item-body>
+	               </paper-item>
+	              </template>
+
+	              <div id='error-detail'>Check the Home Assistant log for more details.</div>
 
                 <div id='error-version'>
+                  <p><span class='info-detail'>This integration: </span><span class='info-header'>[[version]]</span></p>
                   <p><span class='info-detail'>Home Assistant: </span><span class='info-header'>v[[hass.config.version]]</span></p>
-                  <p><span class='info-detail'>This Panel: </span><span class='info-header'>v[[version]]</span></p>
               </div>
               </div>
             </div>
@@ -1375,6 +1348,12 @@
         static get properties(){
           return {
             hass:                 { type: Object },
+            alarm:                { type: Object, observer: 'monitorAlarm' },
+            platform:             { type: String, value: 'bwalarm' },
+            resources_prefix:     { type: String },
+            image_path:           { type: String },
+            default_icon_name:    { type: String },
+            default_icon_path:    { type: String },
             panel:                { type: Object },
             narrow:               { type: Boolean, value: false },
             showMenu:             { type: Boolean, value: false },
@@ -1388,8 +1367,6 @@
             carouselSettings:     { type: Object },
             controls:             { type: Object },
             controlsLoaded:       { type: Boolean, value: false },
-
-            alarm:                { type: Object, observer: 'monitorAlarm' },
 
             attemptArmMode:       { type: String, value: ''},
 
@@ -1424,11 +1401,12 @@
             cameras:              { type: Array, value: [] },
 
             sensors:              { type: Array, value: [] },
+            // internal ones, here to have them created only once instead of on every function call
             binary_sensors:       { type: Array, value: [] },
             switches:             { type: Array, value: [] },
 
             errors:               { type: Array },
-            version:              { type: String, value: '1.3.8_ak74'},
+            version:              { type: String, value: 'v1.7.0b'},
 
             camera_update_interval: { type: Number, value: 5000 }, // ms
 
@@ -1463,9 +1441,22 @@
 
           // Check the alarm component successfully loaded if not then display an error
           if (this.alarm){
+            this.platform = this.alarm.attributes.platform;
+            this.resources_prefix = "/" + this.platform + "/";
+            // TODO: replace hardcoded "images/"
+            this.image_path = this.resources_prefix + "images/";
+            this.default_icon_name = this.alarm.attributes.default_icon_name;
+            this.default_icon_path = this.image_path + this.default_icon_name;
+            //console.log("platform: ", this.platform);
+            //console.log("resources_prefix: ", this.resources_prefix);
+            //console.log("image_path: ", this.image_path);
+            //console.log("default_icon_path: ", this.default_icon_path);
+
             //Countdown360
             var script = document.createElement('script');
-            script.setAttribute('src', '/bwalarm/lib/countdown360.js');
+            var c360 = this.resources_prefix + 'lib/countdown360.js';
+            //console.log("c360: ", c360);
+            script.setAttribute('src', c360);
             document.body.appendChild(script);
 
             this.loadSettings();
@@ -1488,7 +1479,7 @@
               this.updating = false;
               this.items = [];
               for (var item in this.errorItems) {
-                if (this.errorItems[item].level.includes("ERROR") && this.errorItems[item].message.includes("bwalarm")) {
+                if (this.errorItems[item].level.includes("ERROR") && this.errorItems[item].message.includes(this.platform)) {
                   this.items.push(this.errorItems[item]);
                 }
               }
@@ -1808,6 +1799,9 @@
             if (state.split('.')[0] == 'camera'){ //find all cameras and add to array
               this.cameras.push(state);
             }
+            else if (state.split('.')[0] == 'sensor'){
+              this.sensors.push(state);
+            }
             else if (state.split('.')[0] == 'binary_sensor'){
               this.binary_sensors.push(state);
             }
@@ -1817,6 +1811,7 @@
           }
          this.binary_sensors.sort();
          this.switches.sort();
+         this.sensors.sort();
          this.sensors.push.apply(this.sensors, this.binary_sensors);
          this.sensors.push.apply(this.sensors, this.switches);
         }
@@ -1826,47 +1821,43 @@
             case 'time':
               var t = new Date(entry[0] * 1000);
               return t.toLocaleString('en-GB').split(",")[1] + " - " + t.toLocaleString('en-GB').split(",")[0];
-              break;
+
             case 'name':
+              // if it's error message, sometimes we don't need a name
+              if ((entry[2] == 1) || (entry[2] == 2) || (entry[2] == 5) || (entry[2] == 6))
+                return;
               for (var user in this.alarm.attributes.users) {
                 if (this.alarm.attributes.users[user]['id'] == entry[1])
                   return this.toUpper(this.alarm.attributes.users[user]['name']);
               }
               return this.toUpper(entry[1]);
+
             case 'image':
+              // if it's error message, sometimes we don't need a badge
+              if ((entry[2] == 1) || (entry[2] == 2) || (entry[2] == 5) || (entry[2] == 6))
+                return;
               for (var user in this.alarm.attributes.users) {
-                if (this.alarm.attributes.users[user]['id'] == entry[1])
-                  return this.toUpper(this.alarm.attributes.users[user]['picture']);
+                if (this.alarm.attributes.users[user]['id'] == entry[1]){
+                  //console.log("computeLog(%s, %s) = %s", entry[1], type, this.image_path + this.alarm.attributes.users[user]['picture']);
+                  return this.image_path + this.alarm.attributes.users[user]['picture'];
+                }
               }
-              return '/bwalarm/images/ha.png';
+              return this.default_icon_path;
+
             case 'message':
               switch (entry[2]){
-                case 0:
-                  return 'disarmed the alarm';
-                  break;
-                case 1:
-                  return 'Disarm attempt failed, wrong passcode!';
-                  break;
-                case 2:
-                  return 'Alarm has been triggered by ' + this.computeFriendlyName(entry[3]);
-                  break;
-                case 3:
-                  return 'set the alarm in Home mode';
-                  break;
-                case 4:
-                  return 'set the alarm in Away mode';
-                  break;
-                case 5:
-                  return 'Alarm has been tripped by ' + this.computeFriendlyName(entry[3]);
-                  break;
-                case 6:
-                  return 'Panel Locked';
-                  break;
-                case 8:
-                  return 'set the alarm in Night mode';
-                  break;
+                case 0: return 'disarmed the alarm';
+                case 1: return 'Disarm attempt failed, wrong passcode';
+                case 2: return 'Alarm has been triggered by ' + this.computeFriendlyName(entry[3]);
+                case 3: return 'set the alarm in Home mode';
+                case 4: return 'set the alarm in Away mode';
+                case 5: return 'Alarm has been tripped by ' + this.computeFriendlyName(entry[3]);
+                case 6: return 'Panel Locked';
+                case 8: return 'set the alarm in Night mode';
               }
-              break;
+              var err = "unknown message \"" + entry[2] + "\"";
+              console.log("computeLog: ", err);
+              return err;
           }
         }
 
@@ -2328,20 +2319,41 @@
 
         // Gets an image from the username
         computeImage(image){
-          if (image == null || image == '')
-            return '/bwalarm/images/ha.png'
-          else if (this.urlExists(image)) return image;
-          else return '/bwalarm/images/ha.png';
+          var FNAME = '[computeImage] '
+          if (image == null || image == ''){
+            //console.log(FNAME, "empty/null image name, return ", this.default_icon_path);
+            return this.default_icon_path
+          }
+          else{
+             image = this.image_path + image;
+            if (this.urlExists(image)){
+              //console.log(FNAME, "image exists, return ", image);
+              return image;
+            }
+            else{
+              //console.log(FNAME, "image ", image, " does not exist, return ", this.default_icon_path);
+              return this.default_icon_path;
+            }
+          }
         }
 
         urlExists(url){
+          //console.log("urlExists(%s)", url)
           try {
             var http = new XMLHttpRequest();
-            http.open('HEAD', url, false);
+            //http.onload = function() {
+            //  if (http.status !=200){
+            //    alert('Error: ' + http.status);
+            //    return;
+            //  }
+            //}
+            http.open('GET', url, false);
             http.send();
-            return http.status!=404;
+            //console.log("urlExists(%s) status=", url, http.status)
+            return http.status != 404;
           }
-          catch(err) {
+          catch(err){
+            console.log("urlExists(%s) catched error: %s, return false", url, err)
             return false;
           }
         }
@@ -2435,10 +2447,11 @@
           var data = {"entity_id": this.alarm.entity_id, "code": this.code}
 
           // add extra parameters only to service calls that support them: arm_xxx_ext
+          // and only if allowed (to avoid erors from Lovelace alarm card etc)
           if (call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night')
             data["ignore_open_sensors"] = "True"  // no need to check as the panel already called openSensors
 
-          this.hass.callService('bwalarm', call, data);
+          this.hass.callService(this.platform, call, data);
         }
 
         //Restart Home Assistant
@@ -2469,13 +2482,9 @@
               //clear pascode
               this.shadowRoot.querySelector('#user-passcode').value = '';
               //populate user picture
-              this.shadowRoot.querySelector('#user-picture').value = this.alarm.attributes.users[user].picture;
-              //populate enabled toggle
-              //this.shadowRoot.querySelector('#user-disable_animations').checked = this.alarm.attributes.users[user].disable_animations;
-              //populate permissions
-      /*        this.shadowRoot.querySelector('#user-home-permission').checked = this.alarm.attributes.users[user]['home-permission'];
-              this.shadowRoot.querySelector('#user-away-permission').checked = this.alarm.attributes.users[user]['away-permission'];
-              this.shadowRoot.querySelector('#user-perimeter-permission').checked = this.alarm.attributes.users[user]['perimeter-permission'];*/
+              var picture = this.alarm.attributes.users[user].picture;
+              this.loadPreviewImageFromName(picture);
+              this.shadowRoot.querySelector('#user-picture').value = picture;
               this.shadowRoot.querySelector('#user-save').setAttribute('data-userID', user_id);
             }
           }
@@ -2493,10 +2502,6 @@
             user['enabled'] = this.shadowRoot.querySelector('#user-enabled').checked;
             user['code'] = this.shadowRoot.querySelector('#user-passcode').value;
             user['picture'] = this.shadowRoot.querySelector('#user-picture').value;
-            //user['disable_animations'] = this.shadowRoot.querySelector('#user-disable_animations').checked;
-    /*        user[username]['home-permission'] = this.shadowRoot.querySelector('#user-home-permission').checked;
-            user[username]['away-permission'] = this.shadowRoot.querySelector('#user-away-permission').checked;
-            user[username]['perimeter-permission'] = this.shadowRoot.querySelector('#user-perimeter-permission').checked;*/
             if (ev.target.getAttribute('data-userid') != null)
               //Update Config
               this.settingsUpdateUser(user, 'update');
@@ -2532,7 +2537,6 @@
           //populate user picture
           this.shadowRoot.querySelector('#user-picture').value = '';
           //populate enabled toggle
-          //this.shadowRoot.querySelector('#user-disable_animations').checked = false;
         }
 
         async _loadData() {
@@ -2554,21 +2558,22 @@
               user['name']                           = this._users[haUser].name;
               user['enabled']                        = false;
               user['code']                           = this._users[haUser].id;
-              user['picture']                        = '/bwalarm/images/ha.png';
-              //user['disable_animations']             = false;
-  /*              user[username]['home-permission']      = this.shadowRoot.querySelector('#user-home-permission').checked;
-              user[username]['away-permission']      = this.shadowRoot.querySelector('#user-away-permission').checked;
-              user[username]['perimeter-permission'] = this.shadowRoot.querySelector('#user-perimeter-permission').checked;*/
-
+              user['picture']                        = this.default_icon_name;
               this.settingsUpdateUser(user, 'add');
             }
           }
          }
 
-        loadPreviewImage(ev){
-          var image = ev.target.value;
-          if (!this.urlExists(image)) image = '/bwalarm/images/ha.png';
+        loadPreviewImageFromName(fname){
+          //var FNAME='[loadPreviewImageFromName] ';
+          //console.log(FNAME, "image = ", fname);
+          var image = this.computeImage(fname);
+          //console.log(FNAME, "will use image ", image);
           this.shadowRoot.querySelector('#user-badge').setAttribute('style', 'background-image: url("' + image + '");margin-top: auto; margin-bottom: auto; margin-right: 15px;');
+        }
+
+        loadPreviewImage(ev){
+          this.loadPreviewImageFromName(ev.target.value);
         }
 
         //Read the settings that are to be updated
@@ -2718,12 +2723,12 @@
 
         //Call the service to update the yaml file
         settingsUpdate(setting, value){
-          this.hass.callService('bwalarm', 'ALARM_YAML_SAVE', {'configuration': setting, 'value': value });
+          this.hass.callService(this.platform, 'ALARM_YAML_SAVE', {'configuration': setting, 'value': value });
         }
 
         //Call the service to update the yaml file
         settingsUpdateUser(user, command){
-          this.hass.callService('bwalarm', 'ALARM_YAML_USER', {'user': user, 'command': command });
+          this.hass.callService(this.platform, 'ALARM_YAML_USER', {'user': user, 'command': command });
         }
 
         //Check if there are open sensors
@@ -2781,12 +2786,12 @@
           for (var index in sensors) {
             var sensor = sensors[index];
             if (this.alarm.attributes.supported_statuses_on.indexOf(sensor.state.toLowerCase()) > -1) {
-              //console.log(FNAME + "(" + service_name + "): " + sensor + " is " + sensor.state + ", return True");
+              // console.log(FNAME + "(" + service_name + "): " + sensor + " is " + sensor.state + ", return True");
               return true;
             }
           }
 
-          //console.log(FNAME + "(" + service_name + "): return False");
+          // console.log(FNAME + "(" + service_name + "): return False");
           return false;
         }
 
@@ -2801,7 +2806,7 @@
         // Observer: polymer gaurantees that this won't be called util hass and panel are both defined
         onPanelUpdate(hass, panel){
           this.alarm = hass.states[panel.config.alarmid];
-//          config.log("onPanelUpdate: ", panel.config.alarmid);
+          // config.log("onPanelUpdate: ", panel.config.alarmid);
         }
 
         fire(type, detail, options) {
