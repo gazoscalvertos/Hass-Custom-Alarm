@@ -1,3 +1,7 @@
+<!--
+v
+-->
+
 <!-- Panel for bwalarm integration  -->
 <script>
   {
@@ -2341,15 +2345,9 @@
           //console.log("urlExists(%s)", url)
           try {
             var http = new XMLHttpRequest();
-            //http.onload = function() {
-            //  if (http.status !=200){
-            //    alert('Error: ' + http.status);
-            //    return;
-            //  }
-            //}
-            http.open('GET', url, false);
+            http.open('HEAD', url, false);
             http.send();
-            //console.log("urlExists(%s) status=", url, http.status)
+            console.log("urlExists(%s) status = ", url, http.status)
             return http.status != 404;
           }
           catch(err){
