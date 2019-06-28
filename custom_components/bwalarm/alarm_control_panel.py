@@ -1,51 +1,38 @@
-"""
-  CHANGE LOG:
+#### Code of the bwalarm integration ####
 
-v1.1.8_ak74
-    - disable save settings if alarm not disabled
-
-1.1.7_ak74
-  - Arm/Disarm with MQTT commands, including codes, code_to_arm and override
-  - alarm_arm/alarm_disarm revision
-  - debug/info/warning logging added/changed
-  - fixed duplicate reaction to state change
-  - fixed bug #3 (https://github.com/akasma74/Hass-Custom-Alarm/issues/3)
-  - Perimeter -> Night migration
-  - change DOMAIN from alarm_control_panel to bwalarm (affects service calls from HA automations)
-  - changed_by() returns the original trigger and resets upon DISARM/coming back to ARM_XXX state (after trigger time)
-  - persistence file now exists in all but DISARMED states
-
-1.1.6_ak74
-  - Alarm is going back to Triggered state if the sensor that caused the alarm is still active
-"""
 
 # For legacy installations, this is not used in HA > 0.93
 REQUIREMENTS = ['ruamel.yaml==0.15.42']
+
+import logging
+_LOGGER = logging.getLogger(__name__)
 
 import asyncio
 import sys
 import copy
 import datetime
-import logging
 import enum
 import os
+from os import O_CREAT, O_TRUNC, O_WRONLY, stat_result
+
 import re
 import json
 import pytz
 import hashlib
 import time
 import uuid
+from aiohttp import web
 
 from collections import OrderedDict
 
 from homeassistant.const         import (
-    # SERVICES
+    ## SERVICES ##
     SERVICE_ALARM_ARM_NIGHT, SERVICE_ALARM_ARM_HOME, SERVICE_ALARM_ARM_AWAY, SERVICE_ALARM_DISARM,
     # STATES
     STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
     STATE_ALARM_ARMED_NIGHT, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_AWAY,
     STATE_ALARM_TRIGGERED,
-    # CONFIG PARAMETERS
+    ## CONFIG PARAMETERS ##
     CONF_PLATFORM, CONF_NAME, CONF_CODE,
     CONF_PENDING_TIME, CONF_DELAY_TIME, CONF_TRIGGER_TIME,
     CONF_DISARM_AFTER_TRIGGER,
@@ -54,9 +41,8 @@ from homeassistant.const         import (
     EVENT_STATE_CHANGED, EVENT_TIME_CHANGED
     )
 
-from homeassistant.components.alarm_control_panel         import (
-    ALARM_SERVICE_SCHEMA
-    )
+from homeassistant.components.alarm_control_panel \
+                                import ALARM_SERVICE_SCHEMA
 
 from operator                    import attrgetter
 from homeassistant.core          import callback
@@ -65,16 +51,26 @@ from homeassistant.loader        import bind_hass
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.util          import sanitize_filename
+from homeassistant.exceptions    import HomeAssistantError
+from homeassistant.components.http import HomeAssistantView
 
 import voluptuous                                                    as vol
 import homeassistant.components.alarm_control_panel                  as alarm
 import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
-_LOGGER = logging.getLogger(__name__)
+try:
+    from homeassistant.util.ruamel_yaml import JSON_TYPE
+    from ruamel.yaml            import YAML
+    from ruamel.yaml.error      import YAMLError
 
-VERSION                            = '1.1.8_ak74'
-DOMAIN                             = 'bwalarm'
+except Exception as e:
+    _LOGGER.warning('Import Error: %s. Attempting to download and import', e)
+
+
+from .const import PLATFORM, CUSTOM_INTEGRATIONS_ROOT, OVERRIDE_FOLDER, \
+    INTEGRATION_FOLDER, RESOURCES_FOLDER, CONFIG_FNAME, PERSISTENCE_FNAME, \
+    LOG_FNAME, PANEL_FNAME, DEFAULT_ICON_NAME, IMAGES_FOLDER
 
 #//------------ INTERNAL ATTRIBUTES ------------
 INT_ATTR_STATE_CHECK_BEFORE_ARM = 'check_before_arm'
@@ -82,7 +78,6 @@ INT_ATTR_STATE_CHECK_BEFORE_ARM = 'check_before_arm'
 #//--------------------SUPPORTED STATES----------------------------
 OBSOLETE_STATE_ALARM_ARMED_PERIMETER    = 'armed_perimeter'
 STATE_ALARM_WARNING                 = 'warning'
-#STATE_ALARM_ARMED_NIGHT             = 'armed_night'
 
 SUPPORTED_PENDING_STATES            = [STATE_ALARM_ARMED_NIGHT, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_AWAY]
 
@@ -229,6 +224,9 @@ DEFAULT_TRIGGER_TIME = 600 #Ten Minutes
 
 def _state_validator(config): #Place a default value in that timers if there isnt specific ones set
     """Validate the state."""
+    FNAME = '[_state_validator]'
+    _LOGGER.debug("{}".format(FNAME, config))
+
     config = copy.deepcopy(config)
     for state in SUPPORTED_PENDING_STATES:
         if CONF_TRIGGER_TIME not in config[state]:
@@ -241,6 +239,9 @@ def _state_validator(config): #Place a default value in that timers if there isn
 
 def _state_schema():
     """Validate the state."""
+    FNAME = '[_state_schema]'
+    _LOGGER.debug("{}".format(FNAME))
+
     schema = {}
     # if state in SUPPORTED_PENDING_STATES:
     schema[vol.Optional(CONF_TRIGGER_TIME, default=DEFAULT_TRIGGER_TIME)] = vol.All(vol.Coerce(int), vol.Range(min=-1))
@@ -259,7 +260,7 @@ PANEL_SCHEMA = vol.Schema({
 USER_SCHEMA = vol.Schema([{
             vol.Required(CONF_ID, default=uuid.uuid4().hex):             cv.string,
             vol.Required(CONF_NAME):                                     cv.string,
-            vol.Optional(CONF_PICTURE, default='/local/images/ha.png'):  cv.string,
+            vol.Optional(CONF_PICTURE, default=DEFAULT_ICON_NAME):       cv.string,
             vol.Required(CONF_CODE):                                     cv.string,
             vol.Optional(CONF_ENABLED, default=True):                    cv.boolean,
             vol.Optional(CONF_DISABLE_ANIMATIONS, default=False):        cv.boolean
@@ -283,7 +284,7 @@ MQTT_SCHEMA = vol.Schema({
 })
 
 PLATFORM_SCHEMA = vol.Schema(vol.All({
-    vol.Required(CONF_PLATFORM):                                  'bwalarm',
+    vol.Required(CONF_PLATFORM):                                   PLATFORM,
     vol.Optional(CONF_NAME, default='House'):                      cv.string,
     vol.Optional(CONF_PENDING_TIME, default=25):                   vol.All(vol.Coerce(int), vol.Range(min=0)),
     vol.Optional(CONF_WARNING_TIME, default=25):                   vol.All(vol.Coerce(int), vol.Range(min=0)),
@@ -348,25 +349,27 @@ CONF_VALUE              = 'value'
 CONF_USER               = 'user'
 CONF_COMMAND            = 'command'
 
-try:
-    from ruamel.yaml                   import YAML
-except Exception as e:
-    _LOGGER.warning('Import Error: %s. Attempting to download and import', e)
-
 def str2bool(string) -> bool:
     """ Convert True/False string info boolean True/False or returns its input """
     d = {'True': True, 'False': False}
     return d.get(string, string)
 
-async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+def _integration_folder(hass):
+    return os.path.join(hass.config.path(CUSTOM_INTEGRATIONS_ROOT), INTEGRATION_FOLDER)
 
-    # Set up a static enpoint to serve files
-    resources = hass.config.path('custom_components/bwalarm/resources')
-    hass.http.register_static_path("/bwalarm", resources)
+def _resources_folder(hass):
+    return os.path.join(_integration_folder(hass), RESOURCES_FOLDER)
+
+async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+    FNAME = '[async_setup_platform]'
+    _LOGGER.debug("{} begin".format(FNAME))
+
+    hass.http.register_view(BwResources(str(hass.config.path())))
 
     # Register the panel
     url = "/api/panel_custom/alarm"
-    hass.http.register_static_path(url, "{}/panel.html".format(resources))
+    resources = os.path.join(_resources_folder(hass), PANEL_FNAME)
+    hass.http.register_static_path(url, resources)
     await hass.components.panel_custom.async_register_panel(
         webcomponent_name='alarm',
         frontend_url_path="alarm",
@@ -376,10 +379,10 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
         config={"alarmid": "alarm_control_panel.house"},
     )
 
-    #Setup MQTT if enabled
-    mqtt = None
-    if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
-        import homeassistant.components.mqtt as mqtt
+    # Setup MQTT if enabled
+    #mqtt = None
+    #if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
+    import homeassistant.components.mqtt as mqtt
 
     # redefine arm_xxx service calls to accept additional attributes
     @callback
@@ -413,27 +416,115 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.passcode_timeout_listener)
     async_add_devices([alarm])
 
-    hass.services.async_register(DOMAIN, SERVICE_ALARM_ARM_HOME, async_alarm_arm_home, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_ALARM_ARM_AWAY, async_alarm_arm_away, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_ALARM_ARM_NIGHT, async_alarm_arm_night, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_YAML_SAVE, alarm_yaml_save)
-    hass.services.async_register(DOMAIN, SERVICE_YAML_USER, alarm_yaml_user)
+    hass.services.async_register(PLATFORM, SERVICE_ALARM_ARM_HOME, async_alarm_arm_home, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(PLATFORM, SERVICE_ALARM_ARM_AWAY, async_alarm_arm_away, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(PLATFORM, SERVICE_ALARM_ARM_NIGHT, async_alarm_arm_night, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(PLATFORM, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(PLATFORM, SERVICE_YAML_SAVE, alarm_yaml_save)
+    hass.services.async_register(PLATFORM, SERVICE_YAML_USER, alarm_yaml_user)
+    _LOGGER.debug("{} end".format(FNAME))
+
+class BwResources(HomeAssistantView):
+    """Serve up bwalarm resources."""
+    requires_auth = False
+    # TODO:  replace hardcoded to PLATFORM
+    url = r"/bwalarm/{path:.+}"
+    name = "{}:path".format(PLATFORM)
+
+    def __init__(self, hadir):
+        """Initialize."""
+        self.hadir = hadir
+        self.default_folder = os.path.join(self.hadir, CUSTOM_INTEGRATIONS_ROOT, INTEGRATION_FOLDER, RESOURCES_FOLDER)
+        self.override_folder = os.path.join(self.hadir, OVERRIDE_FOLDER, INTEGRATION_FOLDER)
+
+    async def get(self, request, path):
+        """Retrieve file."""
+        override_path = os.path.join(self.override_folder, path)
+        default_path = os.path.join(self.default_folder, path)
+
+        if os.path.exists(override_path):
+            #_LOGGER.debug("BwResources.get({}) override_path exists: {}".format(path, override_path))
+            return web.FileResponse(override_path)
+        elif os.path.exists(default_path):
+            #_LOGGER.debug("BwResources.get({}) default_path exists: {}".format(path, default_path))
+            return web.FileResponse(default_path)
+        else:
+            #_LOGGER.debug("BwResources.get({}) default_path {} and override_path {} do not exist!".format(path, default_path, override_path))
+            return None
 
 class BWAlarm(alarm.AlarmControlPanel):
 
     def __init__(self, hass, config, mqtt):
-        #------------------------------Initalize the alarm system----------------------------------
-        self._config                 = config   # it holds data imported from yaml on startup and is used to return component's attributes in device_state_attributes
-        self._mqtt                   = mqtt
-        self._hass                   = hass
+        FNAME = '[__init__]'
+        _LOGGER.debug("{} begin".format(FNAME))
+        #_LOGGER.debug("{} initial config: \"{}\"".format(FNAME, config))
 
+        #------------------------------Initalize the alarm system----------------------------------
+        self._hass                   = hass
+        self._mqtt                   = mqtt
+        self.yaml                    = YAML()
+        self._config                 = config   # it holds data imported from yaml on startup and is used to return component's attributes in device_state_attributes
+
+        self.init_folders()
         self.init_variables()
         self._updateUI = False
 
+        #_LOGGER.debug("{} final config: \"{}\"".format(FNAME, self._config))
+        _LOGGER.debug("{} end".format(FNAME))
+
+    def init_folders(self):
+        """Set up all necessary variables to access config and data"""
+        FNAME = '[init_folders]'
+
+        # [HA config]
+        self._hadir = str(self._hass.config.path())
+        _LOGGER.debug("{} _hadir: {}".format(FNAME, self._hadir))
+
+        # integration folder and its resources subfolders (covered by HACS, no user data should be stored there!)
+        self._integrationdir = _integration_folder(self._hass)
+        self._defimagesdir = os.path.join(_resources_folder(self._hass), IMAGES_FOLDER)
+        _LOGGER.debug("{} integration: _integrationdir: {}, _defimagesdir: {}".format(FNAME, self._integrationdir, self._defimagesdir))
+
+        # folder where PLATFORM.yaml, PLATFORM_log.json and PLATFORM.json reside
+        #self._configdir = self._hadir
+        self._configdir = os.path.join(self._hadir, OVERRIDE_FOLDER, INTEGRATION_FOLDER)
+        self._yaml_config = os.path.join(self._configdir, CONFIG_FNAME)
+        self._json_persistence = os.path.join(self._configdir, PERSISTENCE_FNAME)
+        self._json_log = os.path.join(self._configdir, LOG_FNAME)
+        _LOGGER.debug("{} config: _configdir: {}, _yaml_config: {}, _json_persistence: {}, _json_log: {}".format(FNAME, self._configdir, self._yaml_config, self._json_persistence, self._json_log))
+
+        # folder for mutable user data
+        self._datadir = os.path.join(self._hadir, OVERRIDE_FOLDER, INTEGRATION_FOLDER)
+        self._imagesdir = os.path.join(self._datadir, IMAGES_FOLDER)
+        _LOGGER.debug("{} override: _datadir: {}, _imagesdir: {}".format(FNAME, self._datadir, self._imagesdir))
+
+
+    # config helpers
+    def config_folder(self):
+        return self._configdir
+
+    def yaml_config(self):
+        return self._yaml_config
+
+    def json_persistence(self):
+        return self._json_persistence
+
+    def json_log(self):
+        return self._json_log
+
+    # resource helpers
+    def default_images_path(self):
+        return self._defimagesdir
+
+    def override_images_path(self):
+        return self._imagesdir
+
+
+
+
     def init_variables(self):
         # basically transfers data from self._config (i.e yaml) and persistence (alarm.json) into internal current settings (self._states etc)
-        FNAME = '[INIT_VARIABLES]'
+        FNAME = '[init_variables]'
 
         _LOGGER.debug("{} begin".format(FNAME))
         #-------------------------------------STATE SPECIFIC--------------------------------------------------
@@ -476,6 +567,11 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         #------------------------------------PASSCODE RELATED-------------------------------------
         self._code                   = self._config.get(CONF_CODE, None)
+
+        if CONF_USERS in self._config:
+            _LOGGER.debug("{} users present, let's fix picture paths..".format(FNAME))
+            self._fix_old_style_user_pictures(self._config)
+
         self._users                  = self._config.get(CONF_USERS, [])
         self._panic_code             = self._config.get(CONF_PANIC_CODE, None)
         self._panel_locked           = False
@@ -488,10 +584,8 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         #-------------------------------------MQTT--------------------------------------------------
         # IF MQTT Enabled define its configuration
-        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
+        if self.mqtt_enabled():
             # # If MQTT enabled but is empty then set default values
-            # if (self._config[CONF_MQTT] == None): self._config[CONF_MQTT] = {}
-
             self._qos                   = self._config[CONF_MQTT].get(CONF_QOS)
             self._state_topic           = self._config[CONF_MQTT].get(CONF_STATE_TOPIC)
             self._command_topic         = self._config[CONF_MQTT].get(CONF_COMMAND_TOPIC)
@@ -507,20 +601,17 @@ class BWAlarm(alarm.AlarmControlPanel):
         if (CONF_ENABLE_LOG in self._config):
             self._config[CONF_LOGS]  = []
             self._log_size = self._config.get(CONF_LOG_SIZE, 10)
-
+            self.load_log()
             # Get the log file or create one if it does not exist
-            log_path       = self._hass.config.path()
-            if not os.path.isdir(log_path):
-               _LOGGER.error("{} logging: Activity Log path {} does not exist".format(FNAME, log_path))
-            else:
-               self._log_final_path = os.path.join(log_path, "alarm_log.json")
-               self.log_load()
-
+#            log_path = self.config_folder()
+#            if os.path.isdir(log_path):
+#                self._log_full_path = self.full_data_path(LOG_NAME)
+#                self.load_log()
+#            else:
+#               _LOGGER.warning("{} logging: Activity Log path {} does not exist".format(FNAME, log_path))
 
         #------------------------------------YAML--------------------------------------------------------
-        # self._yaml_allow_edit                = self._config[CONF_YAML_ALLOW_EDIT]
-        # if (self._yaml_allow_edit):
-        self._yaml_content = self.yaml_load()
+        self._yaml_content = self.load_yaml()
 
         # Reset Alarm
         self.clearsignals()
@@ -528,10 +619,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         #------------------------------------PERSISTENCE----------------------------------------------------
         self._persistence_list  = json.loads('{}')
         if (self._config[CONF_ENABLE_PERSISTENCE]):
-            persistence_path = self._hass.config.path()
+            persistence_path = self.config_folder()
             if os.path.isdir(persistence_path):
-                self._persistence_final_path = os.path.join(persistence_path, "alarm.json")
-                if (self.persistence_load() and (self._persistence_list["state"] != STATE_ALARM_DISARMED) ):
+                #self._persistence_full_path = self.full_data_path(PERSISTENCE_NAME)
+                if (self.load_persistence() and (self._persistence_list["state"] != STATE_ALARM_DISARMED) ):
                     self._state     = self._persistence_list["state"]
                     self._timeoutat = pytz.UTC.localize(datetime.datetime.strptime(self._persistence_list["timeoutat"].split(".")[0].replace("T"," "), '%Y-%m-%d %H:%M:%S')) if self._persistence_list["timeoutat"] != None else None
                     self._returnto  = self._persistence_list["returnto"]
@@ -567,7 +658,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             del self._states[OBSOLETE_STATE_ALARM_ARMED_PERIMETER]
 
         # create lists of sensors to check for every state
-        arm_states_dict = self._config[CONF_STATES]
+        arm_states_dict = self._config.get(CONF_STATES, {})
         for state in arm_states_dict.keys():
             state_config = arm_states_dict[state]
             # convert to sets first as it's easier to merge (|) and remove (-)
@@ -599,7 +690,11 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     @property
     def device_state_attributes(self):
+        FNAME = '[device_state_attributes]'
+        _LOGGER.debug("{}".format(FNAME))
+
         results = {
+            'platform':                 PLATFORM,
             'immediate':                self.immediate,
             'delayed':                  self.delayed,
             'ignored':                  self.ignored,
@@ -616,7 +711,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             'arm_state':                self._armstate,
 
-#            'enable_perimeter_mode':    self._config[CONF_ENABLE_NIGHT_MODE],   # OBSOLETE, CAN WE REMOVE IT?
+            #'enable_perimeter_mode':    self._config[CONF_ENABLE_NIGHT_MODE],   # OBSOLETE, CAN WE REMOVE IT?
             'enable_night_mode':        self._config[CONF_ENABLE_NIGHT_MODE],
             'enable_persistence':       self._config[CONF_ENABLE_PERSISTENCE],
 
@@ -628,17 +723,17 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             'updateUI':					self._updateUI,
 
+            'default_images_path':      self.default_images_path(),
+            'override_images_path':     self.override_images_path(),
+            'default_icon_name':        DEFAULT_ICON_NAME,
+
             'admin_password':           hashlib.sha256(str.encode(self._config[CONF_ADMIN_PASSWORD])).hexdigest(),
 
-            'bwalarm_version':          VERSION,
             'py_version':               sys.version_info,
         }
 
         if (CONF_USERS in self._config):
-            users = copy.deepcopy(self._config[CONF_USERS])
-            for user in users:
-                user['code'] = '****'
-            results[CONF_USERS] = users
+            results[CONF_USERS] = copy.deepcopy(self._config[CONF_USERS])
 
         if (CONF_PANEL in self._config):
             results[CONF_PANEL] = self._config[CONF_PANEL]
@@ -657,20 +752,27 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         return results;
 
-    def yaml_load(self):
-        FNAME = '[LOAD_YAML]'
+    def mqtt_enabled(self):
+        # TODO : try/catch!
+        return self._config[CONF_MQTT][CONF_ENABLE_MQTT] if self._config and CONF_MQTT in self._config and CONF_ENABLE_MQTT in self._config[CONF_MQTT] else False
+
+    def load_yaml(self):
+        FNAME = '[load_yaml]'
+
+        fname = self.yaml_config()
         try:
-            self.yaml = YAML()
-            filename = self._hass.config.path() + "/alarm.yaml"
-            with open(filename) as stream:
+            with open(fname) as stream:
                 try:
-                    _LOGGER.debug("{} File \"{}\" loaded successfully".format(FNAME, filename))
+                    _LOGGER.debug("{} File \"{}\" loaded successfully".format(FNAME, fname))
                     return self.yaml.load(stream)
                 except self.yaml.YAMLError as exc:
                     print(exc)
-            return None
         except Exception as e:
-            _LOGGER.warning("{} Error loading file \"{}\": {}".format(FNAME, filename, str(e)));
+            _LOGGER.warning("{} Error loading file \"{}\": {}".format(FNAME, fname, str(e)));
+
+        result = OrderedDict()
+        _LOGGER.debug("{} failed, return empty {}".format(FNAME, fname, type(result)))
+        return result
 
     def settings_save(self, key=None, value=None):
         """Push the alarm state to the given value."""
@@ -687,20 +789,24 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         key = key.lower()
 
-        # update runtime config
-        self._config[key] = value
-        # load WHOLE config from yaml into loaded config
-        self._yaml_content = self.yaml_load()
-        if self._yaml_content:
-            self._yaml_content[key] = value
-        else:
-            _LOGGER.error("{} yaml_load failed!".format(FNAME))
+        # load WHOLE disk config
+        self._yaml_content = self.load_yaml()
+
+        # update runtime and disk config
+        self._config[key] = self._yaml_content[key] = value
+#        if self._yaml_content:
+#            self._yaml_content[key] = value
+#        else:
+#            _LOGGER.error("{} yaml_load failed!".format(FNAME))
         # and now save the whole loaded config (not runtime one!!!)
         self.settings_yaml_save()
 
     def settings_user(self, user=None, command=None):
         """Push the alarm state to the given value."""
-        self._yaml_content = self.yaml_load()
+        FNAME = '[settings_user]'
+        _LOGGER.debug("{} begin ".format(FNAME))
+
+        self._yaml_content = self.load_yaml()
 
         x = 0
 
@@ -711,7 +817,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self._config['users'] = [user]
                 self._yaml_content['users'] = [user]
             else:
-                _LOGGER.warning(user)
+                _LOGGER.info('{} [users] section exists, append user {} info to it'.format(FNAME, user['name']))
                 self._config['users'].append(user)
                 self._yaml_content['users'].append(user)
         elif (command == 'update'):
@@ -734,11 +840,46 @@ class BWAlarm(alarm.AlarmControlPanel):
                 x = x + 1
 
         self.settings_yaml_save()
+        _LOGGER.debug("{} end ".format(FNAME))
+
+    def _save_yaml(self, fname: str, data: JSON_TYPE) -> None:
+        """Save a YAML file."""
+        tmp_fname = fname + "__TEMP__"
+        try:
+            try:
+                file_stat = os.stat(fname)
+            except OSError:
+                file_stat = stat_result(
+                    (0o644, -1, -1, -1, -1, -1, -1, -1, -1, -1))
+            with open(os.open(tmp_fname, O_WRONLY | O_CREAT | O_TRUNC,
+                                file_stat.st_mode), 'w', encoding='utf-8') \
+                as temp_file:
+                self.yaml.dump(data, temp_file)
+            os.replace(tmp_fname, fname)
+            if hasattr(os, 'chown') and file_stat.st_ctime > -1:
+                try:
+                    os.chown(fname, file_stat.st_uid, file_stat.st_gid)
+                except OSError:
+                    pass
+        except YAMLError as exc:
+            _LOGGER.error(str(exc))
+            raise HomeAssistantError(exc)
+        except OSError as exc:
+            _LOGGER.exception('Saving YAML file %s failed: %s', fname, exc)
+            raise WriteError(exc)
+        finally:
+            if os.path.exists(tmp_fname):
+                try:
+                    os.remove(tmp_fname)
+                except OSError as exc:
+                    # If we are cleaning up then something else went wrong, so
+                    # we should suppress likely follow-on errors in the cleanup
+                    _LOGGER.error("YAML replacement cleanup failed: %s", exc)
 
     def settings_yaml_save(self):
         """ Save the whole loaded config and trigger a GUI update """
 
-        FNAME = '[SAVE_SETTINGS_YAML]'
+        FNAME = '[settings_yaml_save]'
         _LOGGER.debug("{} begin".format(FNAME))
 
         self._updateUI = not self._updateUI
@@ -748,38 +889,49 @@ class BWAlarm(alarm.AlarmControlPanel):
         # this magic required to get a proper representation of OrderedDict in generated yaml
         self.yaml.Representer.add_representer(OrderedDict, self.yaml.Representer.represent_dict)
 
-# don't need it as disabe save settings if alarm not disarmed
-#        if CONF_ENABLE_PERSISTENCE in self._yaml_content.keys():
-            # delete persistence file if persictence is disabled AND it's in one of pending states
-            # as otherwise the file is already removed automatically
-#            if not self._yaml_content[CONF_ENABLE_PERSISTENCE] and self._state in SUPPORTED_PENDING_STATES:
-#                _LOGGER.debug("{} persistence disabled, remove the file".format(FNAME))
-#                self.persistence_remove()
-
         # make sure internal data structures do not go public
         # use self._clean_states_info(self._yaml_content[CONF_STATES]) instead?
-        states_dict = self._yaml_content[CONF_STATES]
+        states_dict = self._yaml_content.get(CONF_STATES, {})
         for state in states_dict.keys():
             state_config = states_dict[state]
             if INT_ATTR_STATE_CHECK_BEFORE_ARM in state_config.keys():
                 _LOGGER.error("{} state {}: {} found, remove before saving".format(FNAME, state, INT_ATTR_STATE_CHECK_BEFORE_ARM))
                 state_config.pop(INT_ATTR_STATE_CHECK_BEFORE_ARM, None)
 
-        filename = self._hass.config.path() + "/alarm.yaml"
-        with open(filename, 'w') as fil:
-            self.yaml.dump(self._yaml_content, fil)
+        fname = self.yaml_config()
+        try:
+            self._save_yaml(fname, self._yaml_content)
+        except Exception as e:
+            _LOGGER.warning("{} Error saving file \"{}\": {}".format(FNAME, fname, str(e)));
+            return
 
-        _LOGGER.debug("{} settings saved to file \"{}\"".format(FNAME, filename))
+        _LOGGER.debug("{} settings saved to file \"{}\"".format(FNAME, fname))
 
         self.init_variables()
         self.schedule_update_ha_state()
         _LOGGER.debug("{} end".format(FNAME))
 
+    # fix old style picture paths if detected
+    def _fix_old_style_user_pictures(self, config):
+        FNAME='[_fix_old_style_user_pictures]'
+        old_prefix = '/local/images/'
+        for user in config.get(CONF_USERS, []):
+            # remove old style picture prefixes
+            picture = user.get('picture', None)
+            _LOGGER.debug("{} processing user {}".format(FNAME, user['name']))
+            if picture and picture.startswith(old_prefix):
+                user['picture'] = picture.replace(old_prefix, '')
+                _LOGGER.debug("{} user {}: old style picture path detected: {} -> {}".format(FNAME, user['name'], picture, user['picture']))
+
     def _replace_obsolete_settings(self, current_settings, loaded_settings):
         # it is required to get clear loaded config from obsolete stuff
         # and make sure new stuff is there as well
 
-        FNAME = '[REPLACE_OBSOLETE_SETTINGS]'
+        # avoid accessing attributes of None
+        if (not current_settings) or (not loaded_settings):
+            return
+
+        FNAME = '[_replace_obsolete_settings]'
 
         # if CONF_ENABLE_NIGHT_MODE attibute is not in yaml, add it
         if CONF_ENABLE_NIGHT_MODE in current_settings.keys() and CONF_ENABLE_NIGHT_MODE not in loaded_settings.keys():
@@ -787,7 +939,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             loaded_settings[CONF_ENABLE_NIGHT_MODE] = copy.deepcopy(current_settings[CONF_ENABLE_NIGHT_MODE])
 
         # if STATE_ALARM_ARMED_NIGHT state is not in yaml, add it
-        if STATE_ALARM_ARMED_NIGHT in current_settings[CONF_STATES].keys() and STATE_ALARM_ARMED_NIGHT not in loaded_settings[CONF_STATES].keys():
+        if CONF_STATES in current_settings.keys() and STATE_ALARM_ARMED_NIGHT in current_settings[CONF_STATES].keys() and CONF_STATES in loaded_settings.keys() and STATE_ALARM_ARMED_NIGHT not in loaded_settings[CONF_STATES].keys():
             _LOGGER.debug("{} add state {}".format(FNAME, STATE_ALARM_ARMED_NIGHT))
             loaded_settings[CONF_STATES][STATE_ALARM_ARMED_NIGHT] = copy.deepcopy(current_settings[CONF_STATES][STATE_ALARM_ARMED_NIGHT])
 
@@ -796,39 +948,41 @@ class BWAlarm(alarm.AlarmControlPanel):
             _LOGGER.debug("{} delete obsolete core attribute {}: {}".format(FNAME, OBSOLETE_CONF_ENABLE_PERIMETER_MODE, loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]))
             del loaded_settings[OBSOLETE_CONF_ENABLE_PERIMETER_MODE]
 
-        if OBSOLETE_STATE_ALARM_ARMED_PERIMETER in loaded_settings[CONF_STATES].keys():
+        if CONF_STATES in loaded_settings.keys() and OBSOLETE_STATE_ALARM_ARMED_PERIMETER in loaded_settings[CONF_STATES].keys():
             _LOGGER.debug("{} delete obsolete state {}".format(FNAME, OBSOLETE_STATE_ALARM_ARMED_PERIMETER))
             del loaded_settings[CONF_STATES][OBSOLETE_STATE_ALARM_ARMED_PERIMETER]
 
+        # fix old style picture paths if detected
+        self._fix_old_style_user_pictures(loaded_settings)
 
-    def persistence_load(self):
-        """ LOAD persistence from file """
-        FNAME = '[LOAD_PERSISTENCE]'
+    def load_persistence(self):
+        """ Load persistence from file """
+        FNAME = '[load_persistence]'
 
-        filename = self._persistence_final_path
-        if os.path.exists(filename):
+        fname = self.json_persistence()
+        if os.path.exists(fname):
             try:
-                if os.path.isfile(filename):
+                if os.path.isfile(fname):
                     # avoid empty files as they cause JSON error
-                    if os.path.getsize(filename):
-                        self._persistence_list = json.load(open(filename, 'r'))
-                        _LOGGER.debug("{} File \"{}\" loaded successfully".format(FNAME, filename))
+                    if os.path.getsize(fname):
+                        self._persistence_list = json.load(open(fname, 'r'))
+                        _LOGGER.debug("{} File \"{}\" loaded successfully".format(FNAME, fname))
                         return True
                     else:
-                        _LOGGER.warning("{} Ignore empty file \"{}\"".format(FNAME, filename))
+                        _LOGGER.warning("{} Ignore empty file \"{}\"".format(FNAME, fname))
                         return False
                 else:
-                    _LOGGER.warning("{} Cannot use file \"{}\": not a regular file".format(FNAME, filename))
+                    _LOGGER.warning("{} Cannot use file \"{}\": not a regular file".format(FNAME, fname))
                     return False
             except Exception as e:
-                _LOGGER.error("{} Error occured while loading file \"{}\": {}".format(FNAME, filename, str(e)))
+                _LOGGER.error("{} Error occured loading file \"{}\": {}".format(FNAME, fname, str(e)))
         else:
             # no worries, it only exists in pending modes
             #_LOGGER.info("{} File \"{}\" does not exist".format(FNAME, filename))
             return False
 
     def _clean_states_info(self, arm_states_dict):
-        FNAME = '[CLEAN_STATES_INFO]'
+        FNAME = '[_clean_states_info]'
         _LOGGER.debug("{} remove {} from states".format(FNAME, INT_ATTR_STATE_CHECK_BEFORE_ARM))
 
         states_dict = copy.deepcopy(arm_states_dict)
@@ -840,40 +994,40 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         return states_dict
 
-    def persistence_save(self, persistence):
-        """ SAVE persistence to file """
-        FNAME = '[SAVE_PERSISTENCE]'
+    def save_persistence(self, persistence):
+        """ Save persistence to file """
+        FNAME = '[save_persistence]'
 
         if persistence: #Check we have something to save [TODO] validate this is a persistence object
             self._persistence_list = persistence
-            filename = self._persistence_final_path
-            try:
-                if self._persistence_list: #Check we have genuine persistence to save if so dump to file
-                    with open(filename, 'w') as fil:
+            fname = self.json_persistence()
+            if self._persistence_list: #Check we have genuine persistence to save if so dump to file
+                try:
+                    with open(fname, 'w') as fil:
                         fil.write(json.dumps(self._persistence_list, ensure_ascii=False))
-                        _LOGGER.debug("{} File \"{}\" saved successfully".format(FNAME, filename))
-                else:
-                    _LOGGER.error("{} No data to save".format(FNAME))
-            except Exception as e:
-               _LOGGER.error("{} Error occured while saving file \"{}\": {}".format(FNAME, filename, str(e)))
-
-    def persistence_remove(self):
-        """ REMOVE persistence file """
-        FNAME = '[REMOVE_PERSISTENCE]'
-
-        filename = self._persistence_final_path
-        try:
-            if os.path.exists(filename):
-                os.remove(filename)
-                _LOGGER.debug("{} File {} removed".format(FNAME, filename))
+                    _LOGGER.debug("{} File \"{}\" saved successfully".format(FNAME, fname))
+                except Exception as e:
+                   _LOGGER.error("{} Error occured saving file \"{}\": {}".format(FNAME, fname, str(e)))
             else:
-                _LOGGER.info("{} File {} does not exist".format(FNAME, filename))
+                _LOGGER.error("{} No data to save".format(FNAME))
+
+    def remove_persistence(self):
+        """ Remove persistence file """
+        FNAME = '[remove_persistence]'
+
+        fname = self.json_persistence()
+        try:
+            if os.path.exists(fname):
+                os.remove(fname)
+                _LOGGER.debug("{} File \"{}\" removed".format(FNAME, fname))
+            else:
+                _LOGGER.info("{} File \"{}\" does not exist".format(FNAME, fname))
         except Exception as e:
-           _LOGGER.error("{} Error occured while removing file \"{}\": {}".format(FNAME, filename, str(e)))
+           _LOGGER.error("{} Error occured removing file \"{}\": {}".format(FNAME, fname, str(e)))
 
     def save_alarm_state(self):
         """ Save alarm state """
-        FNAME = '[SAVE_ALARM_STATE]'
+        FNAME = '[save_alarm_state]'
 
         _LOGGER.debug("{} ({}) begin".format(FNAME, self._state))
         self._persistence_list["state"]     = self._state
@@ -881,39 +1035,44 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._persistence_list["returnto"]  = self._returnto
         self._persistence_list[CONF_STATES]  = self._clean_states_info(self._states)
         self._persistence_list["armstate"]  = self._armstate
-        self.persistence_save(self._persistence_list)
+        self.save_persistence(self._persistence_list)
         _LOGGER.debug("{} ({}) end".format(FNAME, self._state))
 
-    def log_load(self):
-        """ LOAD activity log previously saved """
-        FNAME = '[LOAD_LOG]'
+    def load_log(self):
+        """ Load activity log from file """
+        FNAME = '[load_log]'
 
+        fname = self.json_log()
         try:
-           if os.path.isfile(self._log_final_path):  #Find the log file and load.
-              self._config[CONF_LOGS] = json.load(open(self._log_final_path, 'r'))
+           if os.path.isfile(fname):  #Find the log file and load.
+              self._config[CONF_LOGS] = json.load(open(fname, 'r'))
            else: #No log file found
-              _LOGGER.warning("[ALARM] Activity log file does not exist")
+              _LOGGER.warning("{} File {} does not exist".format(FNAME, fname))
               self._config[CONF_LOGS] = []
-              self.log_save()
+              #self.log_save()
         except Exception as e:
-           _LOGGER.error("[ALARM] Error occured loading: %s", str(e))
+           _LOGGER.error("{} Error occured loading file {}: {}".format(FNAME, fname, str(e)))
 
     def log_save(self):
-        """ UPDATE activity log """
-        FNAME = '[SAVE_LOG]'
+        """ Save activity log to file as JSON """
+        FNAME = '[log_save]'
 
-        try:
-           if self._config[CONF_LOGS] is not []: #Check we have genuine log to save if so dump to file
-              with open(self._log_final_path, 'w') as fil:
-                 fil.write(json.dumps(self._config[CONF_LOGS], ensure_ascii=False))
-           else:
-              _LOGGER.error("{} No log to save".format(FNAME))
-        except Exception as e:
-           _LOGGER.error("{} Error occured saving file \"{}\": {}".format(FNAME, self._log_final_path, str(e)))
+        fname = self.json_log()
+        data = self._config[CONF_LOGS] if CONF_LOGS in self._config else None
+        if data: #Check we have genuine log to save if so dump to file
+            try:
+              with open(fname, 'w') as fil:
+                 fil.write(json.dumps(data, ensure_ascii=False))
+            except Exception as e:
+               _LOGGER.error("{} Error occured saving file \"{}\": {}".format(FNAME, fname, str(e)))
+        else:
+            _LOGGER.warning("{} No data to save".format(FNAME))
+
+
 
     def has_open_sensors(self, arm_state):
         """ Returns True if there are open sensors for that mode and they are not in override section"""
-        FNAME = '[HAS_OPEN_SENSORS]'
+        FNAME = '[has_open_sensors]'
 
         # iterate over all but override registered sensors of that state (ready-made list)
         for entity_id in self._config[CONF_STATES][arm_state][INT_ATTR_STATE_CHECK_BEFORE_ARM]:
@@ -926,12 +1085,14 @@ class BWAlarm(alarm.AlarmControlPanel):
         return False
 
     def alarm_arm(self, event, code, ignore_open_sensors):
-        FNAME = "[ALARM_ARM]"
+        FNAME = "[alarm_arm]"
+
         einfo = event2name[event]
         service = einfo[EATTR_SERVICE]
         state = einfo[EATTR_STATE]
 
         _LOGGER.debug("{} (service: {}, passcode: \"{}\", ignore_open_sensors: {}) begin".format(FNAME, service, code, ignore_open_sensors))
+
         if not isinstance(ignore_open_sensors, bool):
             _LOGGER.error("{} ignore_open_sensors must be bool, got {}".format(FNAME, type(ignore_open_sensors)))
             return False
@@ -1001,7 +1162,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._update_log(None, LOG.TRIGGERED)
 
     def alarm_disarm(self, code):
-        FNAME = "[ALARM_DISARM]"
+        FNAME = "[alarm_disarm]"
 
         _LOGGER.debug("{} (passcode: \"{}\") begin".format(FNAME, code))
 
@@ -1029,7 +1190,7 @@ class BWAlarm(alarm.AlarmControlPanel):
     ### Internal processing
     def setsignals(self, state):
         """ Figure out what to sense and how """
-        FNAME = '[SETSIGNALS]'
+        FNAME = '[setsignals]'
         _LOGGER.debug("{} {}".format(FNAME, state))
 
         self.immediate = self._states[state][CONF_IMMEDIATE].copy()
@@ -1042,7 +1203,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def clearsignals(self):
         """ Clear all our signals, we aren't listening anymore """
-        FNAME = '[CLEARSIGNALS]'
+        FNAME = '[clearsignals]'
         _LOGGER.debug("{}".format(FNAME))
 
         self._panic_mode = "deactivated"
@@ -1055,7 +1216,9 @@ class BWAlarm(alarm.AlarmControlPanel):
         self._lasttrigger = ''
 
     def process_event(self, event, override_pending_time=False):
-        FNAME = '[PROCESS_EVENT]'
+        FNAME = '[process_event]'
+        _LOGGER.debug("{}".format(FNAME))
+
         old_state = self._state
 
         #Update the state of the alarm panel
@@ -1159,7 +1322,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             if self._config[CONF_ENABLE_PERSISTENCE]:
                 # remove persistence file as it makes no sense when disarmed
                 if new_state == STATE_ALARM_DISARMED:
-                    self.persistence_remove()
+                    self.remove_persistence()
                 else:
                     self.save_alarm_state()
             # Let HA know that something changed
@@ -1182,7 +1345,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def _validate_code(self, code):
         """Validate given code."""
-        FNAME = '[VALIDATE_CODE]'
+        FNAME = '[_validate_code]'
 
         if ((int(self._passcode_attempt_allowed) == -1) or (self._passcodeAttemptNo <= int(self._passcode_attempt_allowed))):
             check = self._code is None or code == self._code or self._validate_user_codes(code)
@@ -1194,7 +1357,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             return False
 
     def _validate_user_codes(self, code):
-        FNAME = '[VALIDATE_USER_CODES]'
+        FNAME = '[_validate_user_codes]'
 
         for entity in self._users:
             if entity['enabled'] and entity['code'] == code:
@@ -1203,7 +1366,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         return False
 
     def _validate_code_attempts(self, check):
-        FNAME = '[VALIDATE_CODE_ATTEMPTS]'
+        FNAME = '[_validate_code_attempts]'
 
         if check:
             self._passcodeAttemptNo = 0
@@ -1221,7 +1384,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     def _validate_panic_code(self, code):
         """Validate given code."""
-        FNAME = '[VALIDATE_PANIC_CODE]'
+        FNAME = '[_validate_panic_code]'
 
         check = code == self._panic_code
         if check:
@@ -1230,7 +1393,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         return check
 
     def _update_log(self, user_id, event, entity_id=None):
-        FNAME = '[UODATE_LOG]'
+        FNAME = '[_update_log]'
 
         # entity_id is an active sensor's id
         if not user_id:
@@ -1246,7 +1409,7 @@ class BWAlarm(alarm.AlarmControlPanel):
     #### Listeners ####
     def state_change_listener(self, event):
         """ Something changed, we only care about things turning on at this point """
-        FNAME = '[STATE_CHANGE_LISTENER]'
+        FNAME = '[state_change_listener]'
 
 #        _LOGGER.debug("state_change_listener: event {}".format(event))
         # makes sense only in pending states
@@ -1268,7 +1431,7 @@ class BWAlarm(alarm.AlarmControlPanel):
     ### Actions from the outside world that affect us, turn into enum events for internal processing
     def time_change_listener(self, eventignored):
         """ I just treat the time events as a periodic check, its simpler then (re-/un-)registration """
-        FNAME = '[TIME_CHANGE_LISTENER]'
+        FNAME = '[time_change_listener]'
 
         if self._timeoutat is not None:
             if now() > self._timeoutat:
@@ -1277,7 +1440,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
     ### Actions from the outside world that affect us, turn into enum events for internal processing
     def passcode_timeout_listener(self, eventignored):
-        FNAME = '[PASSCODE_TIME_LISTENER]'
+        FNAME = '[passcode_timeout_listener]'
 
         if self._passcode_timeoutat is not None:
             if now() > self._passcode_timeoutat:
@@ -1290,13 +1453,13 @@ class BWAlarm(alarm.AlarmControlPanel):
         """Publish state change to MQTT."""
 
         # publish only if MQTT enabled
-        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
-            FNAME = '[ASYNC_STATE_CHANGE_LISTENER]'
+        if self.mqtt_enabled():
+            FNAME = '[_async_state_changed_listener]'
 
             # empty name means HA just started
             old_state_name = old_state.state if old_state else ''
             new_state_name = new_state.state if new_state else ''
-#            _LOGGER.debug("{} Got old_state: \"{}\", new_state: \"{}\"".format(FNAME, old_state_name, new_state_name))
+            #_LOGGER.debug("{} Got old_state: \"{}\", new_state: \"{}\"".format(FNAME, old_state_name, new_state_name))
 
             # publish only if the state changed (not on start)
             if old_state_name and new_state_name and new_state_name != old_state_name:
@@ -1304,6 +1467,9 @@ class BWAlarm(alarm.AlarmControlPanel):
                 state_name = STATE_ALARM_PENDING if (new_state_name == STATE_ALARM_WARNING and self._pending_on_warning) else new_state_name
                 _LOGGER.debug("{} mqtt.publish(topic={}, state={}, qos={}, retain={})".format(FNAME, self._state_topic, state_name, self._qos, True))
                 self._mqtt.async_publish(self._hass, self._state_topic, state_name, self._qos, True)
+        else:
+            #_LOGGER.debug("{} mqtt disabled, no need to report state change".format(FNAME))
+            return
 
     #### MQTT support####
     @asyncio.coroutine
@@ -1315,7 +1481,12 @@ class BWAlarm(alarm.AlarmControlPanel):
         @callback
         def message_received(msg):
             """Run when new MQTT message has been received."""
-            FNAME = '[MESSAGE_RECEIVED]'
+            FNAME = '[message_received]'
+
+            if not self.mqtt_enabled():
+                _LOGGER.debug("{} mqtt disabled, mesage ignored: \"{}\"".format(FNAME, msg.payload))
+                return
+
             _LOGGER.debug("{} payload: \"{}\"".format(FNAME, msg.payload))
 
             # assume the message is always like
@@ -1378,10 +1549,21 @@ class BWAlarm(alarm.AlarmControlPanel):
                 _LOGGER.error("{} Ignore unsupported command \"{}\"".format(FNAME, command))
                 return
 
-        if (self._config[CONF_MQTT][CONF_ENABLE_MQTT]):
+        FNAME = '[async_added_to_hass]'
+        _LOGGER.debug("{} begin".format(FNAME))
+
+        if self.mqtt_enabled():
+            _LOGGER.debug("{} mqtt enabled, call async_track_state_change({})".format(FNAME, self.entity_id))
             async_track_state_change(
                 self._hass, self.entity_id, self._async_state_changed_listener
             )
 
-            return self._mqtt.async_subscribe(
-                self._hass, self._command_topic, message_received, self._qos)
+            if self._mqtt:
+                _LOGGER.debug("{} mqtt enabled, call async_subscribe({})".format(FNAME, self.entity_id))
+                return self._mqtt.async_subscribe(
+                    self._hass, self._command_topic, message_received, self._qos)
+            else:
+                _LOGGER.error("{} _mqtt is undefined!".format(FNAME))
+        else:
+            _LOGGER.debug("{} mqtt disabled, nothing to do".format(FNAME))
+        _LOGGER.debug("{} end".format(FNAME))
