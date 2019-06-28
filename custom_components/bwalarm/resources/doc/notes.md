@@ -1,4 +1,5 @@
 Users
+
 The component supports multiple users. To avoid any collisions they should have different names and passcodes.
 
 Options
@@ -25,8 +26,8 @@ The corresponding service calls are alarm_arm_perimeter, alarm_arm_home and alar
 
 MQTT
 
-When MQTT enabled, the component publishes its status to the state topic and listens to commands on the command topic (configurable via GUI/alarm.yaml).
-It supports three variations of arm and disarm commands (actual command names configurable via GUI/alarm.yaml).
+When MQTT enabled, the component publishes its status to the state topic and listens to commands on the command topic (configurable via GUI/bwalarm.yaml).
+It supports three variations of arm and disarm commands (actual command names configurable via GUI/bwalarm.yaml).
 There is an option to disarm the alarm via MQTT message without passcode (Disabled by default).
 
 For example,
