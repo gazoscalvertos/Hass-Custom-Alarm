@@ -1,6 +1,5 @@
 #### Code of the bwalarm integration ####
 
-
 # For legacy installations, this is not used in HA > 0.93
 REQUIREMENTS = ['ruamel.yaml==0.15.42']
 
@@ -425,7 +424,7 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     _LOGGER.debug("{} end".format(FNAME))
 
 class BwResources(HomeAssistantView):
-    """Serve up bwalarm resources."""
+    """Serve up resources."""
     requires_auth = False
     # TODO:  replace hardcoded to PLATFORM
     url = r"/bwalarm/{path:.+}"
@@ -433,24 +432,28 @@ class BwResources(HomeAssistantView):
 
     def __init__(self, hadir):
         """Initialize."""
-        self.hadir = hadir
-        self.default_folder = os.path.join(self.hadir, CUSTOM_INTEGRATIONS_ROOT, INTEGRATION_FOLDER, RESOURCES_FOLDER)
-        self.override_folder = os.path.join(self.hadir, OVERRIDE_FOLDER, INTEGRATION_FOLDER)
+        self.default_folder = "{}/{}/{}/{}".format(hadir, CUSTOM_INTEGRATIONS_ROOT, INTEGRATION_FOLDER, RESOURCES_FOLDER)
+        self.override_folder = "{}/{}/{}".format(hadir, OVERRIDE_FOLDER, INTEGRATION_FOLDER)
+
+    async def head(self, request, path):
+        """Check if file exists."""
+        override_path = "{}/{}".format(self.override_folder, path)
+        default_path = "{}/{}".format(self.default_folder, path)
+
+        response = web.HTTPOk if os.path.exists(override_path) or os.path.exists(default_path) else web.HTTPNotFound
+        return web.Response(status=response.status_code)
 
     async def get(self, request, path):
         """Retrieve file."""
-        override_path = os.path.join(self.override_folder, path)
-        default_path = os.path.join(self.default_folder, path)
+        override_path = "{}/{}".format(self.override_folder, path)
+        default_path = "{}/{}".format(self.default_folder, path)
 
         if os.path.exists(override_path):
-            #_LOGGER.debug("BwResources.get({}) override_path exists: {}".format(path, override_path))
             return web.FileResponse(override_path)
         elif os.path.exists(default_path):
-            #_LOGGER.debug("BwResources.get({}) default_path exists: {}".format(path, default_path))
             return web.FileResponse(default_path)
-        else:
-            #_LOGGER.debug("BwResources.get({}) default_path {} and override_path {} do not exist!".format(path, default_path, override_path))
-            return None
+#        else:
+#            return None
 
 class BWAlarm(alarm.AlarmControlPanel):
 
@@ -602,13 +605,6 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._config[CONF_LOGS]  = []
             self._log_size = self._config.get(CONF_LOG_SIZE, 10)
             self.load_log()
-            # Get the log file or create one if it does not exist
-#            log_path = self.config_folder()
-#            if os.path.isdir(log_path):
-#                self._log_full_path = self.full_data_path(LOG_NAME)
-#                self.load_log()
-#            else:
-#               _LOGGER.warning("{} logging: Activity Log path {} does not exist".format(FNAME, log_path))
 
         #------------------------------------YAML--------------------------------------------------------
         self._yaml_content = self.load_yaml()
