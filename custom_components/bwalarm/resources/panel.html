@@ -1472,7 +1472,7 @@
           }
           // Display the error
           else {
-            console.log("Whoops something went wrong and the alarm component cannot be loaded. Check your Home Assistant error log");
+            console.log("This integration is broken. Check your Home Assistant error log");
             this.updating = true;
             this.hass.callApi("get", "error/all").then((items) => {
               this.errorItems = items;
