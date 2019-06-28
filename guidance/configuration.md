@@ -25,7 +25,7 @@
 - **trigger_time:** 600 #[OPTIONAL, Number, default 600] The time in seconds of the trigger time in which the alarm is firing.  before returning previous set alarm state.
 
 ### [STATES]
-- **armed_perimeter:** #[OPTIONAL]
+- **armed_night:** #[OPTIONAL]
     **pending_time:** 10 #[OPTIONAL] State specific setting if not defined inherits from above top level time
     **trigger_time:** 300 #[OPTIONAL] State specific setting if not defined inherits from above top level time
     #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately
