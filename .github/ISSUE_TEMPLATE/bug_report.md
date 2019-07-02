@@ -8,8 +8,7 @@ assignees: ''
 ---
 
 **Your components (from Alarm/Settings/About):**
- - alarm component version [e.g 1.1.4_ak74]
- - web panel [e.g 1.3.6_ak74]
+ - component version [e.g v1.5.0]
 
 **Platform & Browser:**
  - Platform name & Home assistant version [e.g. Hass.io 0.91.0]
