@@ -26,7 +26,8 @@ from collections import OrderedDict
 
 from homeassistant.const         import (
     ## SERVICES ##
-    SERVICE_ALARM_ARM_NIGHT, SERVICE_ALARM_ARM_HOME, SERVICE_ALARM_ARM_AWAY, SERVICE_ALARM_DISARM,
+    SERVICE_ALARM_ARM_HOME, SERVICE_ALARM_ARM_AWAY, SERVICE_ALARM_ARM_NIGHT,
+    SERVICE_ALARM_DISARM,
     # STATES
     STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
     STATE_ALARM_ARMED_NIGHT, STATE_ALARM_ARMED_HOME, STATE_ALARM_ARMED_AWAY,
@@ -70,6 +71,11 @@ except Exception as e:
 from .const import PLATFORM, CUSTOM_INTEGRATIONS_ROOT, OVERRIDE_FOLDER, \
     INTEGRATION_FOLDER, RESOURCES_FOLDER, CONFIG_FNAME, PERSISTENCE_FNAME, \
     LOG_FNAME, PANEL_FNAME, DEFAULT_ICON_NAME, IMAGES_FOLDER
+
+## SERVICES ##
+SERVICE_ALARM_SAFE_ARM_HOME         = 'alarm_safe_arm_home'
+SERVICE_ALARM_SAFE_ARM_AWAY         = 'alarm_safe_arm_away'
+SERVICE_ALARM_SAFE_ARM_NIGHT        = 'alarm_safe_arm_night'
 
 #//------------ INTERNAL ATTRIBUTES ------------
 INT_ATTR_STATE_CHECK_BEFORE_ARM = 'check_before_arm'
@@ -194,15 +200,15 @@ EATTR_STATE     = 'state'
 
 event2name = {
     Events.ArmNight: {
-        EATTR_SERVICE   :   SERVICE_ALARM_ARM_NIGHT,
+        EATTR_SERVICE   :   SERVICE_ALARM_SAFE_ARM_NIGHT,
         EATTR_STATE     :   STATE_ALARM_ARMED_NIGHT
         },
     Events.ArmHome: {
-        EATTR_SERVICE   :   SERVICE_ALARM_ARM_HOME,
+        EATTR_SERVICE   :   SERVICE_ALARM_SAFE_ARM_HOME,
         EATTR_STATE     :   STATE_ALARM_ARMED_HOME
         },
     Events.ArmAway: {
-        EATTR_SERVICE   :   SERVICE_ALARM_ARM_AWAY,
+        EATTR_SERVICE   :   SERVICE_ALARM_SAFE_ARM_AWAY,
         EATTR_STATE     :   STATE_ALARM_ARMED_AWAY
         }
     }
@@ -383,30 +389,35 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     #if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
     import homeassistant.components.mqtt as mqtt
 
-    # redefine arm_xxx service calls to accept additional attributes
+    # define safe_arm_xxx service calls to accept additional attributes
+    # TODO: can we call BWAlarm methods directly without these?
     @callback
-    def async_alarm_arm_home(service):
-        alarm.async_alarm_arm_home(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
+    def async_alarm_safe_arm_home(service):
+        # TODO: service.endity_id ignored for simplicity, change?
+        alarm.async_alarm_safe_arm_home(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
 
     @callback
-    def async_alarm_arm_away(service):
-        # service.endity_id ignored for simplicity, change?
-        alarm.alarm_arm_away(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
+    def async_alarm_safe_arm_away(service):
+        # TODO: service.endity_id ignored for simplicity, change?
+        alarm.async_alarm_safe_arm_away(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
 
     @callback
-    def async_alarm_arm_night(service):
-        alarm.alarm_arm_night(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
+        # TODO: service.endity_id ignored for simplicity, change?
+    def async_alarm_safe_arm_night(service):
+        alarm.async_alarm_safe_arm_night(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
 
-    @callback
-    def async_alarm_disarm(service):
-        alarm.alarm_disarm(service.data.get(ATTR_CODE))
+#    @callback
+#    def async_alarm_disarm(service):
+#        alarm.async_alarm_disarm(service.data.get(ATTR_CODE))
 
     @callback
     def alarm_yaml_save(service):
+        # TODO: service.endity_id ignored for simplicity, change?
         alarm.settings_save(service.data.get(CONF_CONFIGURATION), service.data.get(CONF_VALUE))
 
     @callback
     def alarm_yaml_user(service):
+        # TODO: service.endity_id ignored for simplicity, change?
         alarm.settings_user(service.data.get(CONF_USER), service.data.get(CONF_COMMAND))
 
     alarm = BWAlarm(hass, config, mqtt)
@@ -415,10 +426,10 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.passcode_timeout_listener)
     async_add_devices([alarm])
 
-    hass.services.async_register(PLATFORM, SERVICE_ALARM_ARM_HOME, async_alarm_arm_home, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(PLATFORM, SERVICE_ALARM_ARM_AWAY, async_alarm_arm_away, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(PLATFORM, SERVICE_ALARM_ARM_NIGHT, async_alarm_arm_night, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(PLATFORM, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(PLATFORM, SERVICE_ALARM_SAFE_ARM_HOME, async_alarm_safe_arm_home, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(PLATFORM, SERVICE_ALARM_SAFE_ARM_AWAY, async_alarm_safe_arm_away, EXTENDED_ALARM_SERVICE_SCHEMA)
+    hass.services.async_register(PLATFORM, SERVICE_ALARM_SAFE_ARM_NIGHT, async_alarm_safe_arm_night, EXTENDED_ALARM_SERVICE_SCHEMA)
+#    hass.services.async_register(PLATFORM, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
     hass.services.async_register(PLATFORM, SERVICE_YAML_SAVE, alarm_yaml_save)
     hass.services.async_register(PLATFORM, SERVICE_YAML_USER, alarm_yaml_user)
     _LOGGER.debug("{} end".format(FNAME))
@@ -426,8 +437,7 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
 class BwResources(HomeAssistantView):
     """Serve up resources."""
     requires_auth = False
-    # TODO:  replace hardcoded to PLATFORM
-    url = r"/bwalarm/{path:.+}"
+    url = "/" + PLATFORM + r"/{path:.+}"
     name = "{}:path".format(PLATFORM)
 
     def __init__(self, hadir):
@@ -1080,6 +1090,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         _LOGGER.debug("{}({}) all clear".format(FNAME, arm_state))
         return False
 
+
     def alarm_arm(self, event, code, ignore_open_sensors):
         FNAME = "[alarm_arm]"
 
@@ -1132,26 +1143,46 @@ class BWAlarm(alarm.AlarmControlPanel):
         _LOGGER.debug("{} (service: {}, passcode: \"{}\", ignore_open_sensors: {}) end".format(FNAME, service, code, ignore_open_sensors))
         return True
 
-    def alarm_arm_home(self, code, ignore_open_sensors):
+    def alarm_arm_home(self, code=None):
+        """Wrapper for standard service calls"""
+        return self.alarm_safe_arm_home(code, True)
+
+    def alarm_safe_arm_home(self, code, ignore_open_sensors):
         return self.alarm_arm(Events.ArmHome, code, ignore_open_sensors)
 
-    def alarm_arm_away(self, code, ignore_open_sensors):
+    def alarm_arm_away(self, code=None):
+        """Wrapper for standard service calls"""
+        return self.alarm_safe_arm_away(code, True)
+
+    def alarm_safe_arm_away(self, code, ignore_open_sensors):
         return self.alarm_arm(Events.ArmAway, code, ignore_open_sensors)
 
-    def alarm_arm_night(self, code, ignore_open_sensors):
-        return self.alarm_arm(Events.ArmNight, code, ignore_open_sensors)
+    def alarm_arm_night(self, code=None):
+        """Wrapper for standard service calls"""
+        if self._enable_night_mode:
+            return self.alarm_safe_arm_night(code, True)
+        else:
+            FNAME='[alarm_arm_night]'
+            _LOGGER.error("{} {} disabled".format(FNAME, SERVICE_ALARM_ARM_NIGHT))
+            return False
 
-    # required for MQTT commands
-    def async_alarm_arm_home(self, code, ignore_open_sensors):
-        return self._hass.async_add_executor_job(self.alarm_arm_home, code, ignore_open_sensors)
+    def alarm_safe_arm_night(self, code, ignore_open_sensors):
+        if self._enable_night_mode:
+            return self.alarm_arm(Events.ArmNight, code, ignore_open_sensors)
+        else:
+            FNAME='[alarm_safe_arm_night]'
+            _LOGGER.error("{} {} disabled".format(FNAME, SERVICE_ALARM_SAFE_ARM_NIGHT))
+            return False
 
-    # required for MQTT commands
-    def async_alarm_arm_away(self, code, ignore_open_sensors):
-        return self._hass.async_add_executor_job(self.alarm_arm_away, code, ignore_open_sensors)
+    # async versions required for MQTT commands and safe_arm_xxx service calls
+    def async_alarm_safe_arm_home(self, code, ignore_open_sensors):
+        return self._hass.async_add_executor_job(self.alarm_safe_arm_home, code, ignore_open_sensors)
 
-    # required for MQTT commands
-    def async_alarm_arm_night(self, code, ignore_open_sensors):
-        return self._hass.async_add_executor_job(self.alarm_arm_night, code, ignore_open_sensors)
+    def async_alarm_safe_arm_away(self, code, ignore_open_sensors):
+        return self._hass.async_add_executor_job(self.alarm_safe_arm_away, code, ignore_open_sensors)
+
+    def async_alarm_safe_arm_night(self, code, ignore_open_sensors):
+        return self._hass.async_add_executor_job(self.alarm_safe_arm_night, code, ignore_open_sensors)
 
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
@@ -1516,12 +1547,12 @@ class BWAlarm(alarm.AlarmControlPanel):
             #_LOGGER.debug("{} command: \"{}\", code: \"{}\", ignore_open_sensors: {}".format(FNAME, command, code, ignore_open_sensors))
 
             if command == self._payload_arm_home:
-                self.async_alarm_arm_home(code, ignore_open_sensors)
+                self.async_alarm_safe_arm_home(code, ignore_open_sensors)
             elif command == self._payload_arm_away:
-                self.async_alarm_arm_away(code, ignore_open_sensors)
+                self.async_alarm_safe_arm_away(code, ignore_open_sensors)
             elif command == self._payload_arm_night:
                 if self._enable_night_mode:
-                    self.async_alarm_arm_night(code, ignore_open_sensors)
+                    self.async_alarm_safe_arm_night(code, ignore_open_sensors)
                 else:
                     _LOGGER.error("{} {} disabled".format(FNAME, command))
                     return

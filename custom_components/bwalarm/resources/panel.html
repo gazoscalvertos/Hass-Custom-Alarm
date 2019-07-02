@@ -9,7 +9,7 @@ v
     const _NAME = 'Alarm Panel';
     const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
     // don't forget to change HaPanelAlarm.version below!
-    const _VERSION = 'v1.7.1b';
+    const _VERSION = 'v1.8.0b';
 
     if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
     window.CUSTOM_UI_LIST.push({
@@ -460,7 +460,7 @@ v
 
                       <div>
                         <h1>Your Versions:</h1>
-		        <div>
+                        <div>
                           <p><span class='info-header'>This integration: </span><span class='info-detail'>[[version]]</span></p>
                           <p><span class='info-header'>Home Assistant: </span><span class='info-detail'>v[[hass.config.version]]</span></p>
                           <p><span class='info-header'>Python: </span><span class='info-detail'>v([[alarm.attributes.py_version]])</span></p>
@@ -1410,7 +1410,7 @@ v
             switches:             { type: Array, value: [] },
 
             errors:               { type: Array },
-            version:              { type: String, value: 'v1.7.1b'},
+            version:              { type: String, value: 'v1.8.0b'},
 
             camera_update_interval: { type: Number, value: 5000 }, // ms
 
@@ -2444,12 +2444,14 @@ v
         alarmService(call){
           var data = {"entity_id": this.alarm.entity_id, "code": this.code}
 
+          // COMENTED OUT AS CURRENTLY alarm_control_panel SERVICE CALLS DO EXACTLY WHAT WE NEED
           // add extra parameters only to service calls that support them: arm_xxx_ext
           // and only if allowed (to avoid erors from Lovelace alarm card etc)
-          if (call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night')
-            data["ignore_open_sensors"] = "True"  // no need to check as the panel already called openSensors
+          //if (call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night')
+          //  data["ignore_open_sensors"] = "True"  // no need to check as the panel already called openSensors
 
-          this.hass.callService(this.platform, call, data);
+          //this.hass.callService(this.platform, call, data);
+          this.hass.callService('alarm_control_panel', call, data);
         }
 
         //Restart Home Assistant

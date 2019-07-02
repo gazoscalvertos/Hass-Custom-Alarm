@@ -3,7 +3,7 @@
 **Alarm.yaml configuration settings:**
 
 - platform: bwalarm **#[REQUIRED, String] Name of the custom alarm component. Do not change**
-- name: House **#[REQUIRED, String]This can be changed to whatever suits your need, ensure this attribute matches the one in your panel_custom.yaml 'alarmid: alarm_control_panel.house'**
+- name: House **#[OPTIONAL, String]This can be changed to whatever suits your need, ensure this attribute matches the one in your panel_custom.yaml 'alarmid: alarm_control_panel.house'**
 
 - code: '9876' **#[REQUIRED, digits] should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes**
 - panic_code: '1234' **#[OPTIONAL, digits] Panic Code should consist of one or more digits ie '1234' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner.**
