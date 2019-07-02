@@ -9,8 +9,8 @@ The corresponding HA thread [here](https://community.home-assistant.io/t/bwalarm
 
 Copy the following folders into your home assistant configuration directory:
 ```
-  resources                  This folder stores your alarm configuration and some user data (i.e badges)
   custom_components/bwalarm/  The alarm system code, resources and documentation there
+  resources                  This folder stores your alarm configuration and some user data (i.e badges)
 ```
 
 To get things working with Home Assistant (HA) you need to add the following to your configuration.yaml:
