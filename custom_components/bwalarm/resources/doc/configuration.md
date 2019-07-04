@@ -15,6 +15,7 @@
 - enable_night_mode: False **#[OPTIONAL, Boolean] False by default. True enables what could be known as 'Perimeter Mode' i.e. only arm the doors whilst there is someone using all floors**
 - weather: True **#[OPTIONAL, Boolean] False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary**
 - persistence: False **#[OPTIONAL, Boolean] False by Default. Allows this custom component to save the state of the alarm to file then reinstate it in the event of power loss.**
+- ignore_open_sensors: False **#[OPTIONAL, Boolean] False by Default. If False, set alarm only if there is no active sensors, otherwise always set alarm**
 - hide_passcode: True **#[OPTIONAL, Boolean] True by default. This is a security feature when enabled hides the passcode while entering disarm code.**
 - hide_sidebar: True **#[OPTIONAL, Boolean] False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.**
 - hide_sensor_groups: True **#[OPTIONAL, Boolean] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear**
@@ -78,9 +79,6 @@
 - payload_arm_home: "ARM_HOME" #[OPTIONAL, string] The payload to set Arm Home mode on this Alarm Panel. Default is “ARM_HOME”.
 - payload_arm_away: "ARM_AWAY" #[OPTIONAL, string] The payload to set Arm Away mode on this Alarm Panel. Default is “ARM_AWAY”.
 - payload_arm_night: "ARM_NIGHT" #[OPTIONAL, string] The payload to set Arm Night mode on this Alarm Panel. Default is “ARM_NIGHT”.
-- payload_safe_arm_home: "SAFE_ARM_HOME" #[OPTIONAL, string] The payload to set Arm Home mode if there is no active sensors detected. Should NOT be the same as Arm Home. Default is "SAFE_ARM_HOME".
-- payload_safe_arm_away: "SAFE_ARM_AWAY" #[OPTIONAL, string] The payload to set Arm Away mode if there is no active sensors detected. Should NOT be the same as Arm Away. Default is "SAFE_ARM_AWAY".
-- payload_safe_arm_night: "SAFE_ARM_NIGHT" #[OPTIONAL, string] The payload to set Arm Night mode if there is no active sensors detected. Should NOT be the same as Arm Night. Default is "SAFE_ARM_NIGHT".
 
 ### [COLOURS]  Use any HTML format
 - warning_colour: 'orange' #[OPTIONAL, string]

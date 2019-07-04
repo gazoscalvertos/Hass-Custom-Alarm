@@ -20,6 +20,7 @@ panel.html
 - warnings in JS console (about deprecated stuff)
 - prev style buttons/code panel?
 - use another way to find out the integration's entity_id (as someone can change name: in bwalarm.yaml and there is no panel_custom.yaml anymore!)
+- service calls: this.platform hardcoded, change
 
 
 
@@ -27,6 +28,3 @@ FRs:
 
 - Is there a way to increase the keypad button size to approximately what it was in the “pre mwc-button”
 - If we could get that override open sensors into the lovelace platform that would be amazing
-
-- update doc/configuration.md
-- update Readme.md (manual and HACS install/update)

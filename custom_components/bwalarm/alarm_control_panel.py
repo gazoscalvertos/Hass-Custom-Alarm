@@ -26,7 +26,7 @@ from collections import OrderedDict
 
 from homeassistant.const         import (
     ## SERVICES ##
-    SERVICE_ALARM_ARM_HOME, SERVICE_ALARM_ARM_AWAY, SERVICE_ALARM_ARM_NIGHT,
+    SERVICE_ALARM_ARM_NIGHT, SERVICE_ALARM_ARM_HOME, SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_DISARM,
     # STATES
     STATE_ALARM_DISARMED, STATE_ALARM_PENDING,
@@ -72,11 +72,6 @@ from .const import PLATFORM, CUSTOM_INTEGRATIONS_ROOT, OVERRIDE_FOLDER, \
     INTEGRATION_FOLDER, RESOURCES_FOLDER, CONFIG_FNAME, PERSISTENCE_FNAME, \
     LOG_FNAME, PANEL_FNAME, DEFAULT_ICON_NAME, IMAGES_FOLDER
 
-## SERVICES ##
-SERVICE_ALARM_SAFE_ARM_HOME         = 'alarm_safe_arm_home'
-SERVICE_ALARM_SAFE_ARM_AWAY         = 'alarm_safe_arm_away'
-SERVICE_ALARM_SAFE_ARM_NIGHT        = 'alarm_safe_arm_night'
-
 #//------------ INTERNAL ATTRIBUTES ------------
 INT_ATTR_STATE_CHECK_BEFORE_ARM = 'check_before_arm'
 
@@ -120,6 +115,7 @@ CONF_HOME_PERM                     = 'home_permision'
 CONF_AWAY_PERM                     = 'away_permission'
 CONF_PERI_PERM                     = 'perimiter_permission'
 CONF_ENABLED                       = 'enabled'
+CONF_IGNORE_OPEN_SENSORS           = 'ignore_open_sensors'
 CONF_CODE_TO_ARM                   = 'code_to_arm'
 CONF_PANIC_CODE                    = 'panic_code'
 CONF_PASSCODE_ATTEMPTS             = 'passcode_attempts'
@@ -168,9 +164,6 @@ CONF_PAYLOAD_DISARM                = 'payload_disarm'
 CONF_PAYLOAD_ARM_HOME              = 'payload_arm_home'
 CONF_PAYLOAD_ARM_AWAY              = 'payload_arm_away'
 CONF_PAYLOAD_ARM_NIGHT             = 'payload_arm_night'
-CONF_PAYLOAD_SAFE_ARM_HOME         = 'payload_safe_arm_home'
-CONF_PAYLOAD_SAFE_ARM_AWAY         = 'payload_safe_arm_away'
-CONF_PAYLOAD_SAFE_ARM_NIGHT        = 'payload_safe_arm_night'
 CONF_QOS                           = 'qos'
 CONF_STATE_TOPIC                   = 'state_topic'
 CONF_COMMAND_TOPIC                 = 'command_topic'
@@ -203,15 +196,15 @@ EATTR_STATE     = 'state'
 
 event2name = {
     Events.ArmNight: {
-        EATTR_SERVICE   :   SERVICE_ALARM_SAFE_ARM_NIGHT,
+        EATTR_SERVICE   :   SERVICE_ALARM_ARM_NIGHT,
         EATTR_STATE     :   STATE_ALARM_ARMED_NIGHT
         },
     Events.ArmHome: {
-        EATTR_SERVICE   :   SERVICE_ALARM_SAFE_ARM_HOME,
+        EATTR_SERVICE   :   SERVICE_ALARM_ARM_HOME,
         EATTR_STATE     :   STATE_ALARM_ARMED_HOME
         },
     Events.ArmAway: {
-        EATTR_SERVICE   :   SERVICE_ALARM_SAFE_ARM_AWAY,
+        EATTR_SERVICE   :   SERVICE_ALARM_ARM_AWAY,
         EATTR_STATE     :   STATE_ALARM_ARMED_AWAY
         }
     }
@@ -286,9 +279,6 @@ MQTT_SCHEMA = vol.Schema({
     vol.Optional(CONF_PAYLOAD_ARM_AWAY, default='ARM_AWAY'):                cv.string,
     vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):                cv.string,
     vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):              cv.string,
-    vol.Optional(CONF_PAYLOAD_SAFE_ARM_AWAY, default='SAFE_ARM_AWAY'):      cv.string,
-    vol.Optional(CONF_PAYLOAD_SAFE_ARM_HOME, default='SAFE_ARM_HOME'):      cv.string,
-    vol.Optional(CONF_PAYLOAD_SAFE_ARM_NIGHT, default='SAFE_ARM_NIGHT'):    cv.string,
     vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):                    cv.string,
     vol.Optional(CONF_OVERRIDE_CODE, default=False):                        cv.boolean,
     vol.Optional(CONF_PENDING_ON_WARNING, default=False):                   cv.boolean,
@@ -327,6 +317,7 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     vol.Optional(OBSOLETE_CONF_ENABLE_PERIMETER_MODE, default=False):       cv.boolean,    # Enable perimeter mode?  # OBSOLETE, DELETE!
     vol.Optional(CONF_ENABLE_NIGHT_MODE, default=False):           cv.boolean,    # Enable perimeter mode?
     vol.Optional(CONF_ENABLE_PERSISTENCE, default=False):          cv.boolean,    # Enables persistence for alarm state
+    vol.Optional(CONF_IGNORE_OPEN_SENSORS, default=False):         cv.boolean,    # False: Set alarm only if there is no active sensors, True: Always
     vol.Optional(CONF_CODE_TO_ARM, default=False):                 cv.boolean,    # Require code to arm alarm?
 
     #---------------------------PANEL RELATED---------------------------
@@ -344,15 +335,19 @@ PLATFORM_SCHEMA = vol.Schema(vol.All({
     #-----------------------------END------------------------------------
 }, _state_validator))
 
-ATTR_IGNORE_OPEN_SENSORS        =   'ignore_open_sensors'
-CONST_DEF_IGNORE_OPEN_SENSORS   =   False
+## SERVICES ##
+SERVICE_ALARM_SET_IGNORE_OPEN_SENSORS   = 'alarm_set_ignore_open_sensors'
+SERVICE_ALARM_ARM_NIGHT_FROM_PANEL      = 'alarm_arm_night_from_panel'
+SERVICE_ALARM_ARM_HOME_FROM_PANEL       = 'alarm_arm_home_from_panel'
+SERVICE_ALARM_ARM_AWAY_FROM_PANEL       = 'alarm_arm_away_from_panel'
+SERVICE_ALARM_YAML_SAVE                 = 'alarm_yaml_save'
+SERVICE_ALARM_YAML_USER                 = 'alarm_yaml_user'
 
-EXTENDED_ALARM_SERVICE_SCHEMA = alarm.ALARM_SERVICE_SCHEMA.extend({
-    vol.Optional(ATTR_IGNORE_OPEN_SENSORS, default=CONST_DEF_IGNORE_OPEN_SENSORS):          cv.boolean
+ATTR_IGNORE_OPEN_SENSORS_VALUE        =   'value'
+
+SET_IGNORE_OPEN_SENSORS_SCHEMA = vol.Schema({
+    vol.Optional(ATTR_IGNORE_OPEN_SENSORS_VALUE, default=False): cv.boolean,
 })
-
-SERVICE_YAML_SAVE  = 'ALARM_YAML_SAVE'
-SERVICE_YAML_USER  = 'ALARM_YAML_USER'
 
 CONF_CONFIGURATION      = 'configuration'
 CONF_VALUE              = 'value'
@@ -395,26 +390,10 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     #if (config[CONF_MQTT][CONF_ENABLE_MQTT]):
     import homeassistant.components.mqtt as mqtt
 
-    # define safe_arm_xxx service calls to accept additional attributes
-    # TODO: can we call BWAlarm methods directly without these?
     @callback
-    def async_alarm_safe_arm_home(service):
+    def async_alarm_set_ignore_open_sensors(service):
         # TODO: service.endity_id ignored for simplicity, change?
-        alarm.async_alarm_safe_arm_home(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
-
-    @callback
-    def async_alarm_safe_arm_away(service):
-        # TODO: service.endity_id ignored for simplicity, change?
-        alarm.async_alarm_safe_arm_away(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
-
-    @callback
-        # TODO: service.endity_id ignored for simplicity, change?
-    def async_alarm_safe_arm_night(service):
-        alarm.async_alarm_safe_arm_night(service.data.get(ATTR_CODE), service.data.get(ATTR_IGNORE_OPEN_SENSORS))
-
-#    @callback
-#    def async_alarm_disarm(service):
-#        alarm.async_alarm_disarm(service.data.get(ATTR_CODE))
+        alarm.set_ignore_open_sensors(service.data.get(ATTR_IGNORE_OPEN_SENSORS_VALUE))
 
     @callback
     def alarm_yaml_save(service):
@@ -426,18 +405,36 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
         # TODO: service.endity_id ignored for simplicity, change?
         alarm.settings_user(service.data.get(CONF_USER), service.data.get(CONF_COMMAND))
 
+    @callback
+    def alarm_arm_night_from_panel(service):
+        # TODO: service.endity_id ignored for simplicity, change?
+        alarm.alarm_arm_night_from_panel(service.data.get(ATTR_CODE))
+
+    @callback
+    def alarm_arm_home_from_panel(service):
+        # TODO: service.endity_id ignored for simplicity, change?
+        alarm.alarm_arm_home_from_panel(service.data.get(ATTR_CODE))
+
+    @callback
+    def alarm_arm_away_from_panel(service):
+        # TODO: service.endity_id ignored for simplicity, change?
+        alarm.alarm_arm_away_from_panel(service.data.get(ATTR_CODE))
+
     alarm = BWAlarm(hass, config, mqtt)
     hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
     hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.passcode_timeout_listener)
     async_add_devices([alarm])
 
-    hass.services.async_register(PLATFORM, SERVICE_ALARM_SAFE_ARM_HOME, async_alarm_safe_arm_home, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(PLATFORM, SERVICE_ALARM_SAFE_ARM_AWAY, async_alarm_safe_arm_away, EXTENDED_ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(PLATFORM, SERVICE_ALARM_SAFE_ARM_NIGHT, async_alarm_safe_arm_night, EXTENDED_ALARM_SERVICE_SCHEMA)
-#    hass.services.async_register(PLATFORM, SERVICE_ALARM_DISARM, async_alarm_disarm, ALARM_SERVICE_SCHEMA)
-    hass.services.async_register(PLATFORM, SERVICE_YAML_SAVE, alarm_yaml_save)
-    hass.services.async_register(PLATFORM, SERVICE_YAML_USER, alarm_yaml_user)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_SET_IGNORE_OPEN_SENSORS, async_alarm_set_ignore_open_sensors, SET_IGNORE_OPEN_SENSORS_SCHEMA)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_YAML_SAVE, alarm_yaml_save)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_YAML_USER, alarm_yaml_user)
+
+    # For web panel - they set alarm anyway #
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_NIGHT_FROM_PANEL, alarm_arm_night_from_panel, ALARM_SERVICE_SCHEMA)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_HOME_FROM_PANEL, alarm_arm_home_from_panel, ALARM_SERVICE_SCHEMA)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_AWAY_FROM_PANEL, alarm_arm_away_from_panel, ALARM_SERVICE_SCHEMA)
+
     _LOGGER.debug("{} end".format(FNAME))
 
 class BwResources(HomeAssistantView):
@@ -565,6 +562,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         self.delayed                 = None
         self.override                = None
         self._opensensors            = None
+        self._ignore_open_sensors    = self._config[CONF_IGNORE_OPEN_SENSORS]
 
         #------------------------------------CORE ALARM RELATED-------------------------------------
         # deal with obsolete enable_perimeter_mode attribute
@@ -610,18 +608,6 @@ class BWAlarm(alarm.AlarmControlPanel):
             self._payload_arm_home          = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_HOME).upper()
             self._payload_arm_away          = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_AWAY).upper()
             self._payload_arm_night         = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_NIGHT).upper()
-            self._payload_safe_arm_home     = self._config[CONF_MQTT].get(CONF_PAYLOAD_SAFE_ARM_HOME).upper()
-            self._payload_safe_arm_away     = self._config[CONF_MQTT].get(CONF_PAYLOAD_SAFE_ARM_AWAY).upper()
-            self._payload_safe_arm_night    = self._config[CONF_MQTT].get(CONF_PAYLOAD_SAFE_ARM_NIGHT).upper()
-
-            if self._payload_arm_home == self._payload_safe_arm_home:
-                _LOGGER.warning("{} Arm Home and Safe Arm Home commands should not be identical, consider changing".format(FNAME))
-            if self._payload_arm_away == self._payload_safe_arm_away:
-                _LOGGER.warning("{} Arm Away and Safe Arm Away commands should not be identical, consider changing".format(FNAME))
-            if self._payload_arm_night == self._payload_safe_arm_night:
-                _LOGGER.warning("{} Arm Night and Safe Arm Night commands should not be identical, consider changing".format(FNAME))
-
-            self.safe_arm_modes = [self._payload_safe_arm_home, self._payload_safe_arm_away, self._payload_safe_arm_night]
             self._override_code             = self._config[CONF_MQTT].get(CONF_OVERRIDE_CODE)
             self._pending_on_warning        = self._config[CONF_MQTT].get(CONF_PENDING_ON_WARNING)
 
@@ -722,6 +708,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             'ignored':                  self.ignored,
             'allsensors':               self._allsensors,
 
+            'ignore_open_sensors':      self._config[CONF_IGNORE_OPEN_SENSORS],
             'code_to_arm':              self._config[CONF_CODE_TO_ARM],
 
             'panel_locked':             self._panel_locked,
@@ -816,11 +803,6 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         # update runtime and disk config
         self._config[key] = self._yaml_content[key] = value
-#        if self._yaml_content:
-#            self._yaml_content[key] = value
-#        else:
-#            _LOGGER.error("{} yaml_load failed!".format(FNAME))
-        # and now save the whole loaded config (not runtime one!!!)
         self.settings_yaml_save()
 
     def settings_user(self, user=None, command=None):
@@ -1106,6 +1088,15 @@ class BWAlarm(alarm.AlarmControlPanel):
         _LOGGER.debug("{}({}) all clear".format(FNAME, arm_state))
         return False
 
+    def set_ignore_open_sensors(self, ignore_open_sensors):
+        """Set value of ignore_open_sensors attribute"""
+        FNAME = '[set_ignore_open_sensors]'
+        _LOGGER.debug("{} ({}) begin".format(FNAME, ignore_open_sensors))
+        if ignore_open_sensors == self._ignore_open_sensors:
+            _LOGGER.debug("{} ({}) no change to the value, nothing to do".format(FNAME, ignore_open_sensors))
+        else:
+            self.settings_save(CONF_IGNORE_OPEN_SENSORS, ignore_open_sensors)
+        _LOGGER.debug("{} ({}) end".format(FNAME, ignore_open_sensors))
 
     def alarm_arm(self, event, code, ignore_open_sensors):
         FNAME = "[alarm_arm]"
@@ -1115,10 +1106,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         state = einfo[EATTR_STATE]
 
         _LOGGER.debug("{} (service: {}, passcode: \"{}\", ignore_open_sensors: {}) begin".format(FNAME, service, code, ignore_open_sensors))
-
-        if not isinstance(ignore_open_sensors, bool):
-            _LOGGER.error("{} ignore_open_sensors must be bool, got {}".format(FNAME, type(ignore_open_sensors)))
-            return False
 
         # for MQTT or service calls as Control Panel always sends ignore_open_sensors = True (it checks them itself atm)
         if not ignore_open_sensors and self.has_open_sensors(state):
@@ -1160,51 +1147,40 @@ class BWAlarm(alarm.AlarmControlPanel):
         return True
 
     def alarm_arm_home(self, code=None):
-        """Wrapper for standard service calls"""
-        return self.alarm_safe_arm_home(code, True)
-
-    def alarm_safe_arm_home(self, code, ignore_open_sensors):
-        return self.alarm_arm(Events.ArmHome, code, ignore_open_sensors)
+        return self.alarm_arm(Events.ArmHome, code, self._ignore_open_sensors)
 
     def alarm_arm_away(self, code=None):
-        """Wrapper for standard service calls"""
-        return self.alarm_safe_arm_away(code, True)
-
-    def alarm_safe_arm_away(self, code, ignore_open_sensors):
-        return self.alarm_arm(Events.ArmAway, code, ignore_open_sensors)
+        return self.alarm_arm(Events.ArmAway, code, self._ignore_open_sensors)
 
     def alarm_arm_night(self, code=None):
         """Wrapper for standard service calls"""
         if self._enable_night_mode:
-            return self.alarm_safe_arm_night(code, True)
+            return self.alarm_arm(Events.ArmNight, code, self._ignore_open_sensors)
         else:
             FNAME='[alarm_arm_night]'
             _LOGGER.error("{} {} disabled".format(FNAME, SERVICE_ALARM_ARM_NIGHT))
             return False
 
-    def alarm_safe_arm_night(self, code, ignore_open_sensors):
+    ## need these for Arm from panel (it checks open sensors itself hence True) ##
+    def alarm_arm_home_from_panel(self, code=None):
+        return self.alarm_arm(Events.ArmHome, code, True)
+
+    def alarm_arm_away_from_panel(self, code=None):
+        return self.alarm_arm(Events.ArmAway, code, True)
+
+    def alarm_arm_night_from_panel(self, code=None):
         if self._enable_night_mode:
-            return self.alarm_arm(Events.ArmNight, code, ignore_open_sensors)
+            return self.alarm_arm(Events.ArmNight, code, True)
         else:
-            FNAME='[alarm_safe_arm_night]'
-            _LOGGER.error("{} {} disabled".format(FNAME, SERVICE_ALARM_SAFE_ARM_NIGHT))
+            FNAME='[alarm_arm_night_from_panel]'
+            _LOGGER.error("{} {} disabled".format(FNAME, SERVICE_ALARM_ARM_NIGHT))
             return False
-
-    # async versions required for MQTT commands and safe_arm_xxx service calls
-    def async_alarm_safe_arm_home(self, code, ignore_open_sensors):
-        return self._hass.async_add_executor_job(self.alarm_safe_arm_home, code, ignore_open_sensors)
-
-    def async_alarm_safe_arm_away(self, code, ignore_open_sensors):
-        return self._hass.async_add_executor_job(self.alarm_safe_arm_away, code, ignore_open_sensors)
-
-    def async_alarm_safe_arm_night(self, code, ignore_open_sensors):
-        return self._hass.async_add_executor_job(self.alarm_safe_arm_night, code, ignore_open_sensors)
 
     def alarm_trigger(self, code=None):
         self.process_event(Events.Trigger)
         self._update_log(None, LOG.TRIGGERED)
 
-    def alarm_disarm(self, code):
+    def alarm_disarm(self, code=None):
         FNAME = "[alarm_disarm]"
 
         _LOGGER.debug("{} (passcode: \"{}\") begin".format(FNAME, code))
@@ -1539,8 +1515,6 @@ class BWAlarm(alarm.AlarmControlPanel):
             # uppercase so  commands are case-insensitive
             command = command.upper()
             code = None
-            # True if command is not SAFE_ARM_XXX
-            ignore_open_sensors = CONST_DEF_IGNORE_OPEN_SENSORS if command in self.safe_arm_modes else True
 
             if params:
                 _LOGGER.debug("{} atributes to import: \"{}\"".format(FNAME, params))
@@ -1553,9 +1527,6 @@ class BWAlarm(alarm.AlarmControlPanel):
                         if ATTR_CODE in data.keys():
                             _LOGGER.debug("{} {}: \"{}\"".format(FNAME, ATTR_CODE, data[ATTR_CODE]))
                             code = str(data[ATTR_CODE])
-                        if command in self.safe_arm_modes and ATTR_IGNORE_OPEN_SENSORS in data.keys():
-                            _LOGGER.debug("{} {}: {}".format(FNAME, ATTR_IGNORE_OPEN_SENSORS, data[ATTR_IGNORE_OPEN_SENSORS]))
-                            ignore_open_sensors = str2bool(data[ATTR_IGNORE_OPEN_SENSORS])
                     else:
                         _LOGGER.warning("{} Only JSON attributess supported, ignore: \"{}\"".format(FNAME, params))
                 except Exception as e:
@@ -1565,14 +1536,13 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             #_LOGGER.debug("{} command: \"{}\", code: \"{}\", ignore_open_sensors: {}".format(FNAME, command, code, ignore_open_sensors))
 
-            # accept both ARM_XXX and SAFE_ARM_XXX
-            if command == self._payload_arm_home or command == self._payload_safe_arm_home:
-                self.async_alarm_safe_arm_home(code, ignore_open_sensors)
-            elif command == self._payload_arm_away or command == self._payload_safe_arm_away:
-                self.async_alarm_safe_arm_away(code, ignore_open_sensors)
+            if command == self._payload_arm_home:
+                self.async_alarm_arm_home(code)
+            elif command == self._payload_arm_away:
+                self.async_alarm_arm_away(code)
             elif command == self._payload_arm_night:
                 if self._enable_night_mode:
-                    self.async_alarm_safe_arm_night(code, ignore_open_sensors)
+                    self.async_alarm_arm_night(code)
                 else:
                     _LOGGER.error("{} {} disabled".format(FNAME, command))
                     return
