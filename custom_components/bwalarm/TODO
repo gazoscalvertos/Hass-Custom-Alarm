@@ -1,0 +1,32 @@
+alarm_control_panel.py
+----------------------
+- take into account endity_id from service calls (what to do in MQTT case?)
+- check how it works if HA restarts in triggered state (will it resume triggering? _lasttrigger?)
+- Enable MQTT without HA restart/(WIP)
+- validate MQTT using schema
+- state[mode]xxx_time appear in yaml with (when that section edited via Settings) OR without quotes, investigate
+- code_arm_required: https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/alarm_control_panel/__init__.py#L91
+
+
+Milestones
+- remove obsolete enable_perimeter_mode attribute and perimeter_mode stuff from the code
+
+KNOWN POTENTIAL ISSUES
+- arm_xxx with open sensor (override), reboot HA -> will react to open sensor and trigger the alarm
+
+panel.html
+----------
+- timer after clear code/restore persistence is incorrect
+- warnings in JS console (about deprecated stuff)
+- prev style buttons/code panel?
+- use another way to find out the integration's entity_id (as someone can change name: in bwalarm.yaml and there is no panel_custom.yaml anymore!)
+
+
+
+FRs:
+
+- Is there a way to increase the keypad button size to approximately what it was in the “pre mwc-button”
+- If we could get that override open sensors into the lovelace platform that would be amazing
+
+- update doc/configuration.md
+- update Readme.md (manual and HACS install/update)
