@@ -9,7 +9,7 @@ v
     const _NAME = 'Alarm Panel';
     const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
     // don't forget to change HaPanelAlarm.version below!
-    const _VERSION = 'v1.9.0';
+    const _VERSION = 'v1.9.0DEV';
 
     if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
     window.CUSTOM_UI_LIST.push({
@@ -113,10 +113,10 @@ v
                       <template is='dom-if' if='[[!showCodePanel(alarm)]]'>
                         <template is='dom-if' if='[[!attemptedArm]]'>
                           <template is='dom-if' if='[[alarm.attributes.enable_night_mode]]'>
-                            <mwc-button id='arm-night' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night' raised>Night</mwc-button>
+                            <mwc-button id='arm-night' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
                           </template>
-                          <mwc-button id='arm-home' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home' raised>Home</mwc-button>
-                          <mwc-button id='arm-away' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away' raised>Away</mwc-button>
+                          <mwc-button id='arm-home' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
+                          <mwc-button id='arm-away' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
                         </template>
                       </template>
                       <template is='dom-if' if='[[attemptedArm]]'>
@@ -131,8 +131,8 @@ v
                           </template>
                           <!-- DS -->
                           <div class='horizontal layout'>
-                            <mwc-button id='arm-override' class='override' on-click='callAlarmService' data-call='override' data-arm='attemptArmMode' raised>Override</mwc-button>
-                            <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>Cancel</mwc-button>
+                            <mwc-button id='arm-override' class='override' on-click='callAlarmService' data-call='override' data-arm='attemptArmMode' raised>Arm anyway</mwc-button>
+                            <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>Don't arm</mwc-button>
                           </div>
                         </div>
                       </template>
@@ -155,10 +155,10 @@ v
                             <template is='dom-if' if='[[requiresCode()]]'>
                               <template is='dom-if' if='[[isdisarmed(alarm)]]'>
                                 <template is='dom-if' if='[[alarm.attributes.enable_night_mode]]'>
-                                  <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night' raised>Night</mwc-button>
+                                  <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
                                 </template>
-                                <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home' raised>Home</mwc-button>
-                                <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away' raised>Away</mwc-button>
+                                <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
+                                <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
                               </template>
                             </template>
                           </div>
@@ -694,6 +694,14 @@ v
                         <span class='info-detail'>When enabled, a valid master/user passcode is required to arm the alarm. If 'override' is used as a passcode, set the alarm immediately (ignores appropriate Pending Time) regardless of this setting</span>
                       </div>
 
+                      <div class='setting-outer vertical layout'>
+                        <div class='setting-inner horizontal layout'>
+                          <span class='info-header'>Ignore Open Sensors on Arm: </span>
+                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.ignore_open_sensors}}' on-change='settingsSave' data-setting='root' data-attribute='ignore_open_sensors'></paper-toggle-button>
+                        </div>
+                        <span class='info-detail'>When Disabled, set alarm only if there is no active sensors detected (safe), otherwise always set. <br>Default: Disabled</span>
+                      </div>
+
                       <div class='setting-outer horizontal layout'>
                         <div class='setting-inner vertical layout'>
                           <span class='info-header'>Disarm Attempts: </span>
@@ -1205,39 +1213,6 @@ v
 
                       <div class='setting-outer horizontal layout'>
                         <div class='setting-inner vertical layout'>
-                          <span class='info-header'>Safe Arm Night command: </span>
-                          <span class='info-detail'>Command to set armed-night mode if there is no active sensors detected. Should NOT be the same as Arm Night.<br>Default: SAFE_ARM_NIGHT</span>
-                          <div class='setting-input horizontal layout'>
-                            <paper-input id='payload_safe_arm_night' value='{{alarm.attributes.mqtt.payload_safe_arm_night}}' placeholder='Payload Safe Night'></paper-input>
-                            <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_safe_arm_night' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class='setting-outer horizontal layout'>
-                        <div class='setting-inner vertical layout'>
-                          <span class='info-header'>Safe Arm Home command: </span>
-                          <span class='info-detail'>Command to set armed-home mode if there is no active sensors detected. Should NOT be the same as Arm Home.<br>Default: SAFE_ARM_HOME</span>
-                          <div class='setting-input horizontal layout'>
-                            <paper-input id='payload_safe_arm_home' value='{{alarm.attributes.mqtt.payload_safe_arm_home}}' placeholder='Payload Safe Home'></paper-input>
-                            <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_safe_arm_home' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class='setting-outer horizontal layout'>
-                        <div class='setting-inner vertical layout'>
-                          <span class='info-header'>Safe Arm Away command: </span>
-                          <span class='info-detail'>Command to set armed-away mode if there is no active sensors detected. Should NOT be the same as Arm Away.<br>Default: SAFE_ARM_AWAY</span>
-                          <div class='setting-input horizontal layout'>
-                            <paper-input id='payload_safe_arm_away' value='{{alarm.attributes.mqtt.payload_safe_arm_away}}' placeholder='Payload Safe Away'></paper-input>
-                            <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_safe_arm_away' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class='setting-outer horizontal layout'>
-                        <div class='setting-inner vertical layout'>
                           <span class='info-header'>Disarm command: </span>
                           <span class='info-detail'>Command to disarm this Alarm Panel.<br>Default: DISARM</span>
                           <div class='setting-input horizontal layout'>
@@ -1478,6 +1453,7 @@ v
 
           // Check the alarm component successfully loaded if not then display an error
           if (this.alarm){
+            // TODO!!
             this.platform = this.alarm.attributes.platform;
             this.resources_prefix = "/" + this.platform + "/";
             // TODO: replace hardcoded "images/"
@@ -2476,14 +2452,7 @@ v
         //Call one of the alarm services
         alarmService(call){
           var data = {"entity_id": this.alarm.entity_id, "code": this.code}
-
-          // COMENTED OUT AS CURRENTLY alarm_control_panel SERVICE CALLS DO EXACTLY WHAT WE NEED
-          // add extra parameters only to service calls that support them: arm_xxx_ext
-          // and only if allowed (to avoid erors from Lovelace alarm card etc)
-          //if (call == 'alarm_arm_home' || call == 'alarm_arm_away' || call == 'alarm_arm_night')
-          //  data["ignore_open_sensors"] = "True"  // no need to check as the panel already called openSensors
-
-          //this.hass.callService(this.platform, call, data);
+          // TODO!!
           this.hass.callService('alarm_control_panel', call, data);
         }
 
@@ -2756,12 +2725,12 @@ v
 
         //Call the service to update the yaml file
         settingsUpdate(setting, value){
-          this.hass.callService(this.platform, 'ALARM_YAML_SAVE', {'configuration': setting, 'value': value });
+          this.hass.callService('alarm_control_panel', 'alarm_yaml_save', {'configuration': setting, 'value': value });
         }
 
         //Call the service to update the yaml file
         settingsUpdateUser(user, command){
-          this.hass.callService(this.platform, 'ALARM_YAML_USER', {'user': user, 'command': command });
+          this.hass.callService('alarm_control_panel', 'alarm_yaml_user', {'user': user, 'command': command });
         }
 
         //Check if there are open sensors
@@ -2796,11 +2765,11 @@ v
 
         service_name2arm_state(service_name) {
           switch(service_name) {
-            case 'alarm_arm_home':  return 'armed_home';
-            case 'alarm_arm_away':  return 'armed_away';
-            case 'alarm_arm_night': return 'armed_night';
+            case 'alarm_arm_home_from_panel':  return 'armed_home';
+            case 'alarm_arm_away_from_panel':  return 'armed_away';
+            case 'alarm_arm_night_from_panel': return 'armed_night';
             default:
-              msg = "service_name2arm_state: invalid service name \"" + service_name + "\"";
+              var msg = "service_name2arm_state: invalid service name \"" + service_name + "\"";
               console.log(msg);
               throw msg;
           }
