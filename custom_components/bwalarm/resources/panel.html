@@ -9,7 +9,7 @@ v
     const _NAME = 'Alarm Panel';
     const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
     // don't forget to change HaPanelAlarm.version below!
-    const _VERSION = 'v1.8.0b';
+    const _VERSION = 'v1.9.0';
 
     if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
     window.CUSTOM_UI_LIST.push({
@@ -1184,9 +1184,9 @@ v
                       <div class='setting-outer horizontal layout'>
                         <div class='setting-inner vertical layout'>
                           <span class='info-header'>Arm Home command: </span>
-                          <span class='info-detail'>Command to set armed-home mode on this Alarm Panel.<br>Default: ARM_HOME</span>
+                          <span class='info-detail'>Command to set armed-home mode.<br>Default: ARM_HOME</span>
                           <div class='setting-input horizontal layout'>
-                            <paper-input id='payload_arm_home' value='{{alarm.attributes.mqtt.payload_arm_home}}' placeholder='Payload Disarm'></paper-input>
+                            <paper-input id='payload_arm_home' value='{{alarm.attributes.mqtt.payload_arm_home}}' placeholder='Payload Home'></paper-input>
                             <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_arm_home' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                           </div>
                         </div>
@@ -1195,10 +1195,43 @@ v
                       <div class='setting-outer horizontal layout'>
                         <div class='setting-inner vertical layout'>
                           <span class='info-header'>Arm Away command: </span>
-                          <span class='info-detail'>Command to set armed-away mode on this Alarm Panel.<br>Default: ARM_AWAY</span>
+                          <span class='info-detail'>Command to set armed-away mode.<br>Default: ARM_AWAY</span>
                           <div class='setting-input horizontal layout'>
                             <paper-input id='payload_arm_away' value='{{alarm.attributes.mqtt.payload_arm_away}}' placeholder='Payload Away'></paper-input>
                             <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_arm_away' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class='setting-outer horizontal layout'>
+                        <div class='setting-inner vertical layout'>
+                          <span class='info-header'>Safe Arm Night command: </span>
+                          <span class='info-detail'>Command to set armed-night mode if there is no active sensors detected. Should NOT be the same as Arm Night.<br>Default: SAFE_ARM_NIGHT</span>
+                          <div class='setting-input horizontal layout'>
+                            <paper-input id='payload_safe_arm_night' value='{{alarm.attributes.mqtt.payload_safe_arm_night}}' placeholder='Payload Safe Night'></paper-input>
+                            <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_safe_arm_night' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class='setting-outer horizontal layout'>
+                        <div class='setting-inner vertical layout'>
+                          <span class='info-header'>Safe Arm Home command: </span>
+                          <span class='info-detail'>Command to set armed-home mode if there is no active sensors detected. Should NOT be the same as Arm Home.<br>Default: SAFE_ARM_HOME</span>
+                          <div class='setting-input horizontal layout'>
+                            <paper-input id='payload_safe_arm_home' value='{{alarm.attributes.mqtt.payload_safe_arm_home}}' placeholder='Payload Safe Home'></paper-input>
+                            <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_safe_arm_home' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class='setting-outer horizontal layout'>
+                        <div class='setting-inner vertical layout'>
+                          <span class='info-header'>Safe Arm Away command: </span>
+                          <span class='info-detail'>Command to set armed-away mode if there is no active sensors detected. Should NOT be the same as Arm Away.<br>Default: SAFE_ARM_AWAY</span>
+                          <div class='setting-input horizontal layout'>
+                            <paper-input id='payload_safe_arm_away' value='{{alarm.attributes.mqtt.payload_safe_arm_away}}' placeholder='Payload Safe Away'></paper-input>
+                            <paper-icon-button data-type='input_text' data-setting='mqtt' data-attribute='payload_safe_arm_away' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                           </div>
                         </div>
                       </div>
@@ -1410,7 +1443,7 @@ v
             switches:             { type: Array, value: [] },
 
             errors:               { type: Array },
-            version:              { type: String, value: 'v1.8.0b'},
+            version:              { type: String, value: 'v1.9.0'},
 
             camera_update_interval: { type: Number, value: 5000 }, // ms
 

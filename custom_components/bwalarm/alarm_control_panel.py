@@ -168,6 +168,9 @@ CONF_PAYLOAD_DISARM                = 'payload_disarm'
 CONF_PAYLOAD_ARM_HOME              = 'payload_arm_home'
 CONF_PAYLOAD_ARM_AWAY              = 'payload_arm_away'
 CONF_PAYLOAD_ARM_NIGHT             = 'payload_arm_night'
+CONF_PAYLOAD_SAFE_ARM_HOME         = 'payload_safe_arm_home'
+CONF_PAYLOAD_SAFE_ARM_AWAY         = 'payload_safe_arm_away'
+CONF_PAYLOAD_SAFE_ARM_NIGHT        = 'payload_safe_arm_night'
 CONF_QOS                           = 'qos'
 CONF_STATE_TOPIC                   = 'state_topic'
 CONF_COMMAND_TOPIC                 = 'command_topic'
@@ -276,16 +279,19 @@ THEMES_SCHEMA = vol.Schema([{
 }])
 
 MQTT_SCHEMA = vol.Schema({
-    vol.Required(CONF_ENABLE_MQTT, default=False):                cv.boolean,
-    vol.Optional(CONF_QOS, default=0):                            vol.All(vol.Coerce(int), vol.Range(min=0)),
-    vol.Optional(CONF_STATE_TOPIC, default='home/alarm'):         cv.string,
-    vol.Optional(CONF_COMMAND_TOPIC, default='home/alarm/set'):   cv.string,
-    vol.Optional(CONF_PAYLOAD_ARM_AWAY, default='ARM_AWAY'):      cv.string,
-    vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):      cv.string,
-    vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):    cv.string,
-    vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):          cv.string,
-    vol.Optional(CONF_OVERRIDE_CODE, default=False):              cv.boolean,
-    vol.Optional(CONF_PENDING_ON_WARNING, default=False):         cv.boolean,
+    vol.Required(CONF_ENABLE_MQTT, default=False):                          cv.boolean,
+    vol.Optional(CONF_QOS, default=0):                                      vol.All(vol.Coerce(int), vol.Range(min=0)),
+    vol.Optional(CONF_STATE_TOPIC, default='home/alarm'):                   cv.string,
+    vol.Optional(CONF_COMMAND_TOPIC, default='home/alarm/set'):             cv.string,
+    vol.Optional(CONF_PAYLOAD_ARM_AWAY, default='ARM_AWAY'):                cv.string,
+    vol.Optional(CONF_PAYLOAD_ARM_HOME, default='ARM_HOME'):                cv.string,
+    vol.Optional(CONF_PAYLOAD_ARM_NIGHT, default='ARM_NIGHT'):              cv.string,
+    vol.Optional(CONF_PAYLOAD_SAFE_ARM_AWAY, default='SAFE_ARM_AWAY'):      cv.string,
+    vol.Optional(CONF_PAYLOAD_SAFE_ARM_HOME, default='SAFE_ARM_HOME'):      cv.string,
+    vol.Optional(CONF_PAYLOAD_SAFE_ARM_NIGHT, default='SAFE_ARM_NIGHT'):    cv.string,
+    vol.Optional(CONF_PAYLOAD_DISARM, default='DISARM'):                    cv.string,
+    vol.Optional(CONF_OVERRIDE_CODE, default=False):                        cv.boolean,
+    vol.Optional(CONF_PENDING_ON_WARNING, default=False):                   cv.boolean,
 })
 
 PLATFORM_SCHEMA = vol.Schema(vol.All({
@@ -533,8 +539,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         return self._imagesdir
 
 
-
-
     def init_variables(self):
         # basically transfers data from self._config (i.e yaml) and persistence (alarm.json) into internal current settings (self._states etc)
         FNAME = '[init_variables]'
@@ -599,15 +603,27 @@ class BWAlarm(alarm.AlarmControlPanel):
         # IF MQTT Enabled define its configuration
         if self.mqtt_enabled():
             # # If MQTT enabled but is empty then set default values
-            self._qos                   = self._config[CONF_MQTT].get(CONF_QOS)
-            self._state_topic           = self._config[CONF_MQTT].get(CONF_STATE_TOPIC)
-            self._command_topic         = self._config[CONF_MQTT].get(CONF_COMMAND_TOPIC)
-            self._payload_disarm        = self._config[CONF_MQTT].get(CONF_PAYLOAD_DISARM)
-            self._payload_arm_home      = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_HOME)
-            self._payload_arm_away      = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_AWAY)
-            self._payload_arm_night     = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_NIGHT)
-            self._override_code         = self._config[CONF_MQTT].get(CONF_OVERRIDE_CODE)
-            self._pending_on_warning    = self._config[CONF_MQTT].get(CONF_PENDING_ON_WARNING)
+            self._qos                       = self._config[CONF_MQTT].get(CONF_QOS)
+            self._state_topic               = self._config[CONF_MQTT].get(CONF_STATE_TOPIC)
+            self._command_topic             = self._config[CONF_MQTT].get(CONF_COMMAND_TOPIC)
+            self._payload_disarm            = self._config[CONF_MQTT].get(CONF_PAYLOAD_DISARM).upper()
+            self._payload_arm_home          = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_HOME).upper()
+            self._payload_arm_away          = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_AWAY).upper()
+            self._payload_arm_night         = self._config[CONF_MQTT].get(CONF_PAYLOAD_ARM_NIGHT).upper()
+            self._payload_safe_arm_home     = self._config[CONF_MQTT].get(CONF_PAYLOAD_SAFE_ARM_HOME).upper()
+            self._payload_safe_arm_away     = self._config[CONF_MQTT].get(CONF_PAYLOAD_SAFE_ARM_AWAY).upper()
+            self._payload_safe_arm_night    = self._config[CONF_MQTT].get(CONF_PAYLOAD_SAFE_ARM_NIGHT).upper()
+
+            if self._payload_arm_home == self._payload_safe_arm_home:
+                _LOGGER.warning("{} Arm Home and Safe Arm Home commands should not be identical, consider changing".format(FNAME))
+            if self._payload_arm_away == self._payload_safe_arm_away:
+                _LOGGER.warning("{} Arm Away and Safe Arm Away commands should not be identical, consider changing".format(FNAME))
+            if self._payload_arm_night == self._payload_safe_arm_night:
+                _LOGGER.warning("{} Arm Night and Safe Arm Night commands should not be identical, consider changing".format(FNAME))
+
+            self.safe_arm_modes = [self._payload_safe_arm_home, self._payload_safe_arm_away, self._payload_safe_arm_night]
+            self._override_code             = self._config[CONF_MQTT].get(CONF_OVERRIDE_CODE)
+            self._pending_on_warning        = self._config[CONF_MQTT].get(CONF_PENDING_ON_WARNING)
 
         #------------------------------------LOGGING--------------------------------------------------------
         # IF logging Enabled define its configuration
@@ -1520,8 +1536,11 @@ class BWAlarm(alarm.AlarmControlPanel):
             # command _JSON_dict_
             # where _JSON_dict_ is optional
             command, sep, params = msg.payload.partition(" ")
+            # uppercase so  commands are case-insensitive
+            command = command.upper()
             code = None
-            ignore_open_sensors = CONST_DEF_IGNORE_OPEN_SENSORS
+            # True if command is not SAFE_ARM_XXX
+            ignore_open_sensors = CONST_DEF_IGNORE_OPEN_SENSORS if command in self.safe_arm_modes else True
 
             if params:
                 _LOGGER.debug("{} atributes to import: \"{}\"".format(FNAME, params))
@@ -1534,7 +1553,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                         if ATTR_CODE in data.keys():
                             _LOGGER.debug("{} {}: \"{}\"".format(FNAME, ATTR_CODE, data[ATTR_CODE]))
                             code = str(data[ATTR_CODE])
-                        if ATTR_IGNORE_OPEN_SENSORS in data.keys():
+                        if command in self.safe_arm_modes and ATTR_IGNORE_OPEN_SENSORS in data.keys():
                             _LOGGER.debug("{} {}: {}".format(FNAME, ATTR_IGNORE_OPEN_SENSORS, data[ATTR_IGNORE_OPEN_SENSORS]))
                             ignore_open_sensors = str2bool(data[ATTR_IGNORE_OPEN_SENSORS])
                     else:
@@ -1546,9 +1565,10 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             #_LOGGER.debug("{} command: \"{}\", code: \"{}\", ignore_open_sensors: {}".format(FNAME, command, code, ignore_open_sensors))
 
-            if command == self._payload_arm_home:
+            # accept both ARM_XXX and SAFE_ARM_XXX
+            if command == self._payload_arm_home or command == self._payload_safe_arm_home:
                 self.async_alarm_safe_arm_home(code, ignore_open_sensors)
-            elif command == self._payload_arm_away:
+            elif command == self._payload_arm_away or command == self._payload_safe_arm_away:
                 self.async_alarm_safe_arm_away(code, ignore_open_sensors)
             elif command == self._payload_arm_night:
                 if self._enable_night_mode:

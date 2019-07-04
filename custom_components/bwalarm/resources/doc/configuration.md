@@ -1,9 +1,9 @@
 ## Configuration variables:
 
-**Alarm.yaml configuration settings:**
+**bwlarm.yaml configuration settings:**
 
 - platform: bwalarm **#[REQUIRED, String] Name of the custom alarm component. Do not change**
-- name: House **#[OPTIONAL, String]This can be changed to whatever suits your need, ensure this attribute matches the one in your panel_custom.yaml 'alarmid: alarm_control_panel.house'**
+- name: House **#[OPTIONAL, String]Do not change**
 
 - code: '9876' **#[REQUIRED, digits] should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes**
 - panic_code: '1234' **#[OPTIONAL, digits] Panic Code should consist of one or more digits ie '1234' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner.**
@@ -12,7 +12,7 @@
 - warning: automation.alarm_warning **#[OPTIONAL, String] The automation to fire when the alarm has been tripped**
 #### [OPTIONAL SETTINGS]
 - clock: True  **#[OPTIONAL, Boolean] False by default. True enables a clock in the center of the status bar**
-- perimeter_mode: True **#[OPTIONAL, Boolean] False by default. True enables perimeter mode, this could be known as 'Day Mode' i.e. only arm the doors whilst there is someone using all floors**
+- enable_night_mode: False **#[OPTIONAL, Boolean] False by default. True enables what could be known as 'Perimeter Mode' i.e. only arm the doors whilst there is someone using all floors**
 - weather: True **#[OPTIONAL, Boolean] False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary**
 - persistence: False **#[OPTIONAL, Boolean] False by Default. Allows this custom component to save the state of the alarm to file then reinstate it in the event of power loss.**
 - hide_passcode: True **#[OPTIONAL, Boolean] True by default. This is a security feature when enabled hides the passcode while entering disarm code.**
@@ -75,9 +75,12 @@
 - command_topic: 'home/alarm/set' #[OPTIONAL, string] The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.
 - qos: 0 #[OPTIONAL, number] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
 - payload_disarm: "DISARM" #[OPTIONAL, string] The payload to disarm this Alarm Panel. Default is “DISARM”.
-- payload_arm_home: "ARM_HOME" #[OPTIONAL, string] The payload to set armed-home mode on this Alarm Panel. Default is “ARM_HOME”.
-- payload_arm_away: "ARM_AWAY" #[OPTIONAL, string] The payload to set armed-away mode on this Alarm Panel. Default is “ARM_AWAY”.
-- payload_arm_night: "ARM_NIGHT" #[OPTIONAL, string] The payload to set armed-night mode on this Alarm Panel. Default is “ARM_NIGHT”.
+- payload_arm_home: "ARM_HOME" #[OPTIONAL, string] The payload to set Arm Home mode on this Alarm Panel. Default is “ARM_HOME”.
+- payload_arm_away: "ARM_AWAY" #[OPTIONAL, string] The payload to set Arm Away mode on this Alarm Panel. Default is “ARM_AWAY”.
+- payload_arm_night: "ARM_NIGHT" #[OPTIONAL, string] The payload to set Arm Night mode on this Alarm Panel. Default is “ARM_NIGHT”.
+- payload_safe_arm_home: "SAFE_ARM_HOME" #[OPTIONAL, string] The payload to set Arm Home mode if there is no active sensors detected. Should NOT be the same as Arm Home. Default is "SAFE_ARM_HOME".
+- payload_safe_arm_away: "SAFE_ARM_AWAY" #[OPTIONAL, string] The payload to set Arm Away mode if there is no active sensors detected. Should NOT be the same as Arm Away. Default is "SAFE_ARM_AWAY".
+- payload_safe_arm_night: "SAFE_ARM_NIGHT" #[OPTIONAL, string] The payload to set Arm Night mode if there is no active sensors detected. Should NOT be the same as Arm Night. Default is "SAFE_ARM_NIGHT".
 
 ### [COLOURS]  Use any HTML format
 - warning_colour: 'orange' #[OPTIONAL, string]
