@@ -14,7 +14,7 @@ Copy the following folders into your home assistant configuration directory:
   resources                  This folder stores your alarm configuration and some user data (i.e badges)
 ```
 
-Using [HASC](https://github.com/custom-components/hacs):
+Using [HACS](https://github.com/custom-components/hacs):
 If you have HACS custom component already installed, do the following:
 1. Click on Community in the left hand side menu on Home Assistant frontend
 2. Click Store
@@ -53,7 +53,7 @@ Currently the update process is pretty much similar to installation:
 2. You only need to copy ```custom_components/bwalarm/``` folder from the downloaded release to the same folder in Home Assistant structure.
 3. Please note that you DON'T need to overwrite ```resources``` folder in Home Assistant structure as it contains your integration's configuration file (and possibly some additional resources).
 
-Using [HASC](https://github.com/custom-components/hacs):
+Using [HACS](https://github.com/custom-components/hacs):
 1. Click on Community in the left hand side menu on Home Assistant frontend
 2. Click on Fork of Yet another take on alarm in Integrations
 3. Click UPGRADE
