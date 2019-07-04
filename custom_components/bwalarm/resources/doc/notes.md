@@ -36,8 +36,9 @@ The difference is the services from the first group don't set the alarm if there
 
 When MQTT enabled, the integration publishes its status to the state topic and listens to commands on the command topic (configurable via Settings -> MQTT or manually in bwalarm.yaml).
 It supports three arm commands, three safe_arm and one disarm command (actual command names are configurable via Settings -> MQTT or manually in bwalarm.yaml). All commands are case-insnsitive.
-Please note that MQTT SAFE_ARM_HOME, SAFE_ARM_AWAY and SAFE_ARM_NIGHT commands set alarm using corresponding service call from the 1st group of service calls described above, i.e it doesn't set alarm if there are active sensors detected or ```ignore_open_sensors``` attribute is ```True```.
+Please note that SAFE_ARM_HOME, SAFE_ARM_AWAY and SAFE_ARM_NIGHT commands set alarm using corresponding service call from the 1st group of service calls described above, i.e it doesn't set alarm if there are active sensors detected or ```ignore_open_sensors``` attribute is ```True```.
 On the other hans, ARM_HOME, ARM_AWAY and ARM_NIGHT commands ALWAYS set alarm.
+You can always check if alarm was set by checking its state in ```wait_template``` or reacting to state change in its state topic.
 
 There is an option to disarm  alarm via MQTT message without passcode (Disabled by default).
 
