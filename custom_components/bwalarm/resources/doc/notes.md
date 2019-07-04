@@ -51,13 +51,12 @@ ARM_XXX and ARM_DISARM commands support the following optional parameters:
 entity_id: <string> # Full name (domain.object_id) of the bwalarm entity to control
 code: <string*> | <int>  # A code to arm alarm control panel with
 ```
+(\*) if 'override' used, it sets alarm immediately, otherwise the alarm changes its state to Pending for Pending Time and then to a corresponding Armed_XXX state.
 
 SAFE_ARM_XXX commands also support the following optional parameters:
 ```
 ignore_open_sensors: True | False # Arm even if there are active sensors detected. Default: False
 ```
-
-* if 'override' used, it sets alarm immediately, otherwise the alarm changes its state to Pending for Pending Time and then to a corresponding Armed_XXX state.
 
 For example,
 
