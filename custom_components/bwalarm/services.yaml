@@ -1,50 +1,8 @@
 # Describes the format for available alarm control panel services
 
-alarm_disarm:
-  description: Sends disarm command to alarm control panel.
+alarm_set_ignore_open_sensors:
+  description: Set value of ```ignore_open_sensors`` attribute
   fields:
-    entity_id:
-      description: Name of alarm control panel to disarm.
-      example: 'alarm_control_panel.downstairs'
-    code:
-      description: An optional code to disarm the alarm control panel with.
-      example: 1234
-
-alarm_safe_arm_home:
-  description: Sends arm home command to alarm control panel. Does not set alarm if there are active sensors detected.
-  fields:
-    entity_id:
-      description: Name of alarm control panel to control.
-      example: 'alarm_control_panel.home'
-    code:
-      description: An optional code to arm home the alarm control panel with. If "override" used, set alarm immediately.
-      example: 1234
-    ignore_open_sensors:
-      description: "When True, set alarm even if active sensors detected. Default: False"
-      example: "True"
-
-alarm_safe_arm_away:
-  description: Sends arm away command to alarm control panel. Does not set alarm if there are active sensors detected.
-  fields:
-    entity_id:
-      description: Name of alarm control panel to control.
-      example: 'alarm_control_panel.downstairs'
-    code:
-      description: An optional code to arm away the alarm control panel with. If "override" used, set alarm immediately.
-      example: 1234
-    ignore_open_sensors:
-      description: "When True, set alarm even if active sensors detected. Default: False"
-      example: "True"
-
-alarm_safe_arm_night:
-  description: Sends arm night command to alarm control panel. Does not set alarm if there are active sensors detected.
-  fields:
-    entity_id:
-      description: Name of alarm control panel to control.
-      example: 'alarm_control_panel.home'
-    code:
-      description: An optional code to arm night the alarm control panel with. If "override" used, set alarm immediately.
-      example: 1234
-    ignore_open_sensors:
-      description: "When True, set alarm even if active sensors detected. Default: False"
-      example: "True"
+    value:
+      description: Boolean. If False, does not allow to set alarm if there is open sensors detected.
+      example: 'False'
