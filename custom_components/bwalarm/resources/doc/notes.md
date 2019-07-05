@@ -50,8 +50,11 @@ data:
 ## MQTT
 
 When MQTT enabled, the integration publishes its status to the state topic and listens to commands on the command topic (configurable via Settings -> MQTT or manually in bwalarm.yaml).
-It supports three arm commands and one disarm command (actual command names are configurable via Settings -> MQTT or manually in bwalarm.yaml). All commands are case-insnsitive.
+
+It supports three arm commands and one disarm command (actual command names are configurable via Settings -> MQTT or manually in bwalarm.yaml). All commands are case-insensitive.
+
 Please note that ARM_HOME, ARM_AWAY and ARM_NIGHT commands set alarm exctly as corresponding service call, i.e they don't set alarm if there are active sensors detected and ```ignore_open_sensors``` attribute is ```False```.
+
 You can always check if alarm was set by checking its state in ```wait_template``` or reacting to state change in its state topic.
 
 There is an option to disarm  alarm via MQTT message without passcode (Disabled by default).
