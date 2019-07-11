@@ -9,7 +9,7 @@ v
     const _NAME = 'Alarm Panel';
     const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
     // don't forget to change HaPanelAlarm.version below!
-    const _VERSION = 'v1.10.0';
+    const _VERSION = 'v1.10.0 dev';
 
     if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
     window.CUSTOM_UI_LIST.push({
@@ -1418,7 +1418,7 @@ v
             switches:             { type: Array, value: [] },
 
             errors:               { type: Array },
-            version:              { type: String, value: 'v1.10.0'},
+            version:              { type: String, value: 'v1.10.0 dev'},
 
             camera_update_interval: { type: Number, value: 5000 }, // ms
 
@@ -2356,7 +2356,7 @@ v
             var http = new XMLHttpRequest();
             http.open('HEAD', url, false);
             http.send();
-            console.log("urlExists(%s) status = ", url, http.status)
+            //console.log("urlExists(%s) status = ", url, http.status)
             return http.status != 404;
           }
           catch(err){
