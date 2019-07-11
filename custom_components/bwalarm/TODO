@@ -5,7 +5,7 @@ alarm_control_panel.py
 - Enable MQTT without HA restart/(WIP)
 - validate MQTT using schema
 - state[mode]xxx_time appear in yaml with (when that section edited via Settings) OR without quotes, investigate
-- code_arm_required: https://github.com/home-assistant/home-assistant/blob/dev/homeassistant/components/alarm_control_panel/__init__.py#L91
+- store persistence file in .storage ?
 
 
 Milestones
@@ -21,6 +21,9 @@ panel.html
 - prev style buttons/code panel?
 - use another way to find out the integration's entity_id (as someone can change name: in bwalarm.yaml and there is no panel_custom.yaml anymore!)
 - service calls: this.platform hardcoded, change
+
+Docs:
+- add something like this about use cases: https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666/222
 
 
 
