@@ -2136,6 +2136,14 @@ v
             //console.log("monitorAlarm: call carouselChange to make sure Settings is not displayed");
             this.carouselChange(this.$.controls);
           }
+
+          // add handler to remove shake effect (otherwise it shakes only once)
+          const content = this.$.content;
+          if (content){
+            content.addEventListener("animationend", (e) => {
+              content.classList.remove("shake");
+            });
+          }
         }
 
         requiresCode(){
@@ -2410,6 +2418,12 @@ v
           switch (call){
             //Check for open sensors before arming the alarm.
             case 'arm':
+              // do we have a code here?
+              if (this.alarm.attributes.code_to_arm == true && !this.code) {
+                console.log("empty codes are not supported!");
+                this.$.content.classList.add('shake');
+                break;
+              }
               this.attemptArmMode = ev.target.getAttribute('data-arm');
               try {
                 if ( this.hasOpenSensors(this.attemptArmMode) ) {
@@ -2440,9 +2454,15 @@ v
 
             //Disarm the alarm.
             case 'disarm':
-              this.alarmService('alarm_disarm');
+              // do we have a code here?
+              if (this.code) {
+                this.alarmService('alarm_disarm');
+              }
+              else {
+                console.log("empty codes are not supported!");
+                this.$.content.classList.add('shake');
+              }
               break;
-
           }
 
           //Reset the display alarm codes
@@ -2731,36 +2751,6 @@ v
         //Call the service to update the yaml file
         settingsUpdateUser(user, command){
           this.hass.callService('alarm_control_panel', 'alarm_yaml_user', {'user': user, 'command': command });
-        }
-
-        //Check if there are open sensors
-        checkOpenSensors_orig(call){
-          //check to see how many open sensors there are, if none arm alarm
-          if (this.opencount == 0) return false;
-
-          for (var sensor in this.allsensors){
-            //is it open?
-            //yes
-            // TODO: IT DOES NOT SEEM TO SUPPORT CUSTOM ON STATES, CHANGE!!
-            if (['on', 'open', 'true', 'detected', 'unlocked'].indexOf(this.allsensors[sensor].state.toLowerCase()) > -1){
-            //is it in the override list?
-              var overrideMode = '';
-              if (call == 'alarm_arm_home') var overrideMode = 'armed_home';
-              if (call == 'alarm_arm_away') var overrideMode = 'armed_away';
-              if (call == 'alarm_arm_night') var overrideMode = 'armed_night';
-
-              //No: return so display message
-              if (this.alarm.attributes.states[overrideMode].override.indexOf(this.allsensors[sensor].entity_id) == -1){
-
-                //display the warning message and shake
-                this.attemptedArm = true;
-
-                this.$.content.classList.add('shake');
-
-                return true;
-              }
-            }
-          }
         }
 
         service_name2arm_state(service_name) {
