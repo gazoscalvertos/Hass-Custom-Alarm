@@ -5,8 +5,6 @@ alarm_control_panel.py
 - Enable MQTT without HA restart/(WIP)
 - validate MQTT using schema
 - state[mode]xxx_time appear in yaml with (when that section edited via Settings) OR without quotes, investigate
-- store persistence file in .storage ?
-
 
 Milestones
 - remove obsolete enable_perimeter_mode attribute and perimeter_mode stuff from the code
@@ -24,8 +22,6 @@ panel.html
 
 Docs:
 - add something like this about use cases: https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666/222
-
-
 
 FRs:
 
