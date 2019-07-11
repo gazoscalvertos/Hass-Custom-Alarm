@@ -43,7 +43,7 @@ You can always configure your alarm using web interface or by editing your ```bw
 
 The default password to access the settings page is: **HG28!!&dn**
 
-For more details please refer to the [configuration description](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/custom_components/bwalarm/resources/doc/configuration.md and [notes](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/custom_components/bwalarm/resources/doc/notes.md)).
+For more details please refer to the [configuration description](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/custom_components/bwalarm/resources/doc/configuration.md) and [notes](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/custom_components/bwalarm/resources/doc/notes.md).
 Some automation examples are available [here](https://github.com/akasma74/Hass-Custom-Alarm/tree/master/custom_components/bwalarm/resources/doc/examples).
 
 ## How to: update
