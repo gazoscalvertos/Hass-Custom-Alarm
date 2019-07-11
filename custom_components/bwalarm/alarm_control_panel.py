@@ -223,6 +223,8 @@ DEFAULT_PENDING_TIME = 0   #0 Seconds
 DEFAULT_WARNING_TIME = 0   #0 Seconds
 DEFAULT_TRIGGER_TIME = 600 #Ten Minutes
 
+VALUE_ARM_IMMEDIATELY   = 'override'
+
 def _state_validator(config): #Place a default value in that timers if there isnt specific ones set
     """Validate the state."""
     FNAME = '[_state_validator]'
@@ -697,6 +699,11 @@ class BWAlarm(alarm.AlarmControlPanel):
         return None if ((self._code is None) or (self._state == STATE_ALARM_DISARMED)) else alarm.FORMAT_NUMBER
 
     @property
+    def code_arm_required(self):
+        """Whether the code is required for arm actions."""
+        return self._config[CONF_CODE_TO_ARM]
+
+    @property
     def device_state_attributes(self):
         FNAME = '[device_state_attributes]'
         _LOGGER.debug("{}".format(FNAME))
@@ -1107,39 +1114,47 @@ class BWAlarm(alarm.AlarmControlPanel):
 
         _LOGGER.debug("{} (service: {}, passcode: \"{}\", ignore_open_sensors: {}) begin".format(FNAME, service, code, ignore_open_sensors))
 
+        admin_id = 'HA'
+        user_id = admin_id
+        arm_immediately = False    # makes sense only for non-GUI calls (MQTT message/service call)
+        code_to_arm_required = self.code_arm_required
+
+        # special case - works even if Require code to arm is Disabled
+        if code == VALUE_ARM_IMMEDIATELY:
+            arm_immediately = True
+            _LOGGER.info("{} {} the alarm immediately as {}".format(FNAME, service, user_id))
+        elif code:
+            # if code required, try to match with known one
+            if code_to_arm_required:
+                if code == self._code:
+                    _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, user_id))
+                # is it one of the users?
+                else:
+                    user_id = ''
+                    for entity in self._users:
+                        if entity['code'] == code and entity['enabled']:
+                            user_id = entity['id']
+                            _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, entity['name']))
+                            break
+
+                    # code does not match any known code
+                    if not user_id:
+                        _LOGGER.error("{} Failed to {}: invalid passcode \"{}\"".format(FNAME, service, code))
+                        return False
+            else:
+                _LOGGER.warning("{} Code not required to {}, ignore passcode \"{}\"".format(FNAME, service, code))
+        # Code required but not supplied - cannot arm
+        elif code_to_arm_required:
+            _LOGGER.error("{} Failed to {}: passcode required".format(FNAME, service))
+            return False
+        # no code supplied, no code required - nothing to do
+        else:
+            _LOGGER.debug("{} no code required, {} the alarm as \"{}\"".format(FNAME, service, user_id))
+
         # for MQTT or service calls as Control Panel always sends ignore_open_sensors = True (it checks them itself atm)
         if not ignore_open_sensors and self.has_open_sensors(state):
             _LOGGER.info("{} Failed to {}: opens sensors detected".format(FNAME, service))
             return False
-
-        admin_id = 'HA'
-        user_id = ''
-        arm_immediately = False    # makes sense only for non-GUI calls (MQTT message/service call)
-
-        # if code provided, try to match it with user
-        if code:
-            if code == self._code:
-                user_id = admin_id
-                _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, user_id))
-            elif code == "override":
-                arm_immediately = True
-                user_id = admin_id
-                _LOGGER.info("{} {} the alarm immediately as {}".format(FNAME, service, user_id))
-            else:
-                # is it one of the users?
-                for entity in self._users:
-                    if entity['enabled'] and entity['code'] == code:
-                        user_id = entity['id']
-                        _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, entity['name']))
-
-                # code does not match any known code
-                # arm as HA
-                if not user_id:
-                    user_id = admin_id
-                    _LOGGER.warning("{} Ignore invalid passcode \"{}\", {} the alarm as {}".format(FNAME, code, service, user_id))
-        else:
-            user_id = admin_id
-            _LOGGER.info("{} no passcode supplied, {} the alarm as {}".format(FNAME, service, user_id))
 
         self.process_event(event, arm_immediately)
         self._update_log(user_id, event)

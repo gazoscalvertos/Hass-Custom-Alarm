@@ -1,6 +1,6 @@
 {
   "domain": "bwalarm",
-  "name": "Fork of Yet another take on an alarm",
+  "name": "BWAlarm (ak74 edition)",
   "documentation": "https://github.com/akasma74/Hass-Custom-Alarm",
   "dependencies": [],
   "codeowners": ["@akasma74"],

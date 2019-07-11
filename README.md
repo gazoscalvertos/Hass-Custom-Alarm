@@ -1,8 +1,8 @@
-# bwalarm (akasma74 edition)
+# BWAlarm (ak74 edition)
 
 ## Disclaimer
 This fork was created to maintain the original [bwalarm](https://github.com/gazoscalvertos/Hass-Custom-Alarm) custom component until its author is back.
-Feel free to create a new issue or pull request here **if you downloaded code from my repo**.
+Feel free to create a new issue or pull request here **if you downloaded code from this repository**.
 The corresponding HA thread [here](https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666)
 
 ## How to: installation
@@ -18,7 +18,7 @@ Using [HACS](https://github.com/custom-components/hacs):
 If you have HACS custom component already installed, do the following:
 1. Click on Community in the left hand side menu on Home Assistant frontend
 2. Click Store
-3. Scroll down until you see Fork of Yet another take on alarm and click on it
+3. Scroll down until you see ```BWAlarm (ak74 edition)``` and  click on it
 4. If necessary, select Show Beta from the drop-down menu under SETTINGS
 5. Optionally, select version from Available versions drop-down list (it has the latest one selected by default).
 6. Click INSTALL
@@ -43,7 +43,8 @@ You can always configure your alarm using web interface or by editing your ```bw
 
 The default password to access the settings page is: **HG28!!&dn**
 
-For more details please refer to the [configuration description](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/guidance/configuration.md).
+For more details please refer to the [configuration description](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/custom_components/bwalarm/resources/doc/configuration.md) and [notes](https://github.com/akasma74/Hass-Custom-Alarm/blob/master/custom_components/bwalarm/resources/doc/notes.md).
+Some automation examples are available [here](https://github.com/akasma74/Hass-Custom-Alarm/tree/master/custom_components/bwalarm/resources/doc/examples).
 
 ## How to: update
 
@@ -55,7 +56,7 @@ Currently the update process is pretty much similar to installation:
 
 Using [HACS](https://github.com/custom-components/hacs):
 1. Click on Community in the left hand side menu on Home Assistant frontend
-2. Click on Fork of Yet another take on alarm in Integrations
+2. Click on ```BWAlarm (ak74 edition)``` in Integrations
 3. Click UPGRADE
 
 Bear in mind that if you use this method, it only updates ```custom_components/bwalarm/``` folder and ALL user data inside that folder will be lost upon every update.
