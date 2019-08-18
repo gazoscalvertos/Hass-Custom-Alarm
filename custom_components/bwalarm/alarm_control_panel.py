@@ -1297,7 +1297,9 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif event == Events.DelayedTrip:   self._state = STATE_ALARM_WARNING
 
         elif old_state == STATE_ALARM_WARNING:
-            if   event == Events.Timeout:       self._state = STATE_ALARM_TRIGGERED
+            # change state to Triggered if time is out OR an immediate sensor is active
+            if event == Events.Timeout or \
+                event == Events.ImmediateTrip:       self._state = STATE_ALARM_TRIGGERED
 
         elif old_state == STATE_ALARM_TRIGGERED:
             if   event == Events.Timeout:       self._state = self._returnto
@@ -1342,15 +1344,13 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self.clearsignals()
 
             # Things to do on leaving state
-            if old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING:
+            if (old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING) and self._config.get(CONF_WARNING):
                 _LOGGER.debug("{} Turning off warning".format(FNAME))
-                if self._config.get(CONF_WARNING):
-                    self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_WARNING)})
+                self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_WARNING)})
 
-            elif old_state == STATE_ALARM_TRIGGERED:
+            elif old_state == STATE_ALARM_TRIGGERED and self._config.get(CONF_ALARM):
                 _LOGGER.debug("{} Turning off alarm".format(FNAME))
-                if self._config.get(CONF_ALARM):
-                    self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_ALARM)})
+                self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_ALARM)})
 
             # if persistence enabled
             if self._config[CONF_ENABLE_PERSISTENCE]:
@@ -1448,7 +1448,9 @@ class BWAlarm(alarm.AlarmControlPanel):
 #        _LOGGER.debug("state_change_listener: event {}".format(event))
         # makes sense only in pending states
         # do not modify _lasttrigger if it's not empty to preserve the original trigger
-        if self._state in SUPPORTED_PENDING_STATES and not self._lasttrigger:
+        # there is an additional special case (issue #38): when sensor from immediate group is active while the alarm is in Warning state
+        # in such a case the alarm should react as normal and don't ignore it
+        if (self._state in SUPPORTED_PENDING_STATES and not self._lasttrigger) or self._state == STATE_ALARM_WARNING:
             new_state = event.data.get('new_state', None)
             if new_state and new_state.state:
                 if new_state.state.lower() in self._supported_statuses_on:
@@ -1457,7 +1459,8 @@ class BWAlarm(alarm.AlarmControlPanel):
                         _LOGGER.debug("{} immediate: {} is {}".format(FNAME, event.data['entity_id'], new_state.state))
                         self._lasttrigger = eid
                         self.process_event(Events.ImmediateTrip)
-                    elif eid in self.delayed:
+                    elif eid in self.delayed and self._state != STATE_ALARM_WARNING:
+                        # don't react on delayed sensors when it's Warning state
                         _LOGGER.debug("{} delayed: {} is {}".format(FNAME, event.data['entity_id'], new_state.state))
                         self._lasttrigger = eid
                         self.process_event(Events.DelayedTrip)
