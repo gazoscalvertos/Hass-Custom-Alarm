@@ -1289,7 +1289,9 @@ v
             <paper-icon-button icon='mdi:cctv' title='Cameras' on-click='carouselClick' data-selection='cameras'></paper-icon-button>
           </template>
           <template is='dom-if' if='[[isChecked(alarm.attributes.enable_log)]]' >
-            <paper-icon-button icon='mdi:view-headline' title='Activity Log' on-click='carouselClick' data-selection='log'></paper-icon-button>
+            <template is='dom-if' if='[[isdisarmed(alarm)]]' >
+              <paper-icon-button icon='mdi:view-headline' title='Activity Log' on-click='carouselClick' data-selection='log'></paper-icon-button>
+            </template>
           </template>
           <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_custom_panel)]]' >
             <paper-icon-button icon='mdi:atom' title='Custom Panel' on-click='carouselClick' data-selection='custom'></paper-icon-button>
