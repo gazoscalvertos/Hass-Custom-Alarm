@@ -719,7 +719,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             'allsensors':               self._allsensors,
 
             'ignore_open_sensors':      self._config[CONF_IGNORE_OPEN_SENSORS],
-            'code_to_arm':              self._config[CONF_CODE_TO_ARM],
+            'code_to_arm':              self.code_arm_required,
 
             'panel_locked':             self._panel_locked,
             'passcode_attempts':        self._passcode_attempt_allowed,
@@ -1120,7 +1120,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         admin_id = 'HA'
         user_id = admin_id
         arm_immediately = False    # makes sense only for non-GUI calls (MQTT message/service call)
-        code_to_arm_required = self.code_arm_required
 
         # special case - works even if Require code to arm is Disabled
         if code == VALUE_ARM_IMMEDIATELY:
@@ -1128,7 +1127,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             _LOGGER.info("{} {} the alarm immediately as {}".format(FNAME, service, user_id))
         elif code:
             # if code required, try to match with known one
-            if code_to_arm_required:
+            if self.code_arm_required:
                 if code == self._code:
                     _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, user_id))
                 # is it one of the users?
@@ -1147,7 +1146,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             else:
                 _LOGGER.warning("{} Code not required to {}, ignore passcode \"{}\"".format(FNAME, service, code))
         # Code required but not supplied - cannot arm
-        elif code_to_arm_required:
+        elif self.code_arm_required:
             _LOGGER.error("{} Failed to {}: passcode required".format(FNAME, service))
             return False
         # no code supplied, no code required - nothing to do

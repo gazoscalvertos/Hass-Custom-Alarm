@@ -689,7 +689,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Require a passcode to set the alarm: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.code_to_arm}}' on-change='settingsSave' data-setting='root' data-attribute='code_to_arm'></paper-toggle-button>
+                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.code_arm_required}}' on-change='settingsSave' data-setting='root' data-attribute='code_to_arm'></paper-toggle-button>
                         </div>
                         <span class='info-detail'>When enabled, a valid master/user passcode is required to arm the alarm. If 'override' is used as a passcode, set the alarm immediately (ignores appropriate Pending Time) regardless of this setting</span>
                       </div>
@@ -2149,7 +2149,7 @@ v
         }
 
         requiresCode(){
-          if (this.alarm.attributes.code_to_arm == false && this.alarm.state == 'disarmed') return false;
+          if (this.alarm.attributes.code_arm_required == false && this.alarm.state == 'disarmed') return false;
           return true;
         }
 
@@ -2405,7 +2405,7 @@ v
 
         //If you require a code to arm the system then force it here
         showCodePanel(alarm){
-          if (this.isChecked(alarm.attributes.code_to_arm) || !this.isdisarmed(alarm))
+          if (this.isChecked(alarm.attributes.code_arm_required) || !this.isdisarmed(alarm))
             return true;
           else return false;
         }
@@ -2421,7 +2421,7 @@ v
             //Check for open sensors before arming the alarm.
             case 'arm':
               // do we have a code here?
-              if (this.alarm.attributes.code_to_arm == true && !this.code) {
+              if (this.alarm.attributes.code_arm_required == true && !this.code) {
                 console.log("empty codes are not supported!");
                 this.$.content.classList.add('shake');
                 break;
