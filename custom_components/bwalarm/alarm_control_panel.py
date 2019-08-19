@@ -696,7 +696,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         """Regex for code format or None if no code is required."""
         # affects Lovelace keypad presence (None means no keypad)
     #        return None if self._code is None else '.+'
-        return None if ((self._code is None) or (self._state == STATE_ALARM_DISARMED)) else alarm.FORMAT_NUMBER
+        FNAME = '[code_format]'
+        res = None if (self._code is None or (self._state == STATE_ALARM_DISARMED and not self.code_arm_required)) else alarm.FORMAT_NUMBER
+        _LOGGER.debug("{} self._code: {}, self._state: {}, code_arm_required: {}, returning {}".format(FNAME, self._code, self._state, self.code_arm_required, res))
+        return res
 
     @property
     def code_arm_required(self):
