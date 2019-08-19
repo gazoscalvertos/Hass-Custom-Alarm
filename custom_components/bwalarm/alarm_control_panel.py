@@ -696,7 +696,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         """Regex for code format or None if no code is required."""
         # affects Lovelace keypad presence (None means no keypad)
     #        return None if self._code is None else '.+'
-        return None if ((self._code is None) or (self._state == STATE_ALARM_DISARMED)) else alarm.FORMAT_NUMBER
+        FNAME = '[code_format]'
+        res = None if (self._code is None or (self._state == STATE_ALARM_DISARMED and not self.code_arm_required)) else alarm.FORMAT_NUMBER
+        _LOGGER.debug("{} self._code: {}, self._state: {}, code_arm_required: {}, returning {}".format(FNAME, self._code, self._state, self.code_arm_required, res))
+        return res
 
     @property
     def code_arm_required(self):
@@ -716,7 +719,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             'allsensors':               self._allsensors,
 
             'ignore_open_sensors':      self._config[CONF_IGNORE_OPEN_SENSORS],
-            'code_to_arm':              self._config[CONF_CODE_TO_ARM],
+            'code_to_arm':              self.code_arm_required,
 
             'panel_locked':             self._panel_locked,
             'passcode_attempts':        self._passcode_attempt_allowed,
@@ -1058,7 +1061,7 @@ class BWAlarm(alarm.AlarmControlPanel):
            if os.path.isfile(fname):  #Find the log file and load.
               self._config[CONF_LOGS] = json.load(open(fname, 'r'))
            else: #No log file found
-              _LOGGER.warning("{} File {} does not exist".format(FNAME, fname))
+              _LOGGER.info("{} File {} does not exist".format(FNAME, fname))
               self._config[CONF_LOGS] = []
               #self.log_save()
         except Exception as e:
@@ -1117,7 +1120,6 @@ class BWAlarm(alarm.AlarmControlPanel):
         admin_id = 'HA'
         user_id = admin_id
         arm_immediately = False    # makes sense only for non-GUI calls (MQTT message/service call)
-        code_to_arm_required = self.code_arm_required
 
         # special case - works even if Require code to arm is Disabled
         if code == VALUE_ARM_IMMEDIATELY:
@@ -1125,7 +1127,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             _LOGGER.info("{} {} the alarm immediately as {}".format(FNAME, service, user_id))
         elif code:
             # if code required, try to match with known one
-            if code_to_arm_required:
+            if self.code_arm_required:
                 if code == self._code:
                     _LOGGER.info("{} {} the alarm as {}".format(FNAME, service, user_id))
                 # is it one of the users?
@@ -1144,7 +1146,7 @@ class BWAlarm(alarm.AlarmControlPanel):
             else:
                 _LOGGER.warning("{} Code not required to {}, ignore passcode \"{}\"".format(FNAME, service, code))
         # Code required but not supplied - cannot arm
-        elif code_to_arm_required:
+        elif self.code_arm_required:
             _LOGGER.error("{} Failed to {}: passcode required".format(FNAME, service))
             return False
         # no code supplied, no code required - nothing to do
@@ -1297,7 +1299,9 @@ class BWAlarm(alarm.AlarmControlPanel):
             elif event == Events.DelayedTrip:   self._state = STATE_ALARM_WARNING
 
         elif old_state == STATE_ALARM_WARNING:
-            if   event == Events.Timeout:       self._state = STATE_ALARM_TRIGGERED
+            # change state to Triggered if time is out OR an immediate sensor is active
+            if event == Events.Timeout or \
+                event == Events.ImmediateTrip:       self._state = STATE_ALARM_TRIGGERED
 
         elif old_state == STATE_ALARM_TRIGGERED:
             if   event == Events.Timeout:       self._state = self._returnto
@@ -1342,15 +1346,13 @@ class BWAlarm(alarm.AlarmControlPanel):
                 self.clearsignals()
 
             # Things to do on leaving state
-            if old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING:
+            if (old_state == STATE_ALARM_WARNING or old_state == STATE_ALARM_PENDING) and self._config.get(CONF_WARNING):
                 _LOGGER.debug("{} Turning off warning".format(FNAME))
-                if self._config.get(CONF_WARNING):
-                    self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_WARNING)})
+                self._hass.services.call(self._config.get(CONF_WARNING).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_WARNING)})
 
-            elif old_state == STATE_ALARM_TRIGGERED:
+            elif old_state == STATE_ALARM_TRIGGERED and self._config.get(CONF_ALARM):
                 _LOGGER.debug("{} Turning off alarm".format(FNAME))
-                if self._config.get(CONF_ALARM):
-                    self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_ALARM)})
+                self._hass.services.call(self._config.get(CONF_ALARM).split('.')[0], 'turn_off', {'entity_id':self._config.get(CONF_ALARM)})
 
             # if persistence enabled
             if self._config[CONF_ENABLE_PERSISTENCE]:
@@ -1448,7 +1450,9 @@ class BWAlarm(alarm.AlarmControlPanel):
 #        _LOGGER.debug("state_change_listener: event {}".format(event))
         # makes sense only in pending states
         # do not modify _lasttrigger if it's not empty to preserve the original trigger
-        if self._state in SUPPORTED_PENDING_STATES and not self._lasttrigger:
+        # there is an additional special case (issue #38): when sensor from immediate group is active while the alarm is in Warning state
+        # in such a case the alarm should react as normal and don't ignore it
+        if (self._state in SUPPORTED_PENDING_STATES and not self._lasttrigger) or self._state == STATE_ALARM_WARNING:
             new_state = event.data.get('new_state', None)
             if new_state and new_state.state:
                 if new_state.state.lower() in self._supported_statuses_on:
@@ -1457,7 +1461,8 @@ class BWAlarm(alarm.AlarmControlPanel):
                         _LOGGER.debug("{} immediate: {} is {}".format(FNAME, event.data['entity_id'], new_state.state))
                         self._lasttrigger = eid
                         self.process_event(Events.ImmediateTrip)
-                    elif eid in self.delayed:
+                    elif eid in self.delayed and self._state != STATE_ALARM_WARNING:
+                        # don't react on delayed sensors when it's Warning state
                         _LOGGER.debug("{} delayed: {} is {}".format(FNAME, event.data['entity_id'], new_state.state))
                         self._lasttrigger = eid
                         self.process_event(Events.DelayedTrip)

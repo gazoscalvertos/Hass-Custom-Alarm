@@ -9,7 +9,7 @@ v
     const _NAME = 'Alarm Panel';
     const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
     // don't forget to change HaPanelAlarm.version below!
-    const _VERSION = 'v1.10.1';
+    const _VERSION = 'v1.10.2';
 
     if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
     window.CUSTOM_UI_LIST.push({
@@ -689,7 +689,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Require a passcode to set the alarm: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.code_to_arm}}' on-change='settingsSave' data-setting='root' data-attribute='code_to_arm'></paper-toggle-button>
+                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.code_arm_required}}' on-change='settingsSave' data-setting='root' data-attribute='code_to_arm'></paper-toggle-button>
                         </div>
                         <span class='info-detail'>When enabled, a valid master/user passcode is required to arm the alarm. If 'override' is used as a passcode, set the alarm immediately (ignores appropriate Pending Time) regardless of this setting</span>
                       </div>
@@ -1289,7 +1289,9 @@ v
             <paper-icon-button icon='mdi:cctv' title='Cameras' on-click='carouselClick' data-selection='cameras'></paper-icon-button>
           </template>
           <template is='dom-if' if='[[isChecked(alarm.attributes.enable_log)]]' >
-            <paper-icon-button icon='mdi:view-headline' title='Activity Log' on-click='carouselClick' data-selection='log'></paper-icon-button>
+            <template is='dom-if' if='[[isdisarmed(alarm)]]' >
+              <paper-icon-button icon='mdi:view-headline' title='Activity Log' on-click='carouselClick' data-selection='log'></paper-icon-button>
+            </template>
           </template>
           <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_custom_panel)]]' >
             <paper-icon-button icon='mdi:atom' title='Custom Panel' on-click='carouselClick' data-selection='custom'></paper-icon-button>
@@ -1418,7 +1420,7 @@ v
             switches:             { type: Array, value: [] },
 
             errors:               { type: Array },
-            version:              { type: String, value: 'v1.10.1'},
+            version:              { type: String, value: 'v1.10.2'},
 
             camera_update_interval: { type: Number, value: 5000 }, // ms
 
@@ -2147,7 +2149,7 @@ v
         }
 
         requiresCode(){
-          if (this.alarm.attributes.code_to_arm == false && this.alarm.state == 'disarmed') return false;
+          if (this.alarm.attributes.code_arm_required == false && this.alarm.state == 'disarmed') return false;
           return true;
         }
 
@@ -2403,7 +2405,7 @@ v
 
         //If you require a code to arm the system then force it here
         showCodePanel(alarm){
-          if (this.isChecked(alarm.attributes.code_to_arm) || !this.isdisarmed(alarm))
+          if (this.isChecked(alarm.attributes.code_arm_required) || !this.isdisarmed(alarm))
             return true;
           else return false;
         }
@@ -2419,7 +2421,7 @@ v
             //Check for open sensors before arming the alarm.
             case 'arm':
               // do we have a code here?
-              if (this.alarm.attributes.code_to_arm == true && !this.code) {
+              if (this.alarm.attributes.code_arm_required == true && !this.code) {
                 console.log("empty codes are not supported!");
                 this.$.content.classList.add('shake');
                 break;

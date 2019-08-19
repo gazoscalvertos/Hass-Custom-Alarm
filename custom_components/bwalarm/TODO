@@ -5,6 +5,8 @@ alarm_control_panel.py
 - Enable MQTT without HA restart/(WIP)
 - validate MQTT using schema
 - state[mode]xxx_time appear in yaml with (when that section edited via Settings) OR without quotes, investigate
+- don't let the alarm re-trigger on active sensor (cutoff time?)
+- replace somehow code_to_arm attribute -> code_arm_required property?
 
 Milestones
 - remove obsolete enable_perimeter_mode attribute and perimeter_mode stuff from the code
@@ -23,7 +25,11 @@ panel.html
 Docs:
 - add something like this about use cases: https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666/222
 
+Bugs:
+- when no code defined, keypad displayed in there's no way to disarm from there (Lovelace works fine) (consider all potential issues related to it - shall we allow no master code at all or make it required?) Based on #37 (https://github.com/akasma74/Hass-Custom-Alarm/issues/37)
+
 FRs:
 
 - Is there a way to increase the keypad button size to approximately what it was in the “pre mwc-button”
 - If we could get that override open sensors into the lovelace platform that would be amazing
+- support of multiple instances!
