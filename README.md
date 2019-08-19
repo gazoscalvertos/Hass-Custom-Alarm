@@ -18,7 +18,7 @@ Using [HACS](https://github.com/custom-components/hacs)(you need to have HACS al
 1. Click on **Community** in the left hand side menu on Home Assistant frontend
 2. Click **Store**
 3. Scroll down until you see _BWAlarm (ak74 edition)_ and  click on it
-4. If necessary, select **Show Beta* from the drop-down menu under **SETTINGS**
+4. If necessary, select **Show Beta** from the drop-down menu under **SETTINGS**
 5. Optionally, select version from **Available versions** drop-down list (_it has the latest one selected by default_).
 6. Click **INSTALL** and wait until it's done
 7. **If you don't have `resources` folder in your HA `config` folder**, you may need to create one
