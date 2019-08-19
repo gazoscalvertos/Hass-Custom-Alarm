@@ -1061,7 +1061,7 @@ class BWAlarm(alarm.AlarmControlPanel):
            if os.path.isfile(fname):  #Find the log file and load.
               self._config[CONF_LOGS] = json.load(open(fname, 'r'))
            else: #No log file found
-              _LOGGER.warning("{} File {} does not exist".format(FNAME, fname))
+              _LOGGER.info("{} File {} does not exist".format(FNAME, fname))
               self._config[CONF_LOGS] = []
               #self.log_save()
         except Exception as e:
