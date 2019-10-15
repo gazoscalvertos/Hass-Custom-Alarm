@@ -17,6 +17,10 @@ v
       url: _URL,
       version: _VERSION
     });
+
+    if (!customElements.get("ha-switch") && customElements.get("paper-toggle-button")) {
+      customElements.define("ha-switch", class extends customElements.get("paper-toggle-button") {})
+    }
   }
   </script>
 
@@ -400,7 +404,7 @@ v
                     <!-- ########################################################################### LOGIN ##################################################################################################### -->
                     <div id='set-login' class='carousel-cell remove'>
                       <div class='title'>Settings</div></br>
-                      <div class='info-detail'>Enter the admin password defined in your alarm.yaml to access this panel</div>
+                      <div class='info-detail'>Enter the admin password defined in your bwalarm.yaml to access this panel</div>
                       <paper-input class="span11" id="passwordInput" type="password" placeholder="Enter Password..." on-keyup='checkSettingsPassword'></paper-input>
                     </div>
 
@@ -500,7 +504,7 @@ v
                       <!-- <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Disable Animations: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.disable_animations)}}' on-change='settingsSave' data-setting='panel' data-attribute='disable_animations'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.disable_animations)}}' on-change='settingsSave' data-setting='panel' data-attribute='disable_animations'></ha-switch>
                         </div>
                         <span class='info-detail'>If enabled, this will disable all animations. This is designed to improve performance on older devices. NOTE you can also disable animations per user within the user section. This is handy to set animations per device.</span>
                       </div> -->
@@ -519,7 +523,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Clock: </span>
-                          <paper-toggle-button class='setting-toggle' checked$='{{alarm.attributes.panel.enable_clock}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_clock'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked$='{{alarm.attributes.panel.enable_clock}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_clock'></ha-switch>
                         </div>
                         <span class='info-detail'>Enables the clock widget in this panel. A Time Sensor named: 'sensor.time' must exist within your Home Assistant setup</span>
                       </div>
@@ -527,7 +531,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Clock 12 Hour Mode?: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_clock_12hr)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_clock_12hr'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_clock_12hr)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_clock_12hr'></ha-switch>
                         </div>
                         <span class='info-detail'>Changes the clock to 12hour mode when enabled.<br>Default: Disabled (i.e 24hr mode)</span>
                       </div>
@@ -535,7 +539,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Weather: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_weather)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_weather'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_weather)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_weather'></ha-switch>
                         </div>
                         <span class='info-detail'>Enables the weather widget in this panel. A Weather Sensor named: 'sensor.weather_summary' or 'sensor.dark_sky_summary' must exist within your Home Assistant setup</span>
                       </div>
@@ -543,7 +547,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Display Fahrenheit: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_fahrenheit)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_fahrenheit'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_fahrenheit)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_fahrenheit'></ha-switch>
                         </div>
                         <span class='info-detail'>Enable this to display the temperaturein Fahrenheit</span>
                       </div>
@@ -551,7 +555,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Passcode Hidden: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_passcode)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_passcode'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_passcode)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_passcode'></ha-switch>
                         </div>
                         <span class='info-detail'>Masks the passcode within the panel input box when typing</span>
                       </div>
@@ -559,7 +563,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Hide HA Sidebar When Armed: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sidebar)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sidebar'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sidebar)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sidebar'></ha-switch>
                         </div>
                         <span class='info-detail'>When the alarm is armed the Home Assistant sidebar will be disabled if enabled. This prevents an intruder simply stopping home assistant from the configuration menu. For this to be truly effective use a browser which locks access to the URL function.</span>
                       </div>
@@ -567,7 +571,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Hide Sensors When Armed: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sensors)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sensors'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sensors)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sensors'></ha-switch>
                         </div>
                         <span class='info-detail'>When the alarm is armed the sensors panel will be hidden.</span>
                       </div>
@@ -575,7 +579,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Round Buttons: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.round_buttons)}}' on-change='settingsSave' data-setting='panel' data-attribute='round_buttons'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.round_buttons)}}' on-change='settingsSave' data-setting='panel' data-attribute='round_buttons'></ha-switch>
                         </div>
                         <span class='info-detail'>Choose whether the alarm buttons should be round or not.</span>
                       </div>
@@ -583,7 +587,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Shadow Text Effect: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.shadow_effect)}}' on-change='settingsSave' data-setting='panel' data-attribute='shadow_effect'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.shadow_effect)}}' on-change='settingsSave' data-setting='panel' data-attribute='shadow_effect'></ha-switch>
                         </div>
                         <span class='info-detail'>Enables the shadow text effect in this panel.<br>Default: Disabled</span>
                       </div>
@@ -591,7 +595,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Serif Font: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_serif_font)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_serif_font'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_serif_font)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_serif_font'></ha-switch>
                         </div>
                         <span class='info-detail'>Enables the 'Lobster' serif font on the title, time and weather within this panel.<br>Default: Disabled</span>
                       </div>
@@ -607,7 +611,7 @@ v
                             <template is='dom-repeat' items='[[alarm.attributes.themes]]'>
                               <div class='horizontal layout'>
                                 <paper-item on-click='defineColors' data-theme$='[[item.name]]' style='width: 75%;  text-transform: uppercase; text-transform: uppercase;'><iron-icon on-click='defineColors' data-theme$='[[item.name]]' icon='mdi:format-paint' style=' padding-right: 7px;'></iron-icon>[[item.name]]</paper-item>
-                                <paper-toggle-button class='setting-toggle' checked$='[[item.active]]' on-change='settingsSave' data-type='boolean' name$='[[item.name]]' data-attribute='activated' data-setting='themes'>Activated?</paper-toggle-button>
+                                <ha-switch class='setting-toggle' checked$='[[item.active]]' on-change='settingsSave' data-type='boolean' name$='[[item.name]]' data-attribute='activated' data-setting='themes'>Activated?</ha-switch>
                                 <paper-icon-button on-click='settingsSave' data-setting='themes' name$='[[item.name]]' data-type='delete' icon='mdi:delete' style='margin-left: 20px; color: white;'></paper-icon-button>
                               </div>
                             </template>
@@ -659,7 +663,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Alarm Persistence: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_persistence}}' on-change='settingsSave' data-setting='root' data-attribute='enable_persistence'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.enable_persistence}}' on-change='settingsSave' data-setting='root' data-attribute='enable_persistence'></ha-switch>
                         </div>
                         <span class='info-detail'>When enabled, the alarm state is persistently saved when either Home Assistant or the underlying host is restarted. This is useful in the event of power loss.<br>Default: Disabled</span>
                       </div>
@@ -689,7 +693,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Require a passcode to set the alarm: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.code_arm_required}}' on-change='settingsSave' data-setting='root' data-attribute='code_to_arm'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.code_arm_required}}' on-change='settingsSave' data-setting='root' data-attribute='code_to_arm'></ha-switch>
                         </div>
                         <span class='info-detail'>When enabled, a valid master/user passcode is required to arm the alarm. If 'override' is used as a passcode, set the alarm immediately (ignores appropriate Pending Time) regardless of this setting</span>
                       </div>
@@ -697,7 +701,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Ignore Open Sensors on Arm: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.ignore_open_sensors}}' on-change='settingsSave' data-setting='root' data-attribute='ignore_open_sensors'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.ignore_open_sensors}}' on-change='settingsSave' data-setting='root' data-attribute='ignore_open_sensors'></ha-switch>
                         </div>
                         <span class='info-detail'>When Disabled, set alarm only if there is no active sensors detected (safe), otherwise always set. <br>Default: Disabled</span>
                       </div>
@@ -727,7 +731,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Log: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_log}}' on-change='settingsSave' data-setting='root' data-attribute='enable_log'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.enable_log}}' on-change='settingsSave' data-setting='root' data-attribute='enable_log'></ha-switch>
                         </div>
                         <span class='info-detail'>When enabled the alarm records a log, permissions must be granted to HA to allow the log file to be saved in the configuration directory as alarm_log.json.<br>Default: Disabled</span>
                       </div>
@@ -756,7 +760,7 @@ v
                           <div class='setting-inner horizontal layout'>
 
                             <div style='margin-top: auto; margin-bottom: auto; margin-left: 15px;'>
-                              <paper-toggle-button class='setting-toggle' checked='{{user.enabled}}' data-userid$='[[user.id]]' on-change='toggleUser'>Enable</paper-toggle-button>
+                              <ha-switch class='setting-toggle' checked='{{user.enabled}}' data-userid$='[[user.id]]' on-change='toggleUser'>Enable</ha-switch>
                             </div>
                             <mwc-button data-type='button' style='background-color: unset; width: 40%; justify-content: left;' data-userid$='{{user.id}}' on-click='editUser'>
                               <div style='margin-left: 5px; margin-right: 10px; padding-left: 15px;' data-userid$='[[user.id]]' on-click='editUser'>
@@ -793,7 +797,7 @@ v
                         <div class='setting-outer vertical layout'>
                           <div class='setting-inner horizontal layout'>
                             <span class='info-header'>Enable User: </span>
-                            <paper-toggle-button id='user-enabled' checked='true'></paper-toggle-button>
+                            <ha-switch id='user-enabled' checked='true'></ha-switch>
                           </div>
                           <span class='info-detail'>Enable this user to control the alarm?</span>
                         </div>
@@ -823,7 +827,7 @@ v
                         <!-- <div class='setting-outer vertical layout'>
                           <div class='setting-inner horizontal layout'>
                             <span class='info-header'>Disable Animations: </span>
-                            <paper-toggle-button id='user-disable_animations' checked='false'></paper-toggle-button>
+                            <ha-switch id='user-disable_animations' checked='false'></ha-switch>
                           </div>
                           <span class='info-detail'>If enabled, the animations in the panel will be disabled for this user to help with performance on older devices.</span>
                         </div> -->
@@ -834,21 +838,21 @@ v
                         <div class='setting-outer vertical layout'>
                           <div class='setting-inner horizontal layout'>
                             <span class='info-header'>Home: </span>
-                            <paper-toggle-button id='user-home-permission' checked='true' class='setting-toggle'></paper-toggle-button>
+                            <ha-switch id='user-home-permission' checked='true' class='setting-toggle'></ha-switch>
                           </div>
                         </div>
 
                         <div class='setting-outer vertical layout'>
                           <div class='setting-inner horizontal layout'>
                             <span class='info-header'>Away: </span>
-                            <paper-toggle-button id='user-away-permission' checked='true' class='setting-toggle'></paper-toggle-button>
+                            <ha-switch id='user-away-permission' checked='true' class='setting-toggle'></ha-switch>
                           </div>
                         </div>
 
                         <div class='setting-outer vertical layout'>
                           <div class='setting-inner horizontal layout'>
                             <span class='info-header'>Perimeter: </span>
-                            <paper-toggle-button id='user-perimeter-permission' checked='true' class='setting-toggle'></paper-toggle-button>
+                            <ha-switch id='user-perimeter-permission' checked='true' class='setting-toggle'></ha-switch>
                           </div>
                         </div> -->
 
@@ -865,7 +869,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Sensors Panel: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_sensors_panel)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_sensors_panel'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_sensors_panel)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_sensors_panel'></ha-switch>
                         </div>
                         <span class='info-detail'>Enabling this allows you to view your sensors groups in a panel</span>
                       </div>
@@ -1006,7 +1010,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Night Mode: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.enable_night_mode}}' on-change='settingsSave' data-setting='root' data-attribute='enable_night_mode'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.enable_night_mode}}' on-change='settingsSave' data-setting='root' data-attribute='enable_night_mode'></ha-switch>
                         </div>
                         <span class='info-detail'>Enable night mode.<br>Default: Disabled</span>
                       </div>
@@ -1082,7 +1086,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Floorplan Panel: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.panel.enable_floorplan_panel}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_floorplan_panel'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.panel.enable_floorplan_panel}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_floorplan_panel'></ha-switch>
                         </div>
                         <span class='info-detail'>Enabling this allows you to setup your custom floorplan to be displayed as a panel</span>
                       </div>
@@ -1110,7 +1114,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Camera Panel: </span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.panel.enable_camera_panel}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_camera_panel'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.panel.enable_camera_panel}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_camera_panel'></ha-switch>
                         </div>
                         <span class='info-detail'>Enabling this allows you to add your cameras listed below to be displayed as a panel</span>
                       </div>
@@ -1140,7 +1144,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable MQTT:</span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.mqtt.enable_mqtt}}' on-change='settingsSave' data-setting='mqtt' data-attribute='enable_mqtt'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.mqtt.enable_mqtt}}' on-change='settingsSave' data-setting='mqtt' data-attribute='enable_mqtt'></ha-switch>
                         </div>
                         <span class='info-detail'>Enabling this allows you to send and receive MQTT messages to interact with your alarm. Restart Home Assistant for the changes to take effect.<br>Default: Disabled</span>
                       </div>
@@ -1225,7 +1229,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-input horizontal layout'>
                           <span class='info-header'>Disarm Without Passcode:</span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.mqtt.override_code}}' on-change='settingsSave' data-setting='mqtt' data-attribute='override_code'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.mqtt.override_code}}' on-change='settingsSave' data-setting='mqtt' data-attribute='override_code'></ha-switch>
                         </div>
                         <span class='info-detail'>If enabled, allows MQTT command to disarm the alarm without a passcode.<br>Default: Disabled</span>
                       </div>
@@ -1233,7 +1237,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Pending On Warning:</span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.mqtt.pending_on_warning}}' on-change='settingsSave' data-setting='mqtt' data-attribute='pending_on_warning'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.mqtt.pending_on_warning}}' on-change='settingsSave' data-setting='mqtt' data-attribute='pending_on_warning'></ha-switch>
                         </div>
                         <span class='info-detail'>Broadcast Pending state when the alarm is tripped instead of the default Warning state. This is to allow integration with other MQTT panels which use this state.<br>Default: Disabled</span>
                       </div>
@@ -1246,7 +1250,7 @@ v
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Custom Panel:</span>
-                          <paper-toggle-button class='setting-toggle' checked='{{alarm.attributes.panel.enable_custom_panel}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_custom_panel'></paper-toggle-button>
+                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.panel.enable_custom_panel}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_custom_panel'></ha-switch>
                         </div>
                         <span class='info-detail'>Enabling this allows you to add your own panel to this interface. For this to work see the template custom-element.html file. You will need to modify this with your own HTML code. Using this you could bring additional custom features of your own such as displaying extra information from Home Assistant or a 3rd party website. You could hook into external cameras or have a stocks and shared ticker.</span>
                       </div>
