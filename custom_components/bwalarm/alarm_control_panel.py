@@ -909,7 +909,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         for state in states_dict.keys():
             state_config = states_dict[state]
             if INT_ATTR_STATE_CHECK_BEFORE_ARM in state_config.keys():
-                _LOGGER.error("{} state {}: {} found, remove before saving".format(FNAME, state, INT_ATTR_STATE_CHECK_BEFORE_ARM))
+                _LOGGER.debug("{} state {}: {} found, remove before saving".format(FNAME, state, INT_ATTR_STATE_CHECK_BEFORE_ARM))
                 state_config.pop(INT_ATTR_STATE_CHECK_BEFORE_ARM, None)
 
         fname = self.yaml_config()
