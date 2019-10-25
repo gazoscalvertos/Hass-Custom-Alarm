@@ -55,7 +55,9 @@ Using [HACS](https://github.com/custom-components/hacs):
 2. Click on _BWAlarm (ak74 edition)_ in Integrations
 3. Click **UPGRADE**
 
-**Bear in mind that if you use this method, it only updates ```custom_components/bwalarm/``` folder and ALL user data inside that folder will be lost upon every update!**
+**Bear in mind that if you use this method, it only updates ```custom_components/bwalarm/``` folder and **ALL** user data inside that folder will be lost upon every update!**  
+
+Updating by using HACS (even if you initially installed the integraton manually) does not overwrite user settings as these are stored in the ```resources``` folder.
 
 ## After update (for all methods)
 
