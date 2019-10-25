@@ -561,7 +561,7 @@
                           <span class='info-header'>Hide HA Sidebar When Armed: </span>
                           <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sidebar)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sidebar'></ha-switch>
                         </div>
-                        <span class='info-detail'>When the alarm is armed the Home Assistant sidebar will be disabled if enabled. This prevents an intruder simply stopping home assistant from the configuration menu. For this to be truly effective use a browser which locks access to the URL function. To enable go to your Profile settings in HA and select “Always hide the sidebar” (Requires HA v96.3 or newer).</span>
+                        <span class='info-detail'>When the alarm is armed the Home Assistant sidebar will be disabled if enabled. This prevents an intruder simply stopping home assistant from the configuration menu. For this to be truly effective use a browser which locks access to the URL function. Note: if your HA is v96.3 or newer, go to your Profile settings in HA and select “Always hide the sidebar” for this option to work correctly.</span>
                       </div>
 
                       <div class='setting-outer vertical layout'>
