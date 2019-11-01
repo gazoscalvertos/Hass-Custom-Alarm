@@ -1775,9 +1775,18 @@
           if (this.alarm.attributes.panel.panel_title != null && this.alarm.attributes.panel.panel_title != '') this.panel_title = this.alarm.attributes.panel.panel_title;
         }
 
-        isChecked(check){
-          if (check == 'True' || check == true) return true;
-          else return false;
+        isChecked(arg){
+          // original code
+          //if (arg == 'True' || arg == true) return true;
+          //else return false;
+          
+          // code that supports case-insensitive booleans and enabled/disabled values
+          // in fact, anything apart from true, 'true' and 'enabled' will result in returning false
+          if (typeof arg == "string") {
+            lc_arg = arg.toLowerCase();
+            return (lc_arg == "true" || lc_arg == "enabled");
+          } else if (typeof arg == "boolean") return arg;
+              else return false;
         }
 
         computeJSONValue(entity, attribute){
