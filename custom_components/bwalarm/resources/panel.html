@@ -112,7 +112,7 @@
                     <div class='horizontal layout arm'  style='justify-content: center;'>
                       <template is='dom-if' if='[[!showCodePanel(alarm)]]'>
                         <template is='dom-if' if='[[!attemptedArm]]'>
-                          <template is='dom-if' if='[[alarm.attributes.enable_night_mode]]'>
+                          <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
                             <mwc-button id='arm-night' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
                           </template>
                           <mwc-button id='arm-home' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
@@ -154,7 +154,7 @@
                           <div class='digits horizontal layout' style='justify-content: center;'>
                             <template is='dom-if' if='[[requiresCode()]]'>
                               <template is='dom-if' if='[[isdisarmed(alarm)]]'>
-                                <template is='dom-if' if='[[alarm.attributes.enable_night_mode]]'>
+                                <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
                                   <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
                                 </template>
                                 <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
@@ -299,7 +299,7 @@
 
                 <!-- ###########################################ACTIVITY LOG############################################### -->
                 <div id='log' class='carousel-cell remove'>
-                  <template is='dom-if' if='[[alarm.attributes.enable_log]]' >
+                  <template is='dom-if' if='[[isChecked(alarm.attributes.enable_log)]]' >
                       <div class='title'>Activity</div>
                           <div >
                           <template is='dom-repeat' items='[[reverseArray(alarm.attributes.logs, 10)]]' as='entry'>
@@ -519,7 +519,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Clock: </span>
-                          <ha-switch class='setting-toggle' checked$='{{alarm.attributes.panel.enable_clock}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_clock'></ha-switch>
+                          <ha-switch class='setting-toggle' checked$='{{isChecked(alarm.attributes.panel.enable_clock)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_clock'></ha-switch>
                         </div>
                         <span class='info-detail'>Enables the clock widget in this panel. A Time Sensor named: 'sensor.time' must exist within your Home Assistant setup</span>
                       </div>
@@ -561,7 +561,7 @@
                           <span class='info-header'>Hide HA Sidebar When Armed: </span>
                           <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.hide_sidebar)}}' on-change='settingsSave' data-setting='panel' data-attribute='hide_sidebar'></ha-switch>
                         </div>
-                        <span class='info-detail'>When the alarm is armed the Home Assistant sidebar will be disabled if enabled. This prevents an intruder simply stopping home assistant from the configuration menu. For this to be truly effective use a browser which locks access to the URL function. Note: if your HA is v96.3 or newer, go to your Profile settings in HA and select “Always hide the sidebar” for this option to work correctly.</span>
+                        <span class='info-detail'>When the alarm is armed the Home Assistant sidebar will be hidden if enabled. This prevents an intruder simply stopping Home Assistant from the configuration menu. For this to be truly effective use a browser which locks access to the URL function. Note: if your HA is v96.3 or newer, go to your Profile settings in HA and select “Always hide the sidebar” for this option to work correctly.</span>
                       </div>
 
                       <div class='setting-outer vertical layout'>
@@ -607,7 +607,7 @@
                             <template is='dom-repeat' items='[[alarm.attributes.themes]]'>
                               <div class='horizontal layout'>
                                 <paper-item on-click='defineColors' data-theme$='[[item.name]]' style='width: 75%;  text-transform: uppercase; text-transform: uppercase;'><iron-icon on-click='defineColors' data-theme$='[[item.name]]' icon='mdi:format-paint' style=' padding-right: 7px;'></iron-icon>[[item.name]]</paper-item>
-                                <ha-switch class='setting-toggle' checked$='[[item.active]]' on-change='settingsSave' data-type='boolean' name$='[[item.name]]' data-attribute='activated' data-setting='themes'>Activated?</ha-switch>
+                                <ha-switch class='setting-toggle' checked$='[[isChecked(item.active)]]' on-change='settingsSave' data-type='boolean' name$='[[item.name]]' data-attribute='activated' data-setting='themes'>Activated?</ha-switch>
                                 <paper-icon-button on-click='settingsSave' data-setting='themes' name$='[[item.name]]' data-type='delete' icon='mdi:delete' style='margin-left: 20px; color: white;'></paper-icon-button>
                               </div>
                             </template>
@@ -659,7 +659,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Alarm Persistence: </span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.enable_persistence}}' on-change='settingsSave' data-setting='root' data-attribute='enable_persistence'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.enable_persistence)}}' on-change='settingsSave' data-setting='root' data-attribute='enable_persistence'></ha-switch>
                         </div>
                         <span class='info-detail'>When enabled, the alarm state is persistently saved when either Home Assistant or the underlying host is restarted. This is useful in the event of power loss.<br>Default: Disabled</span>
                       </div>
@@ -697,7 +697,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Ignore Open Sensors on Arm: </span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.ignore_open_sensors}}' on-change='settingsSave' data-setting='root' data-attribute='ignore_open_sensors'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.ignore_open_sensors)}}' on-change='settingsSave' data-setting='root' data-attribute='ignore_open_sensors'></ha-switch>
                         </div>
                         <span class='info-detail'>When Disabled, set alarm only if there is no active sensors detected (safe), otherwise always set. <br>Default: Disabled</span>
                       </div>
@@ -727,7 +727,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Log: </span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.enable_log}}' on-change='settingsSave' data-setting='root' data-attribute='enable_log'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.enable_log)}}' on-change='settingsSave' data-setting='root' data-attribute='enable_log'></ha-switch>
                         </div>
                         <span class='info-detail'>When enabled the alarm records a log, permissions must be granted to HA to allow the log file to be saved in the configuration directory as alarm_log.json.<br>Default: Disabled</span>
                       </div>
@@ -756,7 +756,7 @@
                           <div class='setting-inner horizontal layout'>
 
                             <div style='margin-top: auto; margin-bottom: auto; margin-left: 15px;'>
-                              <ha-switch class='setting-toggle' checked='{{user.enabled}}' data-userid$='[[user.id]]' on-change='toggleUser'>Enable</ha-switch>
+                              <ha-switch class='setting-toggle' checked='{{isChecked(user.enabled)}}' data-userid$='[[user.id]]' on-change='toggleUser'>Enable</ha-switch>
                             </div>
                             <mwc-button data-type='button' style='background-color: unset; width: 40%; justify-content: left;' data-userid$='{{user.id}}' on-click='editUser'>
                               <div style='margin-left: 5px; margin-right: 10px; padding-left: 15px;' data-userid$='[[user.id]]' on-click='editUser'>
@@ -1006,7 +1006,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Night Mode: </span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.enable_night_mode}}' on-change='settingsSave' data-setting='root' data-attribute='enable_night_mode'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.enable_night_mode)}}' on-change='settingsSave' data-setting='root' data-attribute='enable_night_mode'></ha-switch>
                         </div>
                         <span class='info-detail'>Enable night mode.<br>Default: Disabled</span>
                       </div>
@@ -1110,7 +1110,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable Camera Panel: </span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.panel.enable_camera_panel}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_camera_panel'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.panel.enable_camera_panel)}}' on-change='settingsSave' data-setting='panel' data-attribute='enable_camera_panel'></ha-switch>
                         </div>
                         <span class='info-detail'>Enabling this allows you to add your cameras listed below to be displayed as a panel</span>
                       </div>
@@ -1140,7 +1140,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Enable MQTT:</span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.mqtt.enable_mqtt}}' on-change='settingsSave' data-setting='mqtt' data-attribute='enable_mqtt'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.mqtt.enable_mqtt)}}' on-change='settingsSave' data-setting='mqtt' data-attribute='enable_mqtt'></ha-switch>
                         </div>
                         <span class='info-detail'>Enabling this allows you to send and receive MQTT messages to interact with your alarm. Restart Home Assistant for the changes to take effect.<br>Default: Disabled</span>
                       </div>
@@ -1225,7 +1225,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-input horizontal layout'>
                           <span class='info-header'>Disarm Without Passcode:</span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.mqtt.override_code}}' on-change='settingsSave' data-setting='mqtt' data-attribute='override_code'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.mqtt.override_code)}}' on-change='settingsSave' data-setting='mqtt' data-attribute='override_code'></ha-switch>
                         </div>
                         <span class='info-detail'>If enabled, allows MQTT command to disarm the alarm without a passcode.<br>Default: Disabled</span>
                       </div>
@@ -1233,7 +1233,7 @@
                       <div class='setting-outer vertical layout'>
                         <div class='setting-inner horizontal layout'>
                           <span class='info-header'>Pending On Warning:</span>
-                          <ha-switch class='setting-toggle' checked='{{alarm.attributes.mqtt.pending_on_warning}}' on-change='settingsSave' data-setting='mqtt' data-attribute='pending_on_warning'></ha-switch>
+                          <ha-switch class='setting-toggle' checked='{{isChecked(alarm.attributes.mqtt.pending_on_warning)}}' on-change='settingsSave' data-setting='mqtt' data-attribute='pending_on_warning'></ha-switch>
                         </div>
                         <span class='info-detail'>Broadcast Pending state when the alarm is tripped instead of the default Warning state. This is to allow integration with other MQTT panels which use this state.<br>Default: Disabled</span>
                       </div>
@@ -1478,7 +1478,7 @@
 
             this.controls = this.$.controls;
 
-            if (this.alarm.attributes.hide_sidebar == true)  this.closeSidebar();
+            if (this.isChecked(this.alarm.attributes.hide_sidebar))  this.closeSidebar();
 
             //Determine screensize and set appropriate controls
             this.setupUI();
@@ -1736,7 +1736,7 @@
         updateTheme(){
           if (this.alarm.attributes.themes)
             for (var x in this.alarm.attributes.themes)
-              if (this.alarm.attributes.themes[x].active == true){
+              if (this.isChecked(this.alarm.attributes.themes[x].active)){
 
                 var theme = this.alarm.attributes.themes[x];
                 if (typeof theme.name == 'string'){
@@ -1772,21 +1772,25 @@
         }
 
         getPanelTitle(){
-          if (this.alarm.attributes.panel.panel_title != null && this.alarm.attributes.panel.panel_title != '') this.panel_title = this.alarm.attributes.panel.panel_title;
+          if (this.alarm.attributes.panel.panel_title != null && this.alarm.attributes.panel.panel_title != '')
+            this.panel_title = this.alarm.attributes.panel.panel_title;
         }
 
         isChecked(arg){
           // original code
           //if (arg == 'True' || arg == true) return true;
           //else return false;
-          
+
           // code that supports case-insensitive booleans and enabled/disabled values
           // in fact, anything apart from true, 'true' and 'enabled' will result in returning false
+          var result = false;
+
           if (typeof arg == "string") {
-            lc_arg = arg.toLowerCase();
-            return (lc_arg == "true" || lc_arg == "enabled");
-          } else if (typeof arg == "boolean") return arg;
-              else return false;
+            var lc_arg = arg.toLowerCase();
+            result = lc_arg == "true" || lc_arg == "enabled";
+          } else if (typeof arg == "boolean") result = arg;
+
+          return result;
         }
 
         computeJSONValue(entity, attribute){
@@ -2084,7 +2088,7 @@
 
         // Close the sidebar if alarm is set and the option is enabled
         closeSidebar(instance){
-          if ( instance.alarm != null && instance.alarm.state != 'disarmed')
+          if ( instance.alarm && !instance.isdisarmed(instance.alarm) )
             instance.fire('hass-close-menu');
         }
 
@@ -2116,7 +2120,7 @@
           this.updateStyles({'--countdown-timer-display': 'none'});
           this.updateStyles({'--time-display': 'initial'});
 
-          if (this.alarm.state == 'disarmed'){
+          if (this.isdisarmed(this.alarm)){
             if (this.attemptedArm == true) this.resetUI();
 
           } else if (this.alarm.state == 'pending'){
@@ -2140,7 +2144,7 @@
           }
           else this.panel_locked = false;
 
-          if (this.alarm.state != 'disarmed') {
+          if (!this.isdisarmed(this.alarm)) {
             // show keypad in every instance to avoid settings changes
             //console.log("monitorAlarm: set settingsUnlock to false as alarm is armed");
             this.settingsUnlock = false;
@@ -2158,14 +2162,18 @@
         }
 
         requiresCode(){
-          if (this.alarm.attributes.code_arm_required == false && this.alarm.state == 'disarmed') return false;
-          return true;
+        // original code
+        //  if (this.alarm.attributes.code_arm_required == false && this.alarm.state == 'disarmed') return false;
+        //  return true;
+
+        // code using isChecked
+          return !this.isdisarmed(this.alarm) || this.isChecked(this.alarm.attributes.code_arm_required);
         }
 
         updatePanelStyles(){
           //Re-aligns title bar
           var title = this.shadowRoot.querySelector('#main-title-text');
-          if (this.alarm.attributes.panel != null && (this.alarm.state == 'disarmed' || this.alarm.attributes.panel.hide_sidebar == false)) title.classList.add('margin-left');
+          if (this.alarm.attributes.panel != null && (this.isdisarmed(this.alarm) || !this.isChecked(this.alarm.attributes.panel.hide_sidebar))) title.classList.add('margin-left');
           else title.classList.remove('margin-left');
 
           //Changes the shape of the buttons
@@ -2414,9 +2422,7 @@
 
         //If you require a code to arm the system then force it here
         showCodePanel(alarm){
-          if (this.isChecked(alarm.attributes.code_arm_required) || !this.isdisarmed(alarm))
-            return true;
-          else return false;
+          return this.isChecked(alarm.attributes.code_arm_required) || !this.isdisarmed(alarm);
         }
 
         //An Alarm service has been requested, execute it
@@ -2511,7 +2517,7 @@
               //populate user name
               this.shadowRoot.querySelector('#user-name').value = this.alarm.attributes.users[user].name;
               //populate enabled toggle
-              this.shadowRoot.querySelector('#user-enabled').checked = this.alarm.attributes.users[user].enabled;
+              this.shadowRoot.querySelector('#user-enabled').checked = this.isChecked(this.alarm.attributes.users[user].enabled);
               //clear pascode
               this.shadowRoot.querySelector('#user-passcode').value = '';
               //populate user picture
@@ -2573,6 +2579,7 @@
         }
 
         async _loadData() {
+          try {
             this._users = await this.hass.callWS({
               type: 'config/auth/list',
             });
@@ -2596,6 +2603,10 @@
             }
           }
          }
+         catch (ex) {
+           console.error("Cannot get users' list: ", ex.message);
+         }
+        }
 
         loadPreviewImageFromName(fname){
           //var FNAME='[loadPreviewImageFromName] ';
