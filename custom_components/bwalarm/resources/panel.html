@@ -47,7 +47,7 @@
       <!-- ha-app-layout has-scrolling-region -->
       <div id='layout'>
         <div id='main-title'>
-          <template is='dom-if' if='[[isdisarmed(alarm)]]'>
+          <template is='dom-if' if='[[isDisarmed(alarm)]]'>
             <ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
           </template>
           <div id='main-title-text'>[[panel_title]]</div>
@@ -106,7 +106,7 @@
 
                 <!-- ###########################################CONTROLS############################################### -->
                 <div id='controls' class='carousel-cell remove'>
-                  <template is='dom-if' if='[[isdisarmed(alarm)]]'>
+                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
   <!--                  <div class='vLayout arm'> -->
   <!--                  <div class='digits horizontal layout' style='justify-content: center;'> -->
                     <div class='horizontal layout arm'  style='justify-content: center;'>
@@ -153,7 +153,7 @@
                         <div>
                           <div class='digits horizontal layout' style='justify-content: center;'>
                             <template is='dom-if' if='[[requiresCode()]]'>
-                              <template is='dom-if' if='[[isdisarmed(alarm)]]'>
+                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
                                 <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
                                   <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
                                 </template>
@@ -183,7 +183,7 @@
                               <mwc-button on-click='callcode' data-digit=7 raised>7</mwc-button>
                               <mwc-button on-click='callcode' data-digit=8 raised>8</mwc-button>
                               <mwc-button on-click='callcode' data-digit=9 raised>9</mwc-button>
-                              <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+                              <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
                                 <mwc-button class='sm action-button disarm' on-click='callAlarmService' data-call='disarm' raised>Disarm</mwc-button>
                               </template>
                             </template>
@@ -191,7 +191,7 @@
                           <div class='xs digits horizontal layout center-justified'>
                             <mwc-button class='clear action-button' on-click='callclearcode' raised>C</mwc-button>
                             <mwc-button on-click='callcode' data-digit=0 raised>0</mwc-button>
-                            <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+                            <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
                               <paper-icon-button class='disarm action-button' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
                             </template>
                           </div>
@@ -227,7 +227,7 @@
                   </template>
 
                   <!-- ###########################################ARMED############################################## -->
-                  <template is='dom-if' if='[[!isdisarmed(alarm)]]'>
+                  <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
 
                     <div >
                       <template is='dom-if' if='[[computeArray(delayed)]]'>
@@ -266,7 +266,7 @@
                   </template>
 
                   <!-- ###########################################DISARMED############################################### -->
-                  <template is='dom-if' if='[[isdisarmed(alarm)]]'>
+                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
                     <div class='box-sensors'>
                       <div class='sensor-title'>All Sensors</div>
                       <div class='sensors'>
@@ -1274,14 +1274,14 @@
             <paper-icon-button icon='mdi:floor-plan' title='Floorplan' on-click='carouselClick' data-selection='floorplan'></paper-icon-button>
           </template>
           <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_sensors_panel)]]' >
-            <template is='dom-if' if='[[!isdisarmed(alarm)]]' >
+            <template is='dom-if' if='[[!isDisarmed(alarm)]]' >
               <template is='dom-if' if='[[!isChecked(alarm.attributes.panel.hide_sensors)]]' >
                 <paper-icon-button icon='mdi:radio-tower' title='Alarm Sensors' on-click='carouselClick' data-selection='sensors' style$='color: [[computeButtonColor(opencount)]] !important;'></paper-icon-button>
               </template>
               <template is='dom-if' if='[[isChecked(alarm.attributes.panel.hide_sensors)]]' >
               </template>
             </template>
-            <template is='dom-if' if='[[isdisarmed(alarm)]]' >
+            <template is='dom-if' if='[[isDisarmed(alarm)]]' >
                 <paper-icon-button icon='mdi:radio-tower' title='Alarm Sensors' on-click='carouselClick' data-selection='sensors' style$='color: [[computeButtonColor(opencount)]] !important;'></paper-icon-button>
             </template>
           </template>
@@ -1289,14 +1289,14 @@
             <paper-icon-button icon='mdi:cctv' title='Cameras' on-click='carouselClick' data-selection='cameras'></paper-icon-button>
           </template>
           <template is='dom-if' if='[[isChecked(alarm.attributes.enable_log)]]' >
-            <template is='dom-if' if='[[isdisarmed(alarm)]]' >
+            <template is='dom-if' if='[[isDisarmed(alarm)]]' >
               <paper-icon-button icon='mdi:view-headline' title='Activity Log' on-click='carouselClick' data-selection='log'></paper-icon-button>
             </template>
           </template>
           <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_custom_panel)]]' >
             <paper-icon-button icon='mdi:atom' title='Custom Panel' on-click='carouselClick' data-selection='custom'></paper-icon-button>
           </template>
-          <template is='dom-if' if='[[isdisarmed(alarm)]]' >
+          <template is='dom-if' if='[[isDisarmed(alarm)]]' >
             <paper-icon-button icon='mdi:tune' title='Settings' on-click='carouselClick' data-selection='set-login'></paper-icon-button>
           </template>
         </div>
@@ -2091,7 +2091,7 @@
 
         // Close the sidebar if alarm is set and the option is enabled
         closeSidebar(instance){
-          if ( instance.alarm && !instance.isdisarmed(instance.alarm) )
+          if ( instance.alarm && !instance.isDisarmed(instance.alarm) )
             instance.fire('hass-close-menu');
         }
 
@@ -2118,20 +2118,21 @@
             this.updatePanelStyles();
 
           //Resets countdown display
-          if (this.alarm.state != 'pending') if (this.$.countdown.querySelector('#countdown360')) this.$.countdown.querySelector('#countdown360').remove();
+          if (!this.isPending(this.alarm) && this.$.countdown.querySelector('#countdown360'))
+            this.$.countdown.querySelector('#countdown360').remove();
 
           this.updateStyles({'--countdown-timer-display': 'none'});
           this.updateStyles({'--time-display': 'initial'});
 
-          if (this.isdisarmed(this.alarm)){
+          if (this.isDisarmed(this.alarm)){
             if (this.attemptedArm == true) this.resetUI();
 
-          } else if (this.alarm.state == 'pending'){
+          } else if (this.isPending(this.alarm)){
             this.updateStyles({'--countdown-timer-display': 'initial'});
             this.updateStyles({'--time-display': 'none'});
             this.loadUITimer(false, this.alarm.attributes.states[this.alarm.attributes.arm_state].pending_time);
 
-          } else if (this.alarm.state == 'warning'){
+          } else if (this.isWarning(this.alarm)){
             this.updateStyles({'--countdown-timer-display': 'initial'});
             this.updateStyles({'--time-display': 'none'});
             this.loadUITimer(false, this.alarm.attributes.states[this.alarm.attributes.arm_state].warning_time);
@@ -2147,7 +2148,7 @@
           }
           else this.panel_locked = false;
 
-          if (!this.isdisarmed(this.alarm)) {
+          if (!this.isDisarmed(this.alarm)) {
             // show keypad in every instance to avoid settings changes
             //console.log("monitorAlarm: set settingsUnlock to false as alarm is armed");
             this.settingsUnlock = false;
@@ -2170,13 +2171,13 @@
         //  return true;
 
         // code using isChecked
-          return !this.isdisarmed(this.alarm) || this.isChecked(this.alarm.attributes.code_arm_required);
+          return !this.isDisarmed(this.alarm) || this.isChecked(this.alarm.attributes.code_arm_required);
         }
 
         updatePanelStyles(){
           //Re-aligns title bar
           var title = this.shadowRoot.querySelector('#main-title-text');
-          if (this.alarm.attributes.panel != null && (this.isdisarmed(this.alarm) || !this.isChecked(this.alarm.attributes.panel.hide_sidebar))) title.classList.add('margin-left');
+          if (this.alarm.attributes.panel != null && (this.isDisarmed(this.alarm) || !this.isChecked(this.alarm.attributes.panel.hide_sidebar))) title.classList.add('margin-left');
           else title.classList.remove('margin-left');
 
           //Changes the shape of the buttons
@@ -2268,10 +2269,19 @@
         }
 
         // Is the alarm disarmed?
-        isdisarmed(alarm){
+        isDisarmed(alarm){
           return alarm.state == 'disarmed';
         }
 
+        // Is the alarm in Pending state?
+        isPending(alarm){
+          return alarm.state == 'pending';
+        }
+
+        // Is the alarm in Warning state?
+        isWarning(alarm){
+          return alarm.state == 'warning';
+        }
         // Return a list of open sensors built from sensors
         opensensors(alarm, sensors)   {
           var ret = [];
@@ -2425,7 +2435,7 @@
 
         //If you require a code to arm the system then force it here
         showCodePanel(alarm){
-          return this.isChecked(alarm.attributes.code_arm_required) || !this.isdisarmed(alarm);
+          return this.isChecked(alarm.attributes.code_arm_required) || !this.isDisarmed(alarm);
         }
 
         //An Alarm service has been requested, execute it
