@@ -758,7 +758,7 @@
                             <div style='margin-top: auto; margin-bottom: auto; margin-left: 15px;'>
                               <ha-switch class='setting-toggle' checked='{{isChecked(user.enabled)}}' data-userid$='[[user.id]]' on-change='toggleUser'>Enable</ha-switch>
                             </div>
-                            <mwc-button data-type='button' style='background-color: unset; width: 40%; justify-content: left;' data-userid$='{{user.id}}' on-click='editUser'>
+                            <mwc-button data-type='button' style='background-color: unset; width: 40%;' data-userid$='{{user.id}}' on-click='editUser'>
                               <div style='margin-left: 5px; margin-right: 10px; padding-left: 15px;' data-userid$='[[user.id]]' on-click='editUser'>
                                 <state-badge style$='background-image: url({{computeImage(user.picture)}});' data-userid$='[[user.id]]' on-click='editUser'></state-badge>
                               </div>
