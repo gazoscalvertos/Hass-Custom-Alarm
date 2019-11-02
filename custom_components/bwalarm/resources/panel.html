@@ -1781,16 +1781,19 @@
           //if (arg == 'True' || arg == true) return true;
           //else return false;
 
-          // code that supports case-insensitive booleans and enabled/disabled values
-          // in fact, anything apart from true, 'true' and 'enabled' will result in returning false
-          var result = false;
+          // code that supports booleans, their case-insensitive string equvivalents or numbers
+          // similar to homeassistant/helpers/config_validation: boolean
+          // but does not throw exceptions considering anything else as false (for example, undefined)
+          if (typeof arg == "boolean") return arg;
 
           if (typeof arg == "string") {
             var lc_arg = arg.toLowerCase();
-            result = lc_arg == "true" || lc_arg == "enabled";
-          } else if (typeof arg == "boolean") result = arg;
+            // returns true on "1", "true", "yes", "on" and "enable" and false on anything else
+            return (lc_arg == "1" || lc_arg == "true" || lc_arg == "yes" || lc_arg == "on" || lc_arg == "enable");
+          } else if (typeof arg == "number")
+            return arg !=0;
 
-          return result;
+          return false;
         }
 
         computeJSONValue(entity, attribute){
