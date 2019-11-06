@@ -1,5 +1,24 @@
 # Examples
 
+|:---           |:---            |:---|:---|:---|
+|#### log\_size |                |                  |             | |
+|               |_(integer) (Optional)_| | | |
+|               |Maximum number of the last events to display in the log file.  | | | |
+|               | | | | |
+|               |_Default value:_| | | |
+|               |10| | | |
+|               | | | | |
+|#### states    | | | | |
+|               |_(map) (Optional)_| | | |
+|               |Configurations for supported alarm modes. | | | |
+|               |  | | | |
+|               |                   |#### armed\_away| | |
+|               |                   |                 |_(map) (Required)_| |
+|               |                   |                 |Configuration variables for the `Away` mode.| |
+|               |                   |                 |                  |#### immediate|
+|               |                   |                 |                  |_(list) (Optional)_|
+|               |                   |                 |                  |Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.|
+
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
 
