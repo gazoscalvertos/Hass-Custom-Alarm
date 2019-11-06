@@ -1,37 +1,12 @@
 # Examples
-|  |  |  |  |  | |
-| :--- | :--- | :--- | :--- | :--- | :---
-|##t1 | t2 | t3 |###t4 | t5 | t6
-
-
-| | | | | |
-|:---           |:---            |:---|:---|:---|
-|#### log\_size |                |                  |             | |
-|               |_(integer) (Optional)_| | | |
-|               |Maximum number of the last events to display in the log file.  | | | |
-|               | | | | |
-|               |_Default value:_| | | |
-|               |10| | | |
-|               | | | | |
-|#### states    | | | | |
-|               |_(map) (Optional)_| | | |
-|               |Configurations for supported alarm modes. | | | |
-|               |  | | | |
-|               |                   |#### armed\_away| | |
-|               |                   |                 |_(map) (Required)_| |
-|               |                   |                 |Configuration variables for the `Away` mode.| |
-|               |                   |                 |                  |#### immediate|
-|               |                   |                 |                  |_(list) (Optional)_|
-|               |                   |                 |                  |Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.|
-
 
 #### states
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
 &nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
 &nbsp;  
-&nbsp;&nbsp;&nbsp; **armed\_away
+&nbsp;&nbsp;&nbsp; **armed\_away**  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(map) (Required)_  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
 
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
