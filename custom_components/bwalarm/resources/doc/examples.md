@@ -7,7 +7,7 @@
 [Here](examples/automations.yaml) you can find out how to react to the alarm states in Home Assistant using automations.  
 #### 4
 ##### 5
-####### 6
+###### 6
 ### SERVICE CALLS  
 Set value of `ignore_open_sensors` configuration variable:
 <code><pre>
