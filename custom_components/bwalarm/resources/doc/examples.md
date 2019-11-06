@@ -1,9 +1,9 @@
 #### platform
-&nbsp;&nbsp; _(string) (Required)_  
-<s style="margin-left:1em;"></s> Domain name of this integration. **Please do not change**.  
+&nbsp;&nbsp;&nbsp; _(string) (Required)_  
+&nbsp;&nbsp;&nbsp; Domain name of this integration. **Please do not change**.  
 <s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> bwalarm  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; bwalarm  
 
 # Examples
 
