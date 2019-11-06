@@ -1,4 +1,5 @@
-#### states
+<div>
+<h4> states </h4>
 <s style="margin-left:1em;"></s> _(map) (Optional)_  
 <s style="margin-left:1em;"></s> Configurations for supported alarm modes.  
   <s></s>  
@@ -11,7 +12,9 @@
 
   <s style="margin-left:4em;"></s> _(list) (Optional)_  
   <s style="margin-left:4em;"></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+</div>
 
+**markdown**
 # Examples
 
 ### CONFIGURATION
