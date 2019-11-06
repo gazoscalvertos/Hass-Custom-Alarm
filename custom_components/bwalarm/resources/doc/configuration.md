@@ -616,13 +616,13 @@ This special code tells the alarm to set immediately, while with a normal code t
 These service calls also take into account value of [`ignore_open_sensors`](#ignore_open_sensors) configuration variable. If it is `false` (default value, i.e safe arming), the alarm will be set only if there is no active sensors detected.  
 
 There is `set_ignore_open_sensors` service call that allows to change value of `ignore_open_sensors` configuration variable.  
-Please refer to the [services' description](../../services.yaml) and the [Examples](examples.yaml#service-calls) page for more details.  
+Please refer to the [services' description](../../services.yaml) and the [Examples](examples.md#service-calls) page for more details.  
 
 ### MQTT INTERFACE
 When MQTT interface is [enabled](#enable_mqtt), the alarm publishes its status to the [state topic](#state_topic) and listens to commands on the [command topic](#command_topic).  
 There are three arm commands (for [`Away`](#payload_arm_away), [`Home`](#payload_arm_home) and [`Night`](#payload_arm_night)) and one [disarm](#payload_disarm) command and they behave exactly as corresponding [service calls](#service-calls) do.
 All commands are case-insensitive and accept parameters in a form of a [JSON object](http://www.json.org).  
-Please refer to the [Examples](examples.yaml#mqtt-interface) page for more details.
+Please refer to the [Examples](examples.md#mqtt-interface) page for more details.
 
 ### SETTING ALARM FROM THE PANEL
 Note that if you set the alarm from the panel, it always checks for active sensors and let you choose between `Arm anyway` and `Cancel arming` if any detected.
