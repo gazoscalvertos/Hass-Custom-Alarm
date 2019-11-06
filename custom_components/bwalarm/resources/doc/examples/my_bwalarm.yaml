@@ -1,0 +1,83 @@
+platform: bwalarm
+name: House
+panel:
+  hide_sidebar: 'True'
+  round_buttons: 'False'
+  enable_sensors_panel: enable
+  enable_fahrenheit: '0'
+  panel_title: Home
+  hide_sensors: true
+  hide_passcode: 'False'
+  enable_clock: 'True'
+  cameras: []
+states:
+  armed_away:
+    immediate:
+    - sensor.contact_1st_floor_safe
+    delayed:
+    - binary_sensor.pir_ground_floor_hall
+    - binary_sensor.pir_ground_floor_reception
+    - binary_sensor.pir_ground_floor_lounge
+    - binary_sensor.pir_ground_floor_kitchen
+    - binary_sensor.pir_1st_floor_landing
+    - binary_sensor.pir_1st_floor_master_bedroom
+    override:
+    - binary_sensor.pir_ground_floor_hall
+    pending_time: 40
+    warning_time: 60
+    trigger_time: 300
+  armed_home:
+    immediate: []
+    delayed:
+    - binary_sensor.pir_1st_floor_landing
+    pending_time: '5'
+    warning_time: '60'
+    trigger_time: 15
+    override: []
+  armed_night:
+    immediate: []
+    delayed: []
+    override: []
+    pending_time: 0
+    warning_time: 0
+    trigger_time: 600
+users:
+- id: 959367df035d4d06bb7db19e0760ca7e
+  name: Entrance wallpanel
+  enabled: true
+  code: !secret alarm_wallpanel_code
+  picture: wallpanel.png
+admin_password: !secret alarm_admin_passwd
+enable_persistence: true
+enable_log: true
+code: !secret alarm_code
+panic_code: !secret panic_code
+passcode_attempts: '5'
+passcode_attempts_timeout: '300'
+custom_supported_statuses_on:
+- !secret contact_opened
+- !secret contact_tampered
+themes:
+- name: aaa
+  warning_color: '#995BFF'
+  pending_color: '#FF2943'
+  disarmed_color: '#FF22E6'
+  triggered_color: '#FF0000'
+  armed_home_color: '#C1B1FF'
+  armed_away_color: '#FF8686'
+  armed_perimeter_color: '#DAFF9E'
+  active: false
+  action_button_border_color: '#3ED5FF'
+mqtt:
+  enable_mqtt: true
+  payload_arm_away: ARM_AWAY
+  override_code: false
+  state_topic: home/alarm
+  payload_disarm: DISARM
+  command_topic: home/alarm/set
+  qos: '0'
+  pending_on_warning: false
+  payload_arm_home: ARM_HOME
+  payload_arm_night: ARM_NIGHT
+code_to_arm: false
+enable_night_mode: false
