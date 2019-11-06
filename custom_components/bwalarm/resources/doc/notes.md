@@ -53,7 +53,7 @@ When MQTT enabled, the integration publishes its status to the state topic and l
 
 It supports three arm commands and one disarm command (actual command names are configurable via Settings -> MQTT or manually in bwalarm.yaml). All commands are case-insensitive.
 
-Please note that ARM_HOME, ARM_AWAY and ARM_NIGHT commands set alarm exctly as corresponding service call, i.e they don't set alarm if there are active sensors detected and ```ignore_open_sensors``` attribute is ```False```.
+Please note that arm commands set alarm exactly as corresponding service call, i.e they don't set alarm if there are active sensors detected and ```ignore_open_sensors``` attribute is ```False```.
 
 You can always check if alarm was set by checking its state in ```wait_template``` or reacting to state change in its state topic.
 
@@ -62,7 +62,7 @@ There is an option to disarm  alarm via MQTT message without passcode (Disabled 
 
 All MQTT commands get their parameters in JSON format.
 
-ARM_XXX and ARM_DISARM commands support the following optional parameters:
+arm and disarm commands accept the following optional parameters:
 
 ```
 entity_id: <string> # Full name (domain.object_id) of the bwalarm entity to control
@@ -84,8 +84,8 @@ For example,
 ```home/alarm/set DISARM```
   disarms the alarm if Disarm Without Code is Enabled
 
-```home/alarm/set DISARM {"code": "shazam"}```
+```home/alarm/set DISARM {"code": 1234}```
   disarms the alarm if Disarm Without Code is Disabled
 
 ## Set alarm from panel
-Please note that if you set alarm from web panel, it always checks for active sensors and let you choose to arm anyway or cancel arming if any detected.
+Please note that if you set alarm from the panel, it always checks for active sensors and let you choose to arm anyway or cancel arming if any detected.
