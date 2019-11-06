@@ -1,8 +1,10 @@
 # Examples
 
-<s style="margin-left: 1em;"></s>
+<s style="margin-left: 1em;">
 
-**abc
+**abc**
+
+</s>
 
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
