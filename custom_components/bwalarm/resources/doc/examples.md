@@ -1,22 +1,16 @@
 #### states
-&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
-&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
+<s style="margin-left:1em;"></s> _(map) (Optional)_  
+<s style="margin-left:1em;"></s> Configurations for supported alarm modes.  
   <s></s>  
-  &nbsp;&nbsp;&nbsp; <h4> armed_away </h4>
+  <h4 style="margin-left:1em;"> armed_away </h4>
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(map) (Required)_  
-  &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
+  <s style="margin-left:3em;"></s> _(map) (Required)_  
+  <s style="margin-left:3em;"></s> Configuration variables for the `Away` mode.  
   <s></s>  
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <h4> immediate </h4>
+  <h4 style="margin-left:2em;"> immediate </h4>
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
-  <s></s>  
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<h4> delayed </h4>
-
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
-  <s></s>  
+  <s style="margin-left:4em;"></s> _(list) (Optional)_  
+  <s style="margin-left:4em;"></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
 
 # Examples
 
