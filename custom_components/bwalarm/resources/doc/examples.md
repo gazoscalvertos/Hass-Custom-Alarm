@@ -8,17 +8,17 @@
 
 ### SERVICE CALLS  
 Set value of `ignore_open_sensors` configuration variable:
-```
+```yaml
     service: alarm\_control\_panel.set\_ignore\_open\_sensors
     data:
       value: true
 ```
 The default for `value` is `false`, i.e making a service call without `data`
-```
+```yaml
     service: alarm\_control\_panel.set\_ignore\_open\_sensors
 ```
 has the same effect as
-```
+```yaml
     service: alarm\_control\_panel.set\_ignore\_open\_sensors
     data:
      value: false
