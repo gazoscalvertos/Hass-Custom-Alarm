@@ -1,13 +1,6 @@
-<style type="text/css">
-<!--
- s { margin-left: 1em; }
--->
-</style>
-
 # Examples
 
-<s></s> _(string) (Required)_
-
+<s style="margin-left: 1em;"></s>**abc
 
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
