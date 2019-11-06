@@ -2,8 +2,35 @@
 &nbsp;&nbsp;&nbsp; _(string) (Required)_  
 &nbsp;&nbsp;&nbsp; Domain name of this integration. **Please do not change**.  
 <s></s>  
-&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; Default value:_  
 &nbsp;&nbsp;&nbsp; bwalarm  
+
+#### log\_size
+&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; Maximum number of the last events to display in the log file.  
+<s></s>  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; 10  
+
+#### states
+&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
+  <s></s>  
+  <h4 style="margin-left:1em;"> armed_away </h4>
+
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(map) (Required)_  
+  &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
+  <s></s>  
+  <h4 style="margin-left:2em;"> immediate </h4>
+
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+  <s></s>  
+  <h4 style="margin-left:2em;"> delayed </h4>
+
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+  <s></s>  
 
 # Examples
 
