@@ -1,5 +1,6 @@
 # Examples
-[link](#test)
+[link](#test) [link2](#test2)
+
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
 
@@ -49,6 +50,9 @@ Disarm the alarm if `override_code` is `false`:
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
 &nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
 &nbsp;  
-&nbsp;&nbsp;&nbsp;<span id="#test"> **armed\_away**</span>  
+<span id="#test">
+&nbsp;&nbsp;&nbsp; **armed\_away**    
+</span>
+<span id="#test2></span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(map) (Required)_  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
