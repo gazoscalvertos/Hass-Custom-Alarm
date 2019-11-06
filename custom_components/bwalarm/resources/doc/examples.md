@@ -4,8 +4,8 @@
 |##t1 | t2 | t3 |###t4 | t5 | t6
 
 
-| | | | | 
-|:---           |:---            |:---|:---|:---
+| | | | | |
+|:---           |:---            |:---|:---|:---|
 |#### log\_size |                |                  |             | |
 |               |_(integer) (Optional)_| | | |
 |               |Maximum number of the last events to display in the log file.  | | | |
