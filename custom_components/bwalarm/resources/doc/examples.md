@@ -26,22 +26,22 @@ has the same effect as
 
 ### MQTT INTERFACE
 Set the `Away` mode after a configured `pending_time`:
-```
+```javascript
   home/alarm/set ARM\_AWAY
 ```
 Set the `Home` mode immediately:
-```
+```javascript
   home/alarm/set ARM\_HOME {"code":"override"}
 ```
 Set the `Home` mode using a code after a configured `pending_time`:
-```
+```javascript
   home/alarm/set ARM\_HOME {"code": 1234}
 ```
 Disarms the alarm if `override_code` is `true`:
-```
+```javascript
   home/alarm/set DISARM
 ```
 Disarm the alarm if `override_code` is `false`:
-```
+```javascript
   home/alarm/set DISARM {"code": 1234}
 ```
