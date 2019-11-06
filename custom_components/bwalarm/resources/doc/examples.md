@@ -9,17 +9,17 @@
 ### SERVICE CALLS  
 Set value of `ignore_open_sensors` configuration variable:
 ```yaml
-    service: alarm\_control\_panel.set\_ignore\_open\_sensors
+    service: alarm_control_panel.set_ignore_open_sensors
     data:
       value: true
 ```
 The default for `value` is `false`, i.e making a service call without `data`
 ```yaml
-    service: alarm\_control\_panel.set\_ignore\_open\_sensors
+    service: alarm_control_panel.set_ignore_open_sensors
 ```
 has the same effect as
 ```yaml
-    service: alarm\_control\_panel.set\_ignore\_open\_sensors
+    service: alarm_control_panel.set_ignore_open_sensors
     data:
      value: false
 ```
@@ -27,15 +27,15 @@ has the same effect as
 ### MQTT INTERFACE
 Set the `Away` mode after a configured `pending_time`:
 ```javascript
-  home/alarm/set ARM\_AWAY
+  home/alarm/set ARM_AWAY
 ```
 Set the `Home` mode immediately:
 ```javascript
-  home/alarm/set ARM\_HOME {"code":"override"}
+  home/alarm/set ARM_HOME {"code":"override"}
 ```
 Set the `Home` mode using a code after a configured `pending_time`:
 ```javascript
-  home/alarm/set ARM\_HOME {"code": 1234}
+  home/alarm/set ARM_HOME {"code": 1234}
 ```
 Disarms the alarm if `override_code` is `true`:
 ```javascript
