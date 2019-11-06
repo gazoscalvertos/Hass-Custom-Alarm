@@ -1,3 +1,10 @@
+#### platform
+<s style="margin-left:1em;"></s> _(string) (Required)_  
+<s style="margin-left:1em;"></s> Domain name of this integration. **Please do not change**.  
+<s></s>  
+<s style="margin-left:1em;"></s> _Default value:_  
+<s style="margin-left:1em;"></s> bwalarm  
+
 # Examples
 
 ### CONFIGURATION
