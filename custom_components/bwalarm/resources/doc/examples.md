@@ -1,13 +1,4 @@
 # Examples
-
-#### states
-&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
-&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
-&nbsp;  
-&nbsp;&nbsp;&nbsp;<span id="#test"> **armed\_away**</span>  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(map) (Required)_  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
-
 [link](#test)
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
@@ -54,3 +45,10 @@ Disarm the alarm if `override_code` is `false`:
 ```javascript
   home/alarm/set DISARM {"code": 1234}
 ```
+#### states
+&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp;<span id="#test"> **armed\_away**</span>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
