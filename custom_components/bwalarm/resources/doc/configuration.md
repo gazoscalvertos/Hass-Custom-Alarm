@@ -1,97 +1,667 @@
-## Configuration variables:
+<style type="text/css">
+<!--
+ s { margin-left: 1em; }
+-->
+</style>
 
-**bwlarm.yaml configuration settings:**
+# Configuration variables (in bwalarm.yaml)
 
-- platform: bwalarm **#[REQUIRED, String] Name of the custom alarm component. Do not change**
-- name: House **#[OPTIONAL, String]Do not change**
+**platform**  
+<s></s> _(string) (Required)_  
+<s></s> Domain name of this integration. **Please do not change**.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> bwalarm  
 
-- code: '9876' **#[REQUIRED, digits] should consist of one or more digits ie '6482' ensure your passcode is encapsulated by quotes**
-- panic_code: '1234' **#[OPTIONAL, digits] Panic Code should consist of one or more digits ie '1234' ensure your passcode is encapsulated by quotes, it needs to be different to your standard alarm code. This enables a special panic mode. This can be used under duress to deactivate the alarm which would appear to the unseeing eye as deactivated however a special attribute [panic_mode] listed under the alarm_control_panel.[identifier] will change to ACTIVE. This status could be used in your automations to send a notification to someone else police/spouse/sibling/neighbour that you are under duress. To deactive this mode arm then disarm your alarm in the usual manner.**
+**name**  
+<s></s> _(string) (Optional)_  
+<s></s> Name of the integration entity.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> House  
 
-- code_to_arm: False **#[OPTIONAL, Boolean] False by default. If True, to set alarm via panel/MQTT command/service call you need to supply a master/user code**
+<span id="#pending_time">
+**pending\_time**
+</span>  
+<s></s> _(integer) (Optional)_  
+<s></s> Grace time _(in seconds)_ to allow for exit/entry.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> 25  
 
-- alarm: automation.alarm_triggered **#[REQUIRED, String] The automation to fire when the alarm has been triggered**
-- warning: automation.alarm_warning **#[OPTIONAL, String] The automation to fire when the alarm has been tripped**
-#### [OPTIONAL SETTINGS]
-- clock: True  **#[OPTIONAL, Boolean] False by default. True enables a clock in the center of the status bar**
-- enable_night_mode: False **#[OPTIONAL, Boolean] False by default. True enables what could be known as 'Perimeter Mode' i.e. only arm the doors whilst there is someone using all floors**
-- weather: True **#[OPTIONAL, Boolean] False by Default. Allows a weather summary to be displayed on the status bar. Dark Sky weather component must be enabled with the name sensor.dark_sky_summary**
-- persistence: False **#[OPTIONAL, Boolean] False by Default. Allows this custom component to save the state of the alarm to file then reinstate it in the event of power loss.**
-- ignore_open_sensors: False **#[OPTIONAL, Boolean] False by Default. If False, set alarm only if there is no active sensors, otherwise always set alarm**
-- hide_passcode: True **#[OPTIONAL, Boolean] True by default. This is a security feature when enabled hides the passcode while entering disarm code.**
-- hide_sidebar: True **#[OPTIONAL, Boolean] False by default. This is a security feature when enabled hides the HA sidebar when the alarm is armed. The sidebar re-appears when the alarm is disarmed.  Note: if your HA is v96.3 or newer, go to your Profile settings in HA and select “Always hide the sidebar” for this option to work correctly.**
-- hide_sensor_groups: True **#[OPTIONAL, Boolean] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear**
-- hide_custom_panel: True **#[OPTIONAL, Boolean] - True by default. Setting this to False enables a custom panel below the sensors groups which allows you to add your own html code. Use this to bring any other features you would like to see for example displaying live camera feeds, a rotating image gallery, custom HA buttons and sensors. To use this enable the custom panel in alarm.yaml (custom_panel: True) then ensure you take a copy of custom-element.html and add it to you www/alarm/ folder. Edit the html code between the template tags. I'm have added a custom sample folder where I will upload examples of 'things' which can be added here. Please contribute!!!**
+<span id="warning_time">
+**warning\_time**
+</span>  
+<s></s> _(integer) (Optional)_  
+<s></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> 25  
 
-## Timings
-- **pending_time:** 25 #[OPTIONAL, Number, default 25] Grace time in seconds to allow for exit and entry using Away mode.
-- **trigger_time:** 600 #[OPTIONAL, Number, default 600] The time in seconds of the trigger time in which the alarm is firing.  before returning previous set alarm state.
+<span id="trigger_time">
+**trigger\_time**
+</span>  
+<s></s> _(integer) (Optional)_  
+<s></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> 600  
 
-### [STATES]
-- **armed_night:** #[OPTIONAL]
-    **pending_time:** 10 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    **trigger_time:** 300 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately
-    immediate:
-      - binary_sensor.your_sensors
-    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered
-    delayed:
-      - binary_sensor.your_sensors
-    #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
-    override:
-    - binary_sensor.your_sensor
+**code**  
+<s></s> _(string) (Required)_  
+<s></s> Master passcode to set/disarm the alarm. <span id="#passcode_requirements">It must consist of one or more digits surrounded by quotes.</span>  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> 600  
 
-- **armed_home:** #[REQUIRED]
-    **pending_time:** 10 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    **trigger_time:** 300 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately
-    immediate:
-      - binary_sensor.your_sensors
-    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered
-    delayed:
-      - binary_sensor.your_sensors
-    #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
-    override:
-    - binary_sensor.your_sensor
+**code\_to\_arm**  
+<s></s> _(boolean) (Optional)_  
+<s></s> If `true`, a master/user passcode is required to set the alarm via panel/MQTT command/service call.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> `false`  
 
-- **armed_away:** #[REQUIRED]
-    **pending_time:** 25 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    **trigger_time:** 600 #[OPTIONAL] State specific setting if not defined inherits from above top level time
-    #[OPTIONAL however either an immediate or delayed group must exist] Sensors in this group tigger the alarm immediately
-    immediate:
-      - binary_sensor.your_sensors
-    #[OPTIONAL] Sensors in this group start the clock (pending_time) when tripped before the alarm is triggered
-    delayed:
-      - binary_sensor.your_sensors
-    #[OPTIONAL] Use this group to automatically override the warning message on open sensors when arming. (I use this as I have a motion sensor at the front door)
-    override:
-    - binary_sensor.your_sensor
+**passcode\_attempts**  
+<s></s> _(integer) (Optional)_  
+<s></s> If greater than 0, the system will only allow the set amount of password attempts before timing out.  
+<s></s> -1 allows for unlimited number of attempts.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> -1  
 
-### [PASSCODE RELATED]
-- passcode_attempts: 3 #[OPTIONAL, number] Disabled if commented out. When a value equal or greater than 0 is set, the system will only allow the set amount of password attempts before timing out
-- passcode_attempts_timeout: 30 #[OPTIONAL, number] Default 30 seconds. When set with the password attempts option the panel will timeout for the amount of seconds set if the password is entered incorrectly as per the password_attempts option. The system will then reset the allowed password attempts
+**passcode\_attempts\_timeout**  
+<s></s> _(integer) (Optional)_  
+<s></s> When `passcode_attempts`>0 and the passcode is entered incorrectly `passcode_attempts` times,    
+<s></s> the panel will timeout for the amount set _(in seconds)_ and then reset the number of passcode attempts.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> 30  
 
-### [MQTT RELATED]
-- enable_mqtt: True #[OPTIONAL, boolean] False by default. Settings this to True will enable MQTT Mode. Uncomment options below to use See the README for guidance.
-- override_code: True #[OPTIONAL, boolean] False by default. if true allows MQTT commands to disarm the alarm without a valid code.
-- state_topic: 'home/alarm' #[OPTIONAL, string] The MQTT topic HA will publish state updates to.
-- command_topic: 'home/alarm/set' #[OPTIONAL, string] The MQTT topic HA will subscribe to, to receive commands from a remote device to change the alarm state.
-- qos: 0 #[OPTIONAL, number] The maximum QoS level for subscribing and publishing to MQTT messages. Default is 0.
-- payload_disarm: "DISARM" #[OPTIONAL, string] The payload to disarm this Alarm Panel. Default is “DISARM”.
-- payload_arm_home: "ARM_HOME" #[OPTIONAL, string] The payload to set Arm Home mode on this Alarm Panel. Default is “ARM_HOME”.
-- payload_arm_away: "ARM_AWAY" #[OPTIONAL, string] The payload to set Arm Away mode on this Alarm Panel. Default is “ARM_AWAY”.
-- payload_arm_night: "ARM_NIGHT" #[OPTIONAL, string] The payload to set Arm Night mode on this Alarm Panel. Default is “ARM_NIGHT”.
+**panic\_code**  
+<s></s> _(string) (Optional)_  
+<s></s> Panic passcode disarms the alarm and set a special panic mode attribute that could be used in your automations  
+<s></s> to send a notification to the police/spouse/neighbour that you are under duress.  
+<s></s> To clear this attribute arm and then disarm your alarm in the usual manner.  
+<s></s> It must consist of one or more digits surrounded by quotes.  
 
-### [COLOURS]  Use any HTML format
-- warning_colour: 'orange' #[OPTIONAL, string]
-- pending_colour: 'orange' #[OPTIONAL, string]
-- disarmed_colour: '#03A9F4' #[OPTIONAL, string]
-- armed_home_colour: 'black' #[OPTIONAL, string]
-- armed_away_colour: 'black' #[OPTIONAL, string]
-- triggered_colour: 'red' #[OPTIONAL, string]
+**custom\_supported\_statuses\_on**  
+<s></s> _(list) (Optional)_  
+<s></s> List of strings to consider as sensor's `on` states in addition to standard ones.  
+<s></s> Allows to use sensors that do not have standard (`on`, `True`, `detected` etc) `on` states.  
 
-### [CUSTOM STATUSES]
--custom_supported_statuses_on: #[OPTIONAL, list of strings] CUSTOM SENSOR STATUSES - These settings allow devices which are not natively supported by this panel to be used. This is to be used when the state of the device is not recognised by the panel. Examples are provided below
-  - 'running' #EXAMPLE
--custom_supported_statuses_off:
-  - 'not_running' #EXAMPLE
+**custom\_supported\_statuses\_off**  
+<s></s> _(list) (Optional)_  
+<s></s> List of strings to consider as sensor's `off` states in addition to standard ones.  
+<s></s> Allows to use sensors that do not have standard (`off`, `False`, `closed` etc) `off` states.  
+
+**warning**  
+<s></s> _(string) (Optional)_  
+<s></s> Entity ID to turn on when the alarm has been tripped.  
+
+**alarm**  
+<s></s> _(string) (Optional)_  
+<s></s> Entity ID to turn on when the alarm has been triggered.  
+
+**enable\_log**  
+<s></s> _(boolean) (Optional)_  
+<s></s> If `true`, the alarm saves log of actions to a file. Its content is available in the `Activity Log` tab at the bottom of the panel.   
+<s></s>  
+<s></s> _Default value:_  
+<s></s> `true`  
+
+**log\_size**  
+<s></s> _(integer) (Optional)_  
+<s></s> Maximum number of the last events to display in the log file.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> 10  
+
+**states**  
+<s></s> _(map) (Optional)_  
+<s></s> Configurations for supported alarm modes.  
+<s></s>  
+<s></s> **armed\_away**  
+<s></s><s></s> _(map) (Required)_  
+<s></s><s></s> Configuration variables for the `Away` mode.  
+<s></s>  
+<s></s><s></s>**immediate**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+<s></s>  
+<s></s><s></s>**delayed**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+<s></s>  
+<s></s><s></s>**override**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> By default upon setting the alarm it checks if any the of sensors from `immediate` and `delayed` lists are `on` and does not proceed without user confirmation if any of them are `on`.  
+<s></s><s></s><s></s> To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
+<s></s>  
+<s></s><s></s>**pending\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Grace time _(in seconds)_ to allow for exit/entry.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#pending_time)  
+<s></s>  
+<s></s><s></s>**warning\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#warning_time)  
+<s></s>  
+<s></s><s></s>**trigger\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#trigger_time)  
+<s></s>  
+<s></s> **armed\_home**  
+<s></s><s></s> _(map) (Required)_  
+<s></s><s></s> Configuration variables for the `Home` mode.  
+<s></s>  
+<s></s><s></s>**immediate**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+<s></s>  
+<s></s><s></s>**delayed**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+<s></s>  
+<s></s><s></s>**override**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
+<s></s><s></s><s></s> To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
+<s></s>  
+<s></s><s></s>**pending\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Grace time _(in seconds)_ to allow for exit/entry.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#pending_time)  
+<s></s>  
+<s></s><s></s>**warning\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#warning_time)  
+<s></s>  
+<s></s><s></s>**trigger\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#trigger_time)  
+<s></s>  
+<s></s> **armed\_night**  
+<s></s><s></s> _(map) (Optional)_  
+<s></s><s></s> Configuration variables for the `Night` mode. Check [`enable_night_mode`]("#enable_night_mode") variable for details.  
+<s></s>  
+<s></s><s></s>**immediate**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+<s></s>  
+<s></s><s></s>**delayed**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+<s></s>  
+<s></s><s></s>**override**  
+<s></s><s></s><s></s> _(list) (Optional)_  
+<s></s><s></s><s></s> By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
+<s></s><s></s><s></s> To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
+<s></s>  
+<s></s><s></s>**pending\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Grace time _(in seconds)_ to allow for exit/entry.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#pending_time)  
+<s></s>  
+<s></s><s></s>**warning\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#warning_time)  
+<s></s>  
+<s></s><s></s>**trigger\_time**  
+<s></s><s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s><s></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> [appropriate top-level value](#trigger_time)  
+
+<span id="#enable_night_mode"> **enable\_night\_mode**</span>  
+<s></s> _(boolean) (Optional)_  
+<s></s> If `true`, adds `NIGHT` button to the panel and allows setting the alarm to Night mode via MQTT/service call.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> `false`  
+
+**enable\_persistence**  
+<s></s> _(boolean) (Optional)_  
+<s></s> If `true`, allows the alarm to save its state to file and then reinstate it in the event of power loss.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> `false`
+
+<span id="#ignore_open_sensors">
+**ignore\_open\_sensors**
+</span>  
+<s></s> _(boolean) (Optional)_  
+<s></s> If `false`, set the alarm only if there is no active sensors. Otherwise set alarm without checking sensors' states.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> `false`
+
+**users**  
+<s></s> _(list) (Optional)_  
+<s></s> List of users' configuration variables grouped by their IDs.  
+<s></s>  
+<s></s> **id**  
+<s></s><s></s> _(map) (Required)_  
+<s></s><s></s>  Unique user ID.  
+<s></s><s></s>  The integration gathers all necessary information automatically if the panel uses admin credentials when accessing Home Assistant.  
+<s></s>  
+<s></s><s></s>**name**  
+<s></s><s></s><s></s> _(string) (Required)_  
+<s></s><s></s><s></s> Human-friendly user name.  
+<s></s>  
+<s></s><s></s>**picture**  
+<s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s> Badge _(filename)_ to be used in the `Activity Log` next to this user's name.  
+<s></s>  
+<s></s><s></s>**code**  
+<s></s><s></s><s></s> _(string) (Required)_  
+<s></s><s></s><s></s> **Unique** individual passcode to set/disarm the alarm that fulfills the [passcode requirements](#passcode_requirements).  
+<s></s>  
+<s></s><s></s>**enabled**  
+<s></s><s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s><s></s> If `true`, this user can control the alarm.  
+<s></s>  
+<s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s> `true`  
+
+**mqtt**  
+<s></s> _(map) (Optional)_  
+<s></s> MQTT configuration variables. See more details about MQTT interface [below](#mqtt_interface).  
+<s></s>  
+<span id="#enable_mqtt">
+<s></s> **enable\_mqtt**
+</span>  
+<s></s><s></s> _(boolean) (Required)_  
+<s></s><s></s> Enables/disables MQTT interface of the alarm, i.e ability to control it with MQTT messages and get its status by subscribing to its state topic.  
+<s></s>  
+<s></s> **qos**  
+<s></s><s></s> _(integer) (Optional)_  
+<s></s><s></s> The maximum QoS level for MQTT messages.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> 0  
+<s></s>  
+<span id="#mqtt_state_topic">
+<s></s> **state\_topic**
+</span>  
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> The MQTT topic the alarm will publish its state updates to.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> home/alarm  
+<s></s>  
+<span id="#mqtt_command_topic">
+<s></s> **command\_topic**  
+</span>
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> The MQTT topic the alarm will subscribe to, to receive commands.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> home/alarm/set  
+<s></s>  
+<span id="#mqtt_payload_arm_away">
+<s></s> **payload\_arm\_away**  
+</span>
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> The MQTT payload to set the alarm to `Away` mode.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> ARM\_AWAY  
+<s></s>  
+<span id="#mqtt_payload_arm_home">
+<s></s> **payload\_arm\_home**  
+</span>
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> The MQTT payload to set the alarm to `Home` mode.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> ARM\_HOME  
+<s></s>  
+<span id="#mqtt_payload_arm_night">
+<s></s> **payload\_arm\_night**  
+</span>
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> The MQTT payload to set the alarm to `Night` mode.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> ARM\_NIGHT  
+<s></s>  
+<span id="#mqtt_payload_disarm">
+<s></s> **payload\_disarm**  
+</span>
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> The MQTT payload to disarm the alarm.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> DISARM  
+<s></s>  
+<s></s> **override\_code**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, allows MQTT commands to disarm the alarm without a code.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s> **pending\_on\_warning**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, publishes `pending` state when the alarm is tripped instead of `warning`.  
+<s></s><s></s> This is to allow integration with other MQTT panels which react to this state.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+
+**panel**  
+<s></s> _(map) (Optional)_  
+<s></s> Panel (GUI) configuration variables.  
+<s></s>  
+<s></s> **panel\_title**  
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> The text that shows on the header bar.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> Home Alarm  
+<s></s>  
+<s></s> **enable\_clock**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, displays current time in the status bar.  
+<s></s><s></s> Note that `sensor.time` must exist within your Home Assistant configuration for this option to work.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `true`  
+<s></s>  
+<s></s> **enable\_clock\_12hr**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, displays clock in 12hour mode.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s> **enable\_weather**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, displays the weather summary in the status bar.  
+<s></s><s></s> Note that `sensor.weather_summary` or `sensor.dark_sky_summary` must exist within your Home Assistant configuration for this option to work.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s> **enable\_sensors\_panel**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, adds `Alarm Sensors` tab to the bottom of the panel.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `true`  
+<s></s>  
+<s></s> **enable\_fahrenheit**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, displays the temperature in Fahrenheit.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s> **hide\_passcode**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, masks the passcode within the panel input box when typing.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s>**hide\_sidebar**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, this security feature hides the Home Assistant sidebar to prevent access to Home Assistant settings when the alarm is set. The sidebar re-appears when the alarm is disarmed.  
+<s></s><s></s> Note: if your Home Assistant is v96.3 or newer, go to your `Profile settings` in Home Assistant and select `Always hide the sidebar` for this option to work correctly.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `true`  
+<s></s>  
+<s></s>**hide\_sensors**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, this security feature hides the `Alarm Sensors` tab while the alarm is set.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `true`  
+<s></s>  
+<s></s>**round\_buttons**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> Choose whether the alarm buttons should be round or rectangular.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s>**shadow\_effect**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, adds shadow effect to text.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s>**enable\_serif\_font**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, `Lobster` serif font will be used to display the title, time and weather.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s>**enable\_camera\_panel**  
+<s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s> If `true`, cameras listed below to be displayed as a panel.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> `false`  
+<s></s>  
+<s></s> **cameras**  
+<s></s><s></s> _(list) (Optional)_  
+<s></s><s></s> List of cameras' entity IDs to display their feeds.  
+<s></s>  
+<s></s> **camera\_update\_interval**  
+<s></s><s></s> _(string) (Optional)_  
+<s></s><s></s> Time _(in seconds)_ the camera(s)' image updates.  
+<s></s>  
+<s></s><s></s> _Default value:_  
+<s></s><s></s> 5  
+
+<s></s> **themes**  
+<s></s><s></s> _(map) (Optional)_  
+<s></s><s></s> Themes allow you to override the default Home Assistant colors. See more details about defining colors [below](#themes_colors).  
+<s></s>  
+<s></s><s></s><s></s> **name**  
+<s></s><s></s><s></s><s></s> _(string) (Required)_  
+<s></s><s></s><s></s><s></s> Unique name of the theme.  
+<s></s>  
+<s></s><s></s><s></s> **active**  
+<s></s><s></s><s></s><s></s> _(boolean) (Optional)_  
+<s></s><s></s><s></s><s></s> Only active theme overrides default Home Assistant colors.  
+<s></s>  
+<s></s><s></s><s></s><s></s> _Default value:_  
+<s></s><s></s><s></s><s></s> `false`  
+<s></s>  
+<s></s><s></s><s></s> **disarmed\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> When the alarm is disarmed the panel will display this color in both the top header background and the centre panel background.  
+<s></s>  
+<s></s><s></s><s></s> **pending\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> When the alarm is arming the panel will display this color in both the top header background and the centre panel background.  
+<s></s>  
+<s></s><s></s><s></s> **armed\_away\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> When the alarm is in `Away` mode the panel will display this color in both the top header background and the centre panel background.  
+<s></s>  
+<s></s><s></s><s></s> **armed\_home\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> When the alarm is in `Home` mode the panel will display this color in both the top header background and the centre panel background.  
+<s></s>  
+<s></s><s></s><s></s> **armed\_night\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> When the alarm is in `Night` mode the panel will display this color in both the top header background and the centre panel background.  
+<s></s>  
+<s></s><s></s><s></s> **warning\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> If a sensor is tripped when the alarm is set the panel will display this color in both the top header background and the centre panel background.  
+<s></s>  
+<s></s><s></s><s></s> **triggered\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> When the alarm has been triggered the panel will display this color in both the top header background and the centre panel background.  
+<s></s>  
+<s></s><s></s><s></s> **panel\_background\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The background color of the main content section.  
+<s></s>  
+<s></s><s></s><s></s> **panel\_outer\_background\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The background color of both the status bar and the menu bar.  
+<s></s>  
+<s></s><s></s><s></s> **panel\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the general text within the panel.  
+<s></s>  
+<s></s><s></s><s></s> **header\_background\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The background color of very top header bar.  
+<s></s>  
+<s></s><s></s><s></s> **header\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The text color on very top header bar.  
+<s></s>  
+<s></s><s></s><s></s> **alarmstatus\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The text color to display the alarm status.  
+<s></s>  
+<s></s><s></s><s></s> **time\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The text color to display time.  
+<s></s>  
+<s></s><s></s><s></s> **weather\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The text color to display weather summary.  
+<s></s>  
+<s></s><s></s><s></s> **weather\_image\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of weather image.  
+<s></s>  
+<s></s><s></s><s></s> **info\_header\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the heading within a particular section.  
+<s></s>  
+<s></s><s></s><s></s> **info\_detail\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the descriptive text within a particular section.  
+<s></s>  
+<s></s><s></s><s></s> **title\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the title text within a particular section.  
+<s></s>  
+<s></s><s></s><s></s> **subtitle\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the subtitle text within a particular section.  
+<s></s>  
+<s></s><s></s><s></s> **opensensors\_title\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the `Open Sensors` dialog.  
+<s></s>  
+<s></s><s></s><s></s> **button\_background\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The background color of the alarm buttons.  
+<s></s>  
+<s></s><s></s><s></s> **cancel\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The background color of the `Cancel` button.  
+<s></s>  
+<s></s><s></s><s></s> **override\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The background color of the `Override` button.  
+<s></s>  
+<s></s><s></s><s></s> **info\_panel\_buttons\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the menu buttons.  
+<s></s>  
+<s></s><s></s><s></s> **arm\_button\_border\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The border color of the alarm buttons.  
+<s></s>  
+<s></s><s></s><s></s> **arm\_button\_text\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the text within the alarm buttons.  
+<s></s>  
+<s></s><s></s><s></s> **paper\_listbox\_background\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The background color of the listboxes.  
+<s></s>  
+<s></s><s></s><s></s> **paper\_listbox\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The text color within the listboxes.  
+<s></s>  
+<s></s><s></s><s></s> **paper\_item\_selected\_\_\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The text color of the item selected within a selection box.  
+<s></s>  
+<s></s><s></s><s></s> **action\_button\_border\_color**  
+<s></s><s></s><s></s><s></s> _(string) (Optional)_  
+<s></s><s></s><s></s><s></s> The color of the border surrounding the action buttons.  
+
+**admin\_password**  
+<s></s> _(string) (Optional)_  
+<s></s> Password to access the `Settings` tab.  
+<s></s>  
+<s></s> _Default value:_  
+<s></s> HG28!!&dn  
+
+
+### BOOLEAN VALUES CONVENTION
+Boolean values `true` and `false` are **case-sensitive**.  
+Boolean `true` can be substituted by its **case-insensitive** string equivalent "1", "true", "yes", "on" or "enable", or any non-zero integer.  
+Boolean `false` can be substituted by any string apart from string equivalents of `true`, or number `0`.  
+
+<span id="#service_calls">
+### SERVICE CALLS
+</span>
+All service calls use domain `alarm_control_panel` and accept the `entity_id` parameter:  
+**entity\_id**  
+<s></s> _(string) (Optional)_  
+<s></s> Full name _(domain.object\_id)_ of the alarm integration entity to control. If no such variable used, the service call will applicable to all entities of this integration.  
+
+<span id="#arm_passcode_requrements">
+</span>
+Service calls `alarm_arm_home`, `alarm_arm_away` and `alarm_arm_night` accept optional `code` parameter that has extended specification compared to [passcode requirements](#passcode_requirements) by allowing a special code "override".  
+This special code tells the alarm to set immediately, while with a normal code the alarm will change its state to `pending` first for the corresponding `pending_time` and then change to a corresponding Armed state.  
+These service calls also take into account value of [`ignore_open_sensors`](#ignore_open_sensors) configuration variable. If it is `false` (default value, i.e safe arming), the alarm will be set only if there is no active sensors detected.  
+
+There is `set_ignore_open_sensors` service call that allows to change value of `ignore_open_sensors` configuration variable.  
+Please refer to the [services' description](../services.yaml) and the [Examples](examples.yaml#service_calls) page for more details.  
+  
+<span id="#mqtt_interface">
+### MQTT INTERFACE
+</span>
+When MQTT interface is [enabled](#enable_mqtt), the alarm publishes its status to the [state topic](#mqtt_state_topic) and listens to commands on the [command topic](#mqtt_command_topic).  
+There are three arm commands (for [`Away`](#mqtt_payload_arm_away), [`Home`](#mqtt_payload_arm_home) and [`Night`](#mqtt_payload_arm_night)) and one [disarm](#mqtt_payload_disarm) command and they behave exactly as corresponding [service calls](#service_calls) do.
+All commands are case-insensitive and accept parameters in a form of a [JSON object](http://www.json.org).  
+Please refer to the [Examples](examples.yaml#mqtt_interface) page for more details.
+
+### SETTING ALARM FROM THE PANEL
+Note that if you set the alarm from the panel, it always checks for active sensors and let you choose between `Arm anyway` and `Cancel arming` if any detected.
+
+<span id="#themes_colors">
+### THEMES' COLORS
+</span>
+Color string should contain a [standard HTML color name, hex color code or RGB value](https://htmlcolorcodes.com).  
+All optional themes' colors are `black` by default.  
