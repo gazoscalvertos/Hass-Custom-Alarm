@@ -43,7 +43,7 @@ Manually:
 Currently the update process is pretty much similar to installation:  
 1. Copy a new release archive/clone the repository from GotHub to a local folder on your computer.
 2. You only need to copy `custom_components/bwalarm` folder from the downloaded release into your `<Home Assistant config folder>/custom_components` folder.
-3. Please note that you DON'T need to overwrite `<Home Assistant config folder>/resources` folder in Home Assistant structure as it contains your integration's configuration file (and possibly some additional resources).
+3. Please note that you DON'T need to overwrite `<Home Assistant config folder>/resources` folder as it contains your integration's configuration file (and possibly some additional resources).
 
 Using [HACS](https://github.com/custom-components/hacs):  
 1. Click on **Community** in the left hand side menu on Home Assistant frontend
