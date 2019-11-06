@@ -7,7 +7,7 @@
 [Here](examples/automations.yaml) you can find out how to react to the alarm states in Home Assistant using automations.  
 
 <span id="#service_calls">
-### SERVICE CALLS
+### SERVICE CALLS  
 </span>
 Set value of `ignore_open_sensors` configuration variable:
 <code><pre>
@@ -26,7 +26,7 @@ has the same effect as
      value: false
 </pre></code>
 
-<span id="#mqtt_interface">
+<span id="#mqtt_interface">  
 ### MQTT INTERFACE
 </span>
 Set the `Away` mode after a configured `pending_time`:
