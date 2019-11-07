@@ -751,7 +751,7 @@ This special code tells the alarm to set immediately, while with a normal code t
 These service calls also take into account value of [`ignore_open_sensors`](#ignore_open_sensors) configuration variable. If it is `false` (default value, i.e safe arming), the alarm will be set only if there is no active sensors detected.  
 
 There is `set_ignore_open_sensors` service call that allows to change value of `ignore_open_sensors` configuration variable.  
-Please refer to the [services' description](../../services.yaml) and the [Examples](examples.md#service-calls) page for more details.  
+Please refer to the [services' description](../../services.yaml) and [examples](examples.md#service-calls) for more details.  
 
 ### MQTT INTERFACE
 When MQTT interface is [enabled](#mqtt-enable_mqtt), the alarm publishes its status to the [state topic](#mqtt-state_topic) and listens to commands on the [command topic](#mqtt-command_topic).  
