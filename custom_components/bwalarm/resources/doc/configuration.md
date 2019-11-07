@@ -9,7 +9,7 @@
 &nbsp;&nbsp;&nbsp; bwalarm  
 
 <a id="name"></a>
-**name**
+**name**  
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
 &nbsp;&nbsp;&nbsp; Name of the integration entity.  
 &nbsp;  
@@ -17,7 +17,7 @@
 &nbsp;&nbsp;&nbsp; House  
 
 <a id="pending_time"></a>
-**pending_time**
+**pending_time**  
 &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
 &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
 &nbsp;  
@@ -25,7 +25,7 @@
 &nbsp;&nbsp;&nbsp; 25  
 
 <a id="warning_time"></a>
-**warning_time**
+**warning_time**  
 &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
 &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
 &nbsp;  
@@ -33,7 +33,7 @@
 &nbsp;&nbsp;&nbsp; 25  
 
 <a id="trigger_time"></a>
-**trigger_time**
+**trigger_time**  
 &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
 &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
 &nbsp;  
@@ -41,15 +41,16 @@
 &nbsp;&nbsp;&nbsp; 600  
 
 <a id="code"></a>
-**code**
+**code**  
 &nbsp;&nbsp;&nbsp; _(string) (Required)_  
+<a id="passcode_requirements"></a>
 &nbsp;&nbsp;&nbsp; Master passcode to set/disarm the alarm. It must consist of one or more digits surrounded by quotes.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; _Default value:_  
 &nbsp;&nbsp;&nbsp; 600  
 
 <a id="code_to_arm"></a>
-**code_to_arm**
+**code_to_arm**  
 &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
 &nbsp;&nbsp;&nbsp; If `true`, a master/user passcode is required to set the alarm via panel/MQTT command/service call.  
 &nbsp;  
@@ -57,7 +58,7 @@
 &nbsp;&nbsp;&nbsp; `false`  
 
 <a id="passcode_attempts"></a>
-**passcode_attempts**
+**passcode_attempts**  
 &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
 &nbsp;&nbsp;&nbsp; If greater than 0, the system will only allow the set amount of password attempts before timing out.  
 &nbsp;&nbsp;&nbsp; `-1` allows for unlimited number of attempts.  
@@ -66,7 +67,7 @@
 &nbsp;&nbsp;&nbsp; -1  
 
 <a id="passcode_attempts_timeout"></a>
-**passcode_attempts_timeout**
+**passcode_attempts_timeout**  
 &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
 &nbsp;&nbsp;&nbsp; When `passcode_attempts`>0 and the passcode is entered incorrectly `passcode_attempts` times,    
 &nbsp;&nbsp;&nbsp; the panel will timeout for the amount set _(in seconds)_ and then reset the number of passcode attempts.  
@@ -75,7 +76,7 @@
 &nbsp;&nbsp;&nbsp; 30  
 
 <a id="panic_code"></a>
-**panic_code**
+**panic_code**  
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
 &nbsp;&nbsp;&nbsp; Panic passcode disarms the alarm and set a special panic mode attribute that could be used in your automations  
 &nbsp;&nbsp;&nbsp; to send a notification to the police/spouse/neighbour that you are under duress.  
@@ -83,29 +84,29 @@
 &nbsp;&nbsp;&nbsp; It must consist of one or more digits surrounded by quotes.  
 
 <a id="custom_supported_statuses_on"></a>
-**custom_supported_statuses_on**
+**custom_supported_statuses_on**  
 &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
 &nbsp;&nbsp;&nbsp; List of strings to consider as sensor's `on` states in addition to standard ones.  
 &nbsp;&nbsp;&nbsp; Allows to use sensors that do not have standard (`on`, `True`, `detected` etc) `on` states.  
 
 <a id="custom_supported_statuses_off"></a>
-**custom_supported_statuses_off**
+**custom_supported_statuses_off**  
 &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
 &nbsp;&nbsp;&nbsp; List of strings to consider as sensor's `off` states in addition to standard ones.  
 &nbsp;&nbsp;&nbsp; Allows to use sensors that do not have standard (`off`, `False`, `closed` etc) `off` states.  
 
 <a id="warning"></a>
-**warning**
+**warning**  
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
 &nbsp;&nbsp;&nbsp; Entity ID to turn on when the alarm has been tripped.  
 
 <a id="alarm"></a>
-**alarm**
+**alarm**  
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
 &nbsp;&nbsp;&nbsp; Entity ID to turn on when the alarm has been triggered.  
 
 <a id="enable_log"></a>
-**enable_log**
+**enable_log**  
 &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
 &nbsp;&nbsp;&nbsp; If `true`, the alarm saves log of actions to a file. Its content is available in the `Activity Log` tab at the bottom of the panel.   
 &nbsp;  
@@ -113,7 +114,7 @@
 &nbsp;&nbsp;&nbsp; `true`  
 
 <a id="log_size"></a>
-**log_size**
+**log_size**  
 &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
 &nbsp;&nbsp;&nbsp; Maximum number of the last events to display in the log file.  
 &nbsp;  
@@ -269,7 +270,7 @@
 &nbsp;&nbsp;&nbsp;`false`  
 
 <a id="enable_persistence"></a>
-**enable_persistence**
+**enable_persistence**  
 &nbsp;&nbsp;&nbsp;_(boolean) (Optional)_  
 &nbsp;&nbsp;&nbsp;If `true`, allows the alarm to save its state to file and then reinstate it in the event of power loss.  
 &nbsp;  
@@ -319,7 +320,7 @@
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `true`  
 
 <a id="mqtt"></a>
-**mqtt**
+**mqtt**  
 &nbsp;&nbsp;&nbsp;_(map) (Optional)_  
 &nbsp;&nbsp;&nbsp; MQTT configuration variables. See more details about MQTT interface [below](#mqtt_interface).  
 &nbsp;  
@@ -402,7 +403,7 @@
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
 
 <a id="panel"></a>
-**panel**
+**panel**  
 &nbsp;&nbsp;&nbsp;_(map) (Optional)_  
 &nbsp;&nbsp;&nbsp; Panel (GUI) configuration variables.  
 &nbsp;  
@@ -715,12 +716,12 @@ Boolean `false` can be substituted by any string apart from string equivalents o
 
 ### SERVICE CALLS
 All service calls use domain `alarm_control_panel` and accept the `entity_id` parameter:  
-**entity_id**
+**entity_id**  
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
 &nbsp;&nbsp;&nbsp; Full name _(domain.object\_id)_ of the alarm integration entity to control. If no such variable used, the service call will applicable to all entities of this integration.  
 
 #### ARM PASSCODE REQUIREMENTS
-Service calls `alarm_arm_home`, `alarm_arm_away` and `alarm_arm_night` accept optional `code` parameter that has extended specification compared to [passcode requirements](#code) by allowing a special code "override".  
+Service calls `alarm_arm_home`, `alarm_arm_away` and `alarm_arm_night` accept optional `code` parameter that has extended specification compared to [passcode requirements](#passcode_requirements) by allowing a special code "override".  
 This special code tells the alarm to set immediately, while with a normal code the alarm will change its state to `pending` first for the corresponding `pending_time` and then change to a corresponding Armed state.  
 These service calls also take into account value of [`ignore_open_sensors`](#ignore_open_sensors) configuration variable. If it is `false` (default value, i.e safe arming), the alarm will be set only if there is no active sensors detected.  
 
@@ -728,8 +729,8 @@ There is `set_ignore_open_sensors` service call that allows to change value of `
 Please refer to the [services' description](../../services.yaml) and the [Examples](examples.md#service-calls) page for more details.  
 
 ### MQTT INTERFACE
-When MQTT interface is [enabled](#enable_mqtt), the alarm publishes its status to the [state topic](#state_topic) and listens to commands on the [command topic](#command_topic).  
-There are three arm commands (for [`Away`](#payload_arm_away), [`Home`](#payload_arm_home) and [`Night`](#payload_arm_night)) and one [disarm](#payload_disarm) command and they behave exactly as corresponding [service calls](#service-calls) do.
+When MQTT interface is [enabled](#mqtt-enable_mqtt), the alarm publishes its status to the [state topic](#mqtt-state_topic) and listens to commands on the [command topic](#mqtt-command_topic).  
+There are three arm commands (for [`Away`](#mqtt-payload_arm_away), [`Home`](#mqtt-payload_arm_home) and [`Night`](#mqtt-payload_arm_night)) and one [disarm](#mqtt-payload_disarm) command and they behave exactly as corresponding [service calls](#service-calls) do.
 All commands are case-insensitive and accept parameters in a form of a [JSON object](http://www.json.org).  
 Please refer to the [Examples](examples.md#mqtt-interface) page for more details.
 
