@@ -3,7 +3,8 @@
 #### states
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
 &nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
-<a id="#cba"></a>
+  
+<a id="cba"></a>
 &nbsp;&nbsp;&nbsp; **armed_away**  
   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
@@ -57,3 +58,4 @@ Disarm the alarm if `override_code` is `false`:
 ```javascript
   home/alarm/set DISARM {"code": 1234}
 ```
+[link](user-content-cba)
