@@ -1,687 +1,711 @@
 # Configuration variables (in bwalarm.yaml)
 
-#### platform
-<s style="margin-left:1em;"></s> _(string) (Required)_  
-<s style="margin-left:1em;"></s> Domain name of this integration. **Please do not change**.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> bwalarm  
-
-#### name
-<s style="margin-left:1em;"></s> _(string) (Optional)_  
-<s style="margin-left:1em;"></s> Name of the integration entity.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> House  
-
-#### pending\_time
-<s style="margin-left:1em;"></s> _(integer) (Optional)_  
-<s style="margin-left:1em;"></s> Grace time _(in seconds)_ to allow for exit/entry.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> 25  
-
-#### warning\_time
-<s style="margin-left:1em;"></s> _(integer) (Optional)_  
-<s style="margin-left:1em;"></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> 25  
-
-#### trigger\_time
-<s style="margin-left:1em;"></s> _(integer) (Optional)_  
-<s style="margin-left:1em;"></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> 600  
-
-#### code
-<s style="margin-left:1em;"></s> _(string) (Required)_  
-<s style="margin-left:1em;"></s> Master passcode to set/disarm the alarm. It must consist of one or more digits surrounded by quotes.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> 600  
-
-#### code\_to\_arm
-<s style="margin-left:1em;"></s> _(boolean) (Optional)_  
-<s style="margin-left:1em;"></s> If `true`, a master/user passcode is required to set the alarm via panel/MQTT command/service call.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> `false`  
-
-#### passcode\_attempts
-<s style="margin-left:1em;"></s> _(integer) (Optional)_  
-<s style="margin-left:1em;"></s> If greater than 0, the system will only allow the set amount of password attempts before timing out.  
-<s style="margin-left:1em;"></s> `-1` allows for unlimited number of attempts.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> -1  
-
-#### passcode\_attempts\_timeout
-<s style="margin-left:1em;"></s> _(integer) (Optional)_  
-<s style="margin-left:1em;"></s> When `passcode_attempts`>0 and the passcode is entered incorrectly `passcode_attempts` times,    
-<s style="margin-left:1em;"></s> the panel will timeout for the amount set _(in seconds)_ and then reset the number of passcode attempts.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> 30  
-
-#### panic\_code
-<s style="margin-left:1em;"></s> _(string) (Optional)_  
-<s style="margin-left:1em;"></s> Panic passcode disarms the alarm and set a special panic mode attribute that could be used in your automations  
-<s style="margin-left:1em;"></s> to send a notification to the police/spouse/neighbour that you are under duress.  
-<s style="margin-left:1em;"></s> To clear this attribute arm and then disarm your alarm in the usual manner.  
-<s style="margin-left:1em;"></s> It must consist of one or more digits surrounded by quotes.  
-
-#### custom\_supported\_statuses\_on
-<s style="margin-left:1em;"></s> _(list) (Optional)_  
-<s style="margin-left:1em;"></s> List of strings to consider as sensor's `on` states in addition to standard ones.  
-<s style="margin-left:1em;"></s> Allows to use sensors that do not have standard (`on`, `True`, `detected` etc) `on` states.  
-
-#### custom\_supported\_statuses\_off
-<s style="margin-left:1em;"></s> _(list) (Optional)_  
-<s style="margin-left:1em;"></s> List of strings to consider as sensor's `off` states in addition to standard ones.  
-<s style="margin-left:1em;"></s> Allows to use sensors that do not have standard (`off`, `False`, `closed` etc) `off` states.  
-
-#### warning
-<s style="margin-left:1em;"></s> _(string) (Optional)_  
-<s style="margin-left:1em;"></s> Entity ID to turn on when the alarm has been tripped.  
-
-#### alarm
-<s style="margin-left:1em;"></s> _(string) (Optional)_  
-<s style="margin-left:1em;"></s> Entity ID to turn on when the alarm has been triggered.  
-
-#### enable\_log
-<s style="margin-left:1em;"></s> _(boolean) (Optional)_  
-<s style="margin-left:1em;"></s> If `true`, the alarm saves log of actions to a file. Its content is available in the `Activity Log` tab at the bottom of the panel.   
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> `true`  
-
-#### log\_size
-<s style="margin-left:1em;"></s> _(integer) (Optional)_  
-<s style="margin-left:1em;"></s> Maximum number of the last events to display in the log file.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> 10  
-
-#### states
-<s style="margin-left:1em;"></s> _(map) (Optional)_  
-<s style="margin-left:1em;"></s> Configurations for supported alarm modes.  
-  <s></s>  
-  <h4 style="margin-left:1em;"> armed_away </h4>
-
-  <s style="margin-left:3em;"></s> _(map) (Required)_  
-  <s style="margin-left:3em;"></s> Configuration variables for the `Away` mode.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> immediate </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> delayed </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> override </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> By default upon setting the alarm it checks if any the of sensors from `immediate` and `delayed` lists are `on` and does not proceed without user confirmation if any of them are `on`.  
-  <s style="margin-left:4em;"></s> To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> pending_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Grace time _(in seconds)_ to allow for exit/entry.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#pending_time)  
-  <s></s>  
-  <h4 style="margin-left:2em;"> warning_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#warning_time)  
-  <s></s>  
-  <h4 style="margin-left:2em;"> trigger_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#trigger_time)  
-  <s></s>  
-  <h4 style="margin-left:1em;"> armed_home </h4>
-
-  <s style="margin-left:3em;"></s> _(map) (Required)_  
-  <s style="margin-left:3em;"></s> Configuration variables for the `Home` mode.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> immediate </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> delayed </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> override </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
-  <s style="margin-left:4em;"></s> To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> pending_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Grace time _(in seconds)_ to allow for exit/entry.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#pending_time)  
-  <s></s>  
-  <h4 style="margin-left:2em;"> warning_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#warning_time)  
-  <s></s>  
-  <h4 style="margin-left:2em;"> trigger_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#trigger_time)  
-  <s></s>  
-  <h4 style="margin-left:1em;"> armed_night </h4>
-
-  <s style="margin-left:3em;"></s> _(map) (Optional)_  
-  <s style="margin-left:3em;"></s> Configuration variables for the `Night` mode. Check [`enable_night_mode`]("#enable_night_mode") variable for details.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> immediate </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> delayed </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> override </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
-  <s style="margin-left:4em;"></s> To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> pending_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Grace time _(in seconds)_ to allow for exit/entry.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#pending_time)  
-  <s></s>  
-  <h4 style="margin-left:2em;"> warning_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#warning_time)  
-  <s></s>  
-  <h4 style="margin-left:2em;"> trigger_time </h4>
-
-  <s style="margin-left:4em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:4em;"></s> Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> [appropriate top-level value](#trigger_time)  
-
-#### enable\_night\_mode  
-<s style="margin-left:1em;"></s>_(boolean) (Optional)_  
-<s style="margin-left:1em;"></s>If `true`, adds `NIGHT` button to the panel and allows setting the alarm to Night mode via MQTT/service call.  
-<s></s>  
-<s style="margin-left:1em;"></s>_Default value:_  
-<s style="margin-left:1em;"></s>`false`  
-
-#### enable\_persistence
-<s style="margin-left:1em;"></s>_(boolean) (Optional)_  
-<s style="margin-left:1em;"></s>If `true`, allows the alarm to save its state to file and then reinstate it in the event of power loss.  
-<s></s>  
-<s style="margin-left:1em;"></s>_Default value:_  
-<s style="margin-left:1em;"></s>`false`
-
-#### ignore\_open\_sensors  
-<s style="margin-left:1em;"></s>_(boolean) (Optional)_  
-<s style="margin-left:1em;"></s>If `false`, set the alarm only if there is no active sensors. Otherwise set alarm without checking sensors' states.  
-<s></s>  
-<s style="margin-left:1em;"></s>_Default value:_  
-<s style="margin-left:1em;"></s>`false`
-
-#### users
-<s style="margin-left:1em;"></s>_(list) (Optional)_  
-<s style="margin-left:1em;"></s>List of users' configuration variables grouped by their IDs.  
-<s></s>  
-  <h4 style="margin-left:1em;"> id </h4>
-
-  <s style="margin-left:2em;"></s> _(map) (Required)_  
-  <s style="margin-left:2em;"></s>  Unique user ID.  
-  <s style="margin-left:2em;"></s>  The integration gathers all necessary information automatically if the panel uses admin credentials when accessing Home Assistant.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> name </h4>
-
-  <s style="margin-left:4em;"></s> _(string) (Required)_  
-  <s style="margin-left:4em;"></s> Human-friendly user name.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> picture </h4>
-
-  <s style="margin-left:4em;"></s> _(string) (Optional)_  
-  <s style="margin-left:4em;"></s> Badge _(filename)_ to be used in the `Activity Log` next to this user's name.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> code </h4>
-
-  <s style="margin-left:4em;"></s> _(string) (Required)_  
-  <s style="margin-left:4em;"></s> **Unique** individual passcode to set/disarm the alarm that fulfills the [passcode requirements](#passcode_requirements).  
-  <s></s>  
-  <h4 style="margin-left:2em;"> enabled </h4>
-
-  <s style="margin-left:4em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:4em;"></s> If `true`, this user can control the alarm.  
-  <s></s>  
-  <s style="margin-left:4em;"></s> _Default value:_  
-  <s style="margin-left:4em;"></s> `true`  
-
-#### mqtt
-<s style="margin-left:1em;"></s>_(map) (Optional)_  
-<s style="margin-left:1em;"></s>MQTT configuration variables. See more details about MQTT interface [below](#mqtt_interface).  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_mqtt </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Required)_  
-  <s style="margin-left:3em;"></s> Enables/disables MQTT interface of the alarm, i.e ability to control it with MQTT messages and get its status by subscribing to its state topic.  
-  <s></s>  
-  <h4 style="margin-left:1em;"> qos </h4>
-
-  <s style="margin-left:3em;"></s> _(integer) (Optional)_  
-  <s style="margin-left:3em;"></s> The maximum QoS level for MQTT messages.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> 0  
-  <s></s>  
-  <h4 style="margin-left:1em;"> state_topic </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s> The MQTT topic the alarm will publish its state updates to.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> home/alarm  
-  <s></s>  
-  <h4 style="margin-left:1em;"> command_topic </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s> The MQTT topic the alarm will subscribe to, to receive commands.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> home/alarm/set  
-  <s></s>  
-  <h4 style="margin-left:1em;"> payload_arm_away </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s> The MQTT payload to set the alarm to `Away` mode.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> ARM\_AWAY  
-  <s></s>  
-  <h4 style="margin-left:1em;"> payload_arm_home </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s> The MQTT payload to set the alarm to `Home` mode.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> ARM\_HOME  
-  <s></s>  
-  <h4 style="margin-left:1em;"> payload_arm_night </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s> The MQTT payload to set the alarm to `Night` mode.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> ARM\_NIGHT  
-  <s></s>  
-  <h4 style="margin-left:1em;"> payload_disarm </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s> The MQTT payload to disarm the alarm.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> DISARM  
-  <s></s>  
-  <h4 style="margin-left:1em;"> override_code </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, allows MQTT commands to disarm the alarm without a code.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> pending_on_warning </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, publishes `pending` state when the alarm is tripped instead of `warning`.  
-  <s style="margin-left:3em;"></s> This is to allow integration with other MQTT panels which react to this state.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-
-#### panel
-<s style="margin-left:1em;"></s>_(map) (Optional)_  
-<s style="margin-left:1em;"></s> Panel (GUI) configuration variables.  
-  <s></s>  
-  <h4 style="margin-left:1em;"> panel_title </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s>The text that shows on the header bar.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> Home Alarm  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_clock </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, displays current time in the status bar.  
-  <s style="margin-left:3em;"></s> Note that `sensor.time` must exist within your Home Assistant configuration for this option to work.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `true`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_clock_12hr </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, displays clock in 12hour mode.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_weather </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, displays the weather summary in the status bar.  
-  <s style="margin-left:3em;"></s> Note that `sensor.weather_summary` or `sensor.dark_sky_summary` must exist within your Home Assistant configuration for this option to work.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_sensors_panel </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, adds `Alarm Sensors` tab to the bottom of the panel.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `true`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_fahrenheit </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, displays the temperature in Fahrenheit.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> hide_passcode </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, masks the passcode within the panel input box when typing.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> hide_sidebar </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, this security feature hides the Home Assistant sidebar to prevent access to Home Assistant settings when the alarm is set. The sidebar re-appears when the alarm is disarmed.  
-  <s style="margin-left:3em;"></s> Note: if your Home Assistant is v96.3 or newer, go to your `Profile settings` in Home Assistant and select `Always hide the sidebar` for this option to work correctly.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `true`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> hide_sensors </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, this security feature hides the `Alarm Sensors` tab while the alarm is set.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `true`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> round_buttons </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> Choose whether the alarm buttons should be round or rectangular.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> shadow_effect </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, adds shadow effect to text.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_serif_font </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, `Lobster` serif font will be used to display the title, time and weather.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> enable_camera_panel </h4>
-
-  <s style="margin-left:3em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:3em;"></s> If `true`, cameras listed below to be displayed as a panel.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:1em;"> cameras </h4>
-
-  <s style="margin-left:3em;"></s> _(list) (Optional)_  
-  <s style="margin-left:3em;"></s> List of cameras' entity IDs to display their feeds.  
-  <s></s>  
-  <h4 style="margin-left:1em;"> camera_update_interval </h4>
-
-  <s style="margin-left:3em;"></s> _(string) (Optional)_  
-  <s style="margin-left:3em;"></s> Time _(in seconds)_ the camera(s)' image updates.  
-  <s></s>  
-  <s style="margin-left:3em;"></s> _Default value:_  
-  <s style="margin-left:3em;"></s> 5  
-
-  <h4 style="margin-left:1em;"> themes </h4>
-
-  <s style="margin-left:3em;"></s> _(map) (Optional)_  
-  <s style="margin-left:3em;"></s> Themes allow you to override the default Home Assistant colors. See more details about defining colors [below](#themes_colors).  
-  <s></s>  
-  <h4 style="margin-left:2em;"> name </h4>
-
-  <s style="margin-left:4em;"></s> _(string) (Required)_  
-  <s style="margin-left:4em;"></s> Unique name of the theme.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> active </h4>
-
-  <s style="margin-left:5em;"></s> _(boolean) (Optional)_  
-  <s style="margin-left:5em;"></s> Only active theme overrides default Home Assistant colors.  
-  <s></s>  
-  <s style="margin-left:5em;"></s> _Default value:_  
-  <s style="margin-left:5em;"></s> `false`  
-  <s></s>  
-  <h4 style="margin-left:3em;"> disarmed_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> When the alarm is disarmed the panel will display this color in both the top header background and the centre panel background.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> pending_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> When the alarm is arming the panel will display this color in both the top header background and the centre panel background.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> armed_away_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> When the alarm is in `Away` mode the panel will display this color in both the top header background and the centre panel background.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> armed_home_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> When the alarm is in `Home` mode the panel will display this color in both the top header background and the centre panel background.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> armed_night_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> When the alarm is in `Night` mode the panel will display this color in both the top header background and the centre panel background.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> warning_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> If a sensor is tripped when the alarm is set the panel will display this color in both the top header background and the centre panel background.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> triggered_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> When the alarm has been triggered the panel will display this color in both the top header background and the centre panel background.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> panel_background_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The background color of the main content section.  
-  <s></s>  
-  <h4 style="margin-left:4em;"> panel_outer_background_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The background color of both the status bar and the menu bar.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> panel_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the general text within the panel.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> header_background_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The background color of very top header bar.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> header_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The text color on very top header bar.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> alarmstatus_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The text color to display the alarm status.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> time_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The text color to display time.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> weather_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The text color to display weather summary.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> weather_image_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of weather image.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> info_header_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the heading within a particular section.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> info_detail_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the descriptive text within a particular section.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> title_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the title text within a particular section.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> subtitle_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the subtitle text within a particular section.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> opensensors_title_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the `Open Sensors` dialog.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> button_background_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The background color of the alarm buttons.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> cancel_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The background color of the `Cancel` button.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> override_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The background color of the `Override` button.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> info_panel_buttons_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the menu buttons.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> arm_button_border_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The border color of the alarm buttons.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> arm_button_text_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the text within the alarm buttons.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> paper_listbox_background_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The background color of the listboxes.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> paper_listbox_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The text color within the listboxes.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> paper_item_selected___color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The text color of the item selected within a selection box.  
-  <s></s>  
-  <h4 style="margin-left:3em;"> action_button_border_color </h4>
-
-  <s style="margin-left:5em;"></s> _(string) (Optional)_  
-  <s style="margin-left:5em;"></s> The color of the border surrounding the action buttons.  
-
-#### admin\_password
-<s style="margin-left:1em;"></s> _(string) (Optional)_  
-<s style="margin-left:1em;"></s> Password to access the `Settings` tab.  
-<s></s>  
-<s style="margin-left:1em;"></s> _Default value:_  
-<s style="margin-left:1em;"></s> HG28!!&dn  
+<a id="platform"></a>
+**platform**  
+&nbsp;&nbsp;&nbsp; _(string) (Required)_  
+&nbsp;&nbsp;&nbsp; Domain name of this integration. **Please do not change**.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; bwalarm  
+
+<a id="name"></a>
+**name**
+&nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; Name of the integration entity.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; House  
+
+<a id="pending_time"></a>
+**pending_time**
+&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; 25  
+
+<a id="warning_time"></a>
+**warning_time**
+&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; 25  
+
+<a id="trigger_time"></a>
+**trigger_time**
+&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; 600  
+
+<a id="code"></a>
+**code**
+&nbsp;&nbsp;&nbsp; _(string) (Required)_  
+&nbsp;&nbsp;&nbsp; Master passcode to set/disarm the alarm. It must consist of one or more digits surrounded by quotes.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; 600  
+
+<a id="code_to_arm"></a>
+**code_to_arm**
+&nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; If `true`, a master/user passcode is required to set the alarm via panel/MQTT command/service call.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; `false`  
+
+<a id="passcode_attempts"></a>
+**passcode_attempts**
+&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; If greater than 0, the system will only allow the set amount of password attempts before timing out.  
+&nbsp;&nbsp;&nbsp; `-1` allows for unlimited number of attempts.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; -1  
+
+<a id="passcode_attempts_timeout"></a>
+**passcode_attempts_timeout**
+&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; When `passcode_attempts`>0 and the passcode is entered incorrectly `passcode_attempts` times,    
+&nbsp;&nbsp;&nbsp; the panel will timeout for the amount set _(in seconds)_ and then reset the number of passcode attempts.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; 30  
+
+<a id="panic_code"></a>
+**panic_code**
+&nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; Panic passcode disarms the alarm and set a special panic mode attribute that could be used in your automations  
+&nbsp;&nbsp;&nbsp; to send a notification to the police/spouse/neighbour that you are under duress.  
+&nbsp;&nbsp;&nbsp; To clear this attribute arm and then disarm your alarm in the usual manner.  
+&nbsp;&nbsp;&nbsp; It must consist of one or more digits surrounded by quotes.  
+
+<a id="custom_supported_statuses_on"></a>
+**custom_supported_statuses_on**
+&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; List of strings to consider as sensor's `on` states in addition to standard ones.  
+&nbsp;&nbsp;&nbsp; Allows to use sensors that do not have standard (`on`, `True`, `detected` etc) `on` states.  
+
+<a id="custom_supported_statuses_off"></a>
+**custom_supported_statuses_off**
+&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; List of strings to consider as sensor's `off` states in addition to standard ones.  
+&nbsp;&nbsp;&nbsp; Allows to use sensors that do not have standard (`off`, `False`, `closed` etc) `off` states.  
+
+<a id="warning"></a>
+**warning**
+&nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; Entity ID to turn on when the alarm has been tripped.  
+
+<a id="alarm"></a>
+**alarm**
+&nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; Entity ID to turn on when the alarm has been triggered.  
+
+<a id="enable_log"></a>
+**enable_log**
+&nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; If `true`, the alarm saves log of actions to a file. Its content is available in the `Activity Log` tab at the bottom of the panel.   
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; `true`  
+
+<a id="log_size"></a>
+**log_size**
+&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; Maximum number of the last events to display in the log file.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; 10  
+
+<a id="states"></a>
+**states**  
+&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
+&nbsp;  
+<a id="states-armed_away"></a>
+&nbsp;&nbsp;&nbsp; **armed_away**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
+&nbsp;  
+<a id="states-armed_away-immediate"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **immediate**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+&nbsp;  
+<a id="states-armed_away-delayed"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+&nbsp;  
+<a id="states-armed_away-pending_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **override**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm it checks if any the of sensors from `immediate` and `delayed` lists are `on` and does not proceed without user confirmation if any of them are `on`.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
+&nbsp;  
+<a id="states-armed_away-"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **pending_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#pending_time)  
+&nbsp;  
+<a id="states-armed_away-warning_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **warning_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#warning_time)  
+&nbsp;  
+<a id="states-armed_away-trigger_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **trigger_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#trigger_time)  
+&nbsp;  
+<a id="states-armed_home"></a>
+&nbsp;&nbsp;&nbsp; **armed_home**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Home` mode.  
+&nbsp;  
+<a id="states-armed_home-immediate"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **immediate**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+&nbsp;  
+<a id="states-armed_home-delayed"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+&nbsp;  
+<a id="states-armed_home-override"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **override**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
+&nbsp;  
+<a id="states-armed_home-pending_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **pending_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#pending_time)  
+&nbsp;  
+<a id="states-armed_home-warning_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **warning_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#warning_time)  
+&nbsp;  
+<a id="states-armed_home-trigger_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **trigger_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#trigger_time)  
+&nbsp;  
+<a id="states-armed_night"></a>
+&nbsp;&nbsp;&nbsp; **armed_night**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Night` mode. Check [`enable_night_mode`]("#enable_night_mode") variable for details.  
+&nbsp;  
+<a id="states-armed_night-immediate"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **immediate**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+&nbsp;  
+<a id="states-armed_night-delayed"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+&nbsp;  
+<a id="states-armed_night-override"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **override**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors to this list.  
+&nbsp;  
+<a id="states-armed_night-pending_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **pending_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#pending_time)  
+&nbsp;  
+<a id="states-armed_night-warning_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **warning_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#warning_time)  
+&nbsp;  
+<a id="states-armed_night-trigger_time"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **trigger_time**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#trigger_time)  
+
+<a id="enable_night_mode"></a>
+**enable_night_mode**  
+&nbsp;&nbsp;&nbsp;_(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp;If `true`, adds `NIGHT` button to the panel and allows setting the alarm to Night mode via MQTT/service call.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp;_Default value:_  
+&nbsp;&nbsp;&nbsp;`false`  
+
+<a id="enable_persistence"></a>
+**enable_persistence**
+&nbsp;&nbsp;&nbsp;_(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp;If `true`, allows the alarm to save its state to file and then reinstate it in the event of power loss.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp;_Default value:_  
+&nbsp;&nbsp;&nbsp;`false`
+
+<a id="ignore_open_sensors"></a>
+**ignore_open_sensors**  
+&nbsp;&nbsp;&nbsp;_(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp;If `false`, set the alarm only if there is no active sensors. Otherwise set alarm without checking sensors' states.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp;_Default value:_  
+&nbsp;&nbsp;&nbsp;`false`
+
+<a id="users"></a>
+**users**  
+&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; List of users' configuration variables grouped by their IDs.  
+&nbsp;  
+<a id="users-id"></a>
+&nbsp;&nbsp;&nbsp; **id**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Unique user ID.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The integration gathers all necessary information automatically if the panel uses admin credentials when accessing Home Assistant.  
+&nbsp;  
+<a id="users-name"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **name**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Human-friendly user name.  
+&nbsp;  
+<a id="users-picture"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **picture**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Badge _(filename)_ to be used in the `Activity Log` next to this user's name.  
+&nbsp;  
+<a id="users-code"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **code**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **Unique** individual passcode to set/disarm the alarm that fulfills the [passcode requirements](#passcode_requirements).  
+&nbsp;  
+<a id="users-enabled"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **enabled**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, this user can control the alarm.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `true`  
+
+<a id="mqtt"></a>
+**mqtt**
+&nbsp;&nbsp;&nbsp;_(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; MQTT configuration variables. See more details about MQTT interface [below](#mqtt_interface).  
+&nbsp;  
+<a id="mqtt-enable_mqtt"></a>
+&nbsp;&nbsp;&nbsp; **enable_mqtt**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Enables/disables MQTT interface of the alarm, i.e ability to control it with MQTT messages and get its status by subscribing to its state topic.  
+&nbsp;  
+<a id="mqtt-qos"></a>
+&nbsp;&nbsp;&nbsp; **qos**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The maximum QoS level for MQTT messages.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 0  
+&nbsp;  
+<a id="mqtt-state_topic"></a>
+&nbsp;&nbsp;&nbsp; **state_topic**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The MQTT topic the alarm will publish its state updates to.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; home/alarm  
+&nbsp;  
+<a id="mqtt-command_topic"></a>
+&nbsp;&nbsp;&nbsp; **command_topic**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The MQTT topic the alarm will subscribe to, to receive commands.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; home/alarm/set  
+&nbsp;  
+<a id="mqtt-payload_arm_away"></a>
+&nbsp;&nbsp;&nbsp; **payload_arm_away**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The MQTT payload to set the alarm to `Away` mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ARM\_AWAY  
+&nbsp;  
+<a id="mqtt-payload_arm_home"></a>
+&nbsp;&nbsp;&nbsp; **payload_arm_home**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The MQTT payload to set the alarm to `Home` mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ARM\_HOME  
+&nbsp;  
+<a id="mqtt-payload_arm_night"></a>
+&nbsp;&nbsp;&nbsp; **payload_arm_night**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The MQTT payload to set the alarm to `Night` mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ARM\_NIGHT  
+&nbsp;  
+<a id="mqtt-payload_disarm"></a>
+&nbsp;&nbsp;&nbsp; **payload_disarm**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The MQTT payload to disarm the alarm.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; DISARM  
+&nbsp;  
+<a id="mqtt-override_code"></a>
+&nbsp;&nbsp;&nbsp; **override_code**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, allows MQTT commands to disarm the alarm without a code.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="mqtt-pending_on_warning"></a>
+&nbsp;&nbsp;&nbsp; **pending_on_warning**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, publishes `pending` state when the alarm is tripped instead of `warning`.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; This is to allow integration with other MQTT panels which react to this state.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+
+<a id="panel"></a>
+**panel**
+&nbsp;&nbsp;&nbsp;_(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; Panel (GUI) configuration variables.  
+&nbsp;  
+<a id="panel-panel_title"></a>
+&nbsp;&nbsp;&nbsp; **panel_title**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;The text that shows on the header bar.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Home Alarm  
+&nbsp;  
+<a id="panel-enable_clock"></a>
+&nbsp;&nbsp;&nbsp; **enable_clock**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, displays current time in the status bar.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note that `sensor.time` must exist within your Home Assistant configuration for this option to work.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `true`  
+&nbsp;  
+<a id="panel-enable_clock_12hr"></a>
+&nbsp;&nbsp;&nbsp; **enable_clock_12hr**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, displays clock in 12hour mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-enable_weather"></a>
+&nbsp;&nbsp;&nbsp; **enable_weather**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, displays the weather summary in the status bar.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note that `sensor.weather_summary` or `sensor.dark_sky_summary` must exist within your Home Assistant configuration for this option to work.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-enable_sensors_panel"></a>
+&nbsp;&nbsp;&nbsp; **enable_sensors_panel**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, adds `Alarm Sensors` tab to the bottom of the panel.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `true`  
+&nbsp;  
+<a id="panel-enable_fahrenheit"></a>
+&nbsp;&nbsp;&nbsp; **enable_fahrenheit**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, displays the temperature in Fahrenheit.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-hide_passcode"></a>
+&nbsp;&nbsp;&nbsp; **hide_passcode**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, masks the passcode within the panel input box when typing.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-hide_sidebar"></a>
+&nbsp;&nbsp;&nbsp; **hide_sidebar**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, this security feature hides the Home Assistant sidebar to prevent access to Home Assistant settings when the alarm is set. The sidebar re-appears when the alarm is disarmed.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note: if your Home Assistant is v96.3 or newer, go to your `Profile settings` in Home Assistant and select `Always hide the sidebar` for this option to work correctly.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `true`  
+&nbsp;  
+<a id="panel-hide_sensors"></a>
+&nbsp;&nbsp;&nbsp; **hide_sensors**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, this security feature hides the `Alarm Sensors` tab while the alarm is set.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `true`  
+&nbsp;  
+<a id="panel-round_buttons"></a>
+&nbsp;&nbsp;&nbsp; **round_buttons**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Choose whether the alarm buttons should be round or rectangular.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-shadow_effect"></a>
+&nbsp;&nbsp;&nbsp; **shadow_effect**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, adds shadow effect to text.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-enable_serif_font"></a>
+&nbsp;&nbsp;&nbsp; **enable_serif_font**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, `Lobster` serif font will be used to display the title, time and weather.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-enable_camera_panel"></a>
+&nbsp;&nbsp;&nbsp; **enable_camera_panel**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, cameras listed below to be displayed as a panel.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="panel-cameras"></a>
+&nbsp;&nbsp;&nbsp; **cameras**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; List of cameras' entity IDs to display their feeds.  
+&nbsp;  
+<a id="panel-camera_update_interval"></a>
+&nbsp;&nbsp;&nbsp; **camera_update_interval**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the camera(s)' image updates.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 5  
+
+<a id="themes"></a>
+**themes**  
+&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; Themes allow you to override the default Home Assistant colors. See more details about defining colors [below](#themes_colors).  
+&nbsp;  
+<a id="themes-name"></a>
+&nbsp;&nbsp;&nbsp; **name**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Unique name of the theme.  
+&nbsp;  
+<a id="themes-name-active"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **active**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Only active theme overrides default Home Assistant colors.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
+&nbsp;  
+<a id="themes-name-disarmed_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **disarmed_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the alarm is disarmed the panel will display this color in both the top header background and the centre panel background.  
+&nbsp;  
+<a id="themes-name-pending_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **pending_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the alarm is arming the panel will display this color in both the top header background and the centre panel background.  
+&nbsp;  
+<a id="themes-name-armed_away_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **armed_away_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the alarm is in `Away` mode the panel will display this color in both the top header background and the centre panel background.  
+&nbsp;  
+<a id="themes-name-armed_home_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **armed_home_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the alarm is in `Home` mode the panel will display this color in both the top header background and the centre panel background.  
+&nbsp;  
+<a id="themes-name-armed_night_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **armed_night_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the alarm is in `Night` mode the panel will display this color in both the top header background and the centre panel background.  
+&nbsp;  
+<a id="themes-name-warning_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **warning_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If a sensor is tripped when the alarm is set the panel will display this color in both the top header background and the centre panel background.  
+&nbsp;  
+<a id="themes-name-triggered_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **triggered_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; When the alarm has been triggered the panel will display this color in both the top header background and the centre panel background.  
+&nbsp;  
+<a id="themes-name-panel_background_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **panel_background_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The background color of the main content section.  
+&nbsp;  
+<a id="themes-name-panel_outer_background_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **panel_outer_background_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The background color of both the status bar and the menu bar.  
+&nbsp;  
+<a id="themes-name-panel_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **panel_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the general text within the panel.  
+&nbsp;  
+<a id="themes-name-header_background_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **header_background_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The background color of very top header bar.  
+&nbsp;  
+<a id="themes-name-header_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **header_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The text color on very top header bar.  
+&nbsp;  
+<a id="themes-name-alarmstatus_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **alarmstatus_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The text color to display the alarm status.  
+&nbsp;  
+<a id="themes-name-time_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **time_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The text color to display time.  
+&nbsp;  
+<a id="themes-name-weather_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **weather_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The text color to display weather summary.  
+&nbsp;  
+<a id="themes-name-weather_image_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **weather_image_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of weather image.  
+&nbsp;  
+<a id="themes-name-info_header_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **info_header_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the heading within a particular section.  
+&nbsp;  
+<a id="themes-name-info_detail_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **info_detail_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the descriptive text within a particular section.  
+&nbsp;  
+<a id="themes-name-title_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **title_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the title text within a particular section.  
+&nbsp;  
+<a id="themes-name-subtitle_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **subtitle_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the subtitle text within a particular section.  
+&nbsp;  
+<a id="themes-name-opensensors_title_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **opensensors_title_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the `Open Sensors` dialog.  
+&nbsp;  
+<a id="themes-name-button_background_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **button_background_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The background color of the alarm buttons.  
+&nbsp;  
+<a id="themes-name-cancel_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **cancel_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The background color of the `Cancel` button.  
+&nbsp;  
+<a id="themes-name-override_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **override_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The background color of the `Override` button.  
+&nbsp;  
+<a id="themes-name-info_panel_buttons_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **info_panel_buttons_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the menu buttons.  
+&nbsp;  
+<a id="themes-name-arm_button_border_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **arm_button_border_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The border color of the alarm buttons.  
+&nbsp;  
+<a id="themes-name-arm_button_text_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **arm_button_text_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the text within the alarm buttons.  
+&nbsp;  
+<a id="themes-name-paper_listbox_background_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **paper_listbox_background_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The background color of the listboxes.  
+&nbsp;  
+<a id="themes-name-paper_listbox_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **paper_listbox_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The text color within the listboxes.  
+&nbsp;  
+<a id="themes-name-paper_item_selected___color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **paper_item_selected___color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The text color of the item selected within a selection box.  
+&nbsp;  
+<a id="themes-name-action_button_border_color"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **action_button_border_color**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The color of the border surrounding the action buttons.  
+
+<a id="admin_password"></a>
+**admin_password**  
+&nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; Password to access the `Settings` tab.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; HG28!!&dn  
 
 
 ### BOOLEAN VALUES CONVENTION
@@ -691,9 +715,9 @@ Boolean `false` can be substituted by any string apart from string equivalents o
 
 ### SERVICE CALLS
 All service calls use domain `alarm_control_panel` and accept the `entity_id` parameter:  
-#### entity\_id
-<s></s> _(string) (Optional)_  
-<s></s> Full name _(domain.object\_id)_ of the alarm integration entity to control. If no such variable used, the service call will applicable to all entities of this integration.  
+**entity_id**
+&nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; Full name _(domain.object\_id)_ of the alarm integration entity to control. If no such variable used, the service call will applicable to all entities of this integration.  
 
 #### ARM PASSCODE REQUIREMENTS
 Service calls `alarm_arm_home`, `alarm_arm_away` and `alarm_arm_night` accept optional `code` parameter that has extended specification compared to [passcode requirements](#code) by allowing a special code "override".  
