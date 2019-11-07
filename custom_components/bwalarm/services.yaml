@@ -1,8 +1,44 @@
 # Describes the format for available alarm control panel services
+alarm_arm_away_from_panel:
+  description: This command is identical to `alarm_control_panel.alarm_arm_away` and for internal use only.
+  fields:
+    entity_id:
+      description: Name of alarm control panel to arm Away.
+      example: 'alarm_control_panel.downstairs'
+    code:
+      description: An optional code to disarm the alarm control panel with.
+      example: 1234
+
+alarm_arm_home_from_panel:
+  description: This command is identical to `alarm_control_panel.alarm_arm_home` and for internal use only.
+  fields:
+    entity_id:
+      description: Name of alarm control panel to arm Home.
+      example: 'alarm_control_panel.downstairs'
+    code:
+      description: An optional code to disarm the alarm control panel with.
+      example: 1234
+
+alarm_arm_night_from_panel:
+  description: This command is identical to `alarm_control_panel.alarm_arm_night` and for internal use only.
+  fields:
+    entity_id:
+      description: Name of alarm control panel to arm Night.
+      example: 'alarm_control_panel.downstairs'
+    code:
+      description: An optional code to disarm the alarm control panel with.
+      example: 1234
 
 alarm_set_ignore_open_sensors:
-  description: Set value of ```ignore_open_sensors`` attribute
+  description: Set value of `ignore_open_sensors` attribute
   fields:
     value:
-      description: Boolean. If False, does not allow to set alarm if there is open sensors detected.
-      example: 'False'
+      description: Boolean. If `false`, does not allow to set alarm if there is open sensors detected.
+      default: false
+      example: false
+
+alarm_yaml_save:
+  description: For internal use only.
+
+alarm_yaml_user:
+  description: For internal use only.

@@ -1,18 +1,23 @@
-alarm_control_panel.py
+enhancementalarm_control_panel.py
 ----------------------
 - take into account endity_id from service calls (what to do in MQTT case?)
 - check how it works if HA restarts in triggered state (will it resume triggering? _lasttrigger?)
 - Enable MQTT without HA restart/(WIP)
 - validate MQTT using schema
 - state[mode]xxx_time appear in yaml with (when that section edited via Settings) OR without quotes, investigate
-- don't let the alarm re-trigger on active sensor (cutoff time?)
-- replace somehow code_to_arm attribute -> code_arm_required property?
+- check init of global and state-level pending/warning/trigger_time
+- do we need enable_night_mode at all?
+- missing: - floorplan
+          - custom_panel
 
 Milestones
 - remove obsolete enable_perimeter_mode attribute and perimeter_mode stuff from the code
+- get rid of doc/notes.md
 
 KNOWN POTENTIAL ISSUES
 - arm_xxx with open sensor (override), reboot HA -> will react to open sensor and trigger the alarm
+- what if the panel is open in a browser? (can hit Back button and access previous screen/view even if armed)
+- services.yaml is for bwalarm but services registered to alarm_control_panel: how to resolve so their descriptions are picked up?
 
 panel.html
 ----------
@@ -21,15 +26,21 @@ panel.html
 - prev style buttons/code panel?
 - use another way to find out the integration's entity_id (as someone can change name: in bwalarm.yaml and there is no panel_custom.yaml anymore!)
 - service calls: this.platform hardcoded, change
+- Beware that html imports are deprecated and support will be removed: https://www.chromestatus.com/feature/5144752345317376
+- enhancement: Enable by User Specific Codes no matter of the toggle state
+- _loadData: this.hass.callWS called from non-admin user causes Error handling message: Unauthorized in HA log
 
 Docs:
 - add something like this about use cases: https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666/222
-
-Bugs:
-- when no code defined, keypad displayed in there's no way to disarm from there (Lovelace works fine) (consider all potential issues related to it - shall we allow no master code at all or make it required?) Based on #37 (https://github.com/akasma74/Hass-Custom-Alarm/issues/37)
+- Video tutorial(s) that cover:
+    some overall things; set pin code, how arm away/home works, show numpad on “frontend”/lovelace
+    how motion sensors are handled (delay, trigger etc)
+    how the motion sensors trigger a siren (when armed)
+    how the motion sensors trigger a email or/and a notification when triggered)
+    -reset alarm after it has been triggered
 
 FRs:
 
 - Is there a way to increase the keypad button size to approximately what it was in the “pre mwc-button”
 - If we could get that override open sensors into the lovelace platform that would be amazing
-- support of multiple instances!
+- hide_sensor_groups: True **#[OPTIONAL, Boolean] - False by default. Setting this to True hides sensor groups (all sensors, immediate sensors, delayed sensors, inactive sensors) from the display. Open sensors will still appear**
