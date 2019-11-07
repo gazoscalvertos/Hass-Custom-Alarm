@@ -3,6 +3,7 @@
 <a id="states"></a>
 **states**  
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;
 &nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
   
 <a id="armed_away"></a>
@@ -66,4 +67,4 @@ Disarm the alarm if `override_code` is `false`:
 ```
 [link](examples.md#armed_away)
 [link](#armed_away)
-[link](examples.md#states-armed_away-t2)
+[link](#states-armed_away-t2)
