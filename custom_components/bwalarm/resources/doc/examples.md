@@ -3,7 +3,7 @@
 <a id="states"></a>
 **states**  
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
-&nbsp;
+&nbsp;  
 &nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
   
 <a id="armed_away"></a>
