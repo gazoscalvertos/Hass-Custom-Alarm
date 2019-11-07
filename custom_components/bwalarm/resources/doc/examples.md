@@ -6,7 +6,6 @@
   
 <a id="cba"></a>
 &nbsp;&nbsp;&nbsp; **armed_away**  
-  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
 <s></s>  
