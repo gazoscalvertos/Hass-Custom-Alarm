@@ -1,5 +1,13 @@
 <div id="#test">abc</div>
 
+<a id="platform"></a>
+**platform**  
+&nbsp;&nbsp;&nbsp; _(string) (Required)_  
+&nbsp;&nbsp;&nbsp; Domain name of this integration. **Please do not change**.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; bwalarm  
+  
 <a id="states"></a>
 **states**  
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
