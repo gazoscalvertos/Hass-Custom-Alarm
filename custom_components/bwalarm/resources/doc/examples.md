@@ -1,21 +1,16 @@
-<div id="test">abc</div>
+<div id="#test">abc</div>
   
 [link](#user-content-test)
 
 #### states
-<s style="margin-left:1em;"></s> _(map) (Optional)_  
-<s style="margin-left:1em;"></s> Configurations for supported alarm modes.  
-  <s></s>  
-  <h4 style="margin-left:1em;"> armed_away </h4>
+&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
+<s></s>  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; armed_away </h4>
 
-  <s style="margin-left:3em;"></s> _(map) (Required)_  
-  <s style="margin-left:3em;"></s> Configuration variables for the `Away` mode.  
-  <s></s>  
-  <h4 style="margin-left:2em;"> immediate </h4>
-
-  <s style="margin-left:4em;"></s> _(list) (Optional)_  
-  <s style="margin-left:4em;"></s> Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
-
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
+<s></s> 
 
 # Examples
 
