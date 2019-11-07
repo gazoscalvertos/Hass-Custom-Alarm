@@ -18,7 +18,7 @@
 
 <a id="pending_time"></a>
 **pending_time**  
-&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -26,7 +26,7 @@
 
 <a id="warning_time"></a>
 **warning_time**  
-&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -34,7 +34,7 @@
 
 <a id="trigger_time"></a>
 **trigger_time**  
-&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set alarm mode.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -45,9 +45,6 @@
 &nbsp;&nbsp;&nbsp; _(string) (Required)_  
 <a id="passcode_requirements"></a>
 &nbsp;&nbsp;&nbsp; Master passcode to set/disarm the alarm. It must consist of one or more digits surrounded by quotes.  
-&nbsp;  
-&nbsp;&nbsp;&nbsp; _Default value:_  
-&nbsp;&nbsp;&nbsp; 600  
 
 <a id="code_to_arm"></a>
 **code_to_arm**  
@@ -59,7 +56,7 @@
 
 <a id="passcode_attempts"></a>
 **passcode_attempts**  
-&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; If greater than 0, the system will only allow the set amount of password attempts before timing out.  
 &nbsp;&nbsp;&nbsp; `-1` allows for unlimited number of attempts.  
 &nbsp;  
@@ -68,7 +65,7 @@
 
 <a id="passcode_attempts_timeout"></a>
 **passcode_attempts_timeout**  
-&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; When `passcode_attempts`>0 and the passcode is entered incorrectly `passcode_attempts` times,    
 &nbsp;&nbsp;&nbsp; the panel will timeout for the amount set _(in seconds)_ and then reset the number of passcode attempts.  
 &nbsp;  
@@ -116,7 +113,7 @@
 
 <a id="log_size"></a>
 **log_size**  
-&nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; Maximum number of the last events to display in the log file.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -140,20 +137,20 @@
 <a id="states-armed_away-delayed"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning`  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; before triggering.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to `Warning` before triggering.  
 &nbsp;  
 <a id="states-armed_away-pending_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **override**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm it checks if any the of sensors from `immediate` and `delayed` lists  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; are `on` and does not proceed without user confirmation if any of them are `on`.  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to this list.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm it checks if any the of sensors from `immediate`  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; and `delayed` lists are `on` and prevents from proceeding if any of them are `on`.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example)  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; add those sensors to this list.  
 &nbsp;  
 <a id="states-armed_away-"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **pending_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -161,7 +158,7 @@
 &nbsp;  
 <a id="states-armed_away-warning_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **warning_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -169,9 +166,9 @@
 &nbsp;  
 <a id="states-armed_away-trigger_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **trigger_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; alarm mode.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to the previously set alarm mode.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#trigger_time)  
@@ -189,20 +186,20 @@
 <a id="states-armed_home-delayed"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning`  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; before triggering.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to `Warning` before triggering.  
 &nbsp;  
 <a id="states-armed_home-override"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **override**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; are `off` and prevents from proceeding if any of them are `on`.  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to this list.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm it checks if any the of sensors from `immediate`  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example)  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; add those sensors to this list.  
 &nbsp;  
 <a id="states-armed_home-pending_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **pending_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -210,7 +207,7 @@
 &nbsp;  
 <a id="states-armed_home-warning_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **warning_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -218,9 +215,9 @@
 &nbsp;  
 <a id="states-armed_home-trigger_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **trigger_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; alarm mode.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to the previously set alarm mode.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#trigger_time)  
@@ -238,20 +235,20 @@
 <a id="states-armed_night-delayed"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning`  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; before triggering.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to `Warning` before triggering.  
 &nbsp;  
 <a id="states-armed_night-override"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **override**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm the integration checks if any of sensors from `immediate` and `delayed` lists  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; are `off` and prevents from proceeding if any of them are `on`.  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example) add those sensors  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to this list.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; By default upon setting the alarm it checks if any the of sensors from `immediate`  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; and `delayed` lists are `off` and prevents from proceeding if any of them are `on`.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; To exclude some sensors from that check (motion sensor at the front door, for example)  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; add those sensors to this list.  
 &nbsp;  
 <a id="states-armed_night-pending_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **pending_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Grace time _(in seconds)_ to allow for exit/entry.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -259,7 +256,7 @@
 &nbsp;  
 <a id="states-armed_night-warning_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **warning_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ before triggering the alarm if a sensor has been tripped.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -267,36 +264,36 @@
 &nbsp;  
 <a id="states-armed_night-trigger_time"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **trigger_time**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back to previously set  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; alarm mode.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the alarm remains in `Triggered` mode. After that it returns back  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; to the previously set alarm mode.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; [appropriate top-level value](#trigger_time)  
 
 <a id="enable_night_mode"></a>
 **enable_night_mode**  
-&nbsp;&nbsp;&nbsp;_(boolean) (Optional)_  
-&nbsp;&nbsp;&nbsp;If `true`, adds `NIGHT` button to the panel and allows setting the alarm to Night mode via MQTT/service call.  
+&nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; If `true`, adds `NIGHT` button to the panel and allows setting the alarm to Night mode via MQTT/service call.  
 &nbsp;  
-&nbsp;&nbsp;&nbsp;_Default value:_  
-&nbsp;&nbsp;&nbsp;`false`  
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; `false`  
 
 <a id="enable_persistence"></a>
 **enable_persistence**  
-&nbsp;&nbsp;&nbsp;_(boolean) (Optional)_  
-&nbsp;&nbsp;&nbsp;If `true`, allows the alarm to save its state to file and then reinstate it in the event of power loss.  
+&nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; If `true`, allows the alarm to save its state to file and then reinstate it in the event of power loss.  
 &nbsp;  
-&nbsp;&nbsp;&nbsp;_Default value:_  
-&nbsp;&nbsp;&nbsp;`false`
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; `false`
 
 <a id="ignore_open_sensors"></a>
 **ignore_open_sensors**  
-&nbsp;&nbsp;&nbsp;_(boolean) (Optional)_  
-&nbsp;&nbsp;&nbsp;If `false`, set the alarm only if there is no active sensors. Otherwise set alarm without checking sensors' states.  
+&nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
+&nbsp;&nbsp;&nbsp; If `false`, set the alarm only if there is no active sensors. Otherwise set the alarm without checking sensors' states.  
 &nbsp;  
-&nbsp;&nbsp;&nbsp;_Default value:_  
-&nbsp;&nbsp;&nbsp;`false`
+&nbsp;&nbsp;&nbsp; _Default value:_  
+&nbsp;&nbsp;&nbsp; `false`
 
 <a id="users"></a>
 **users**  
@@ -318,12 +315,12 @@
 <a id="users-picture"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **picture**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Badge _(filename)_ to be used in the `Activity Log` next to this user's name.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Filename of a badge to be used in the `Activity Log` next to this user's name.  
 &nbsp;  
 <a id="users-code"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **code**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **Unique** individual passcode to set/disarm the alarm that fulfills the [passcode requirements](#passcode_requirements).  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Unique user passcode to set/disarm the alarm that fulfills the [passcode requirements](#passcode_requirements).  
 &nbsp;  
 <a id="users-enabled"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **enabled**  
@@ -336,17 +333,18 @@
 <a id="mqtt"></a>
 **mqtt**  
 &nbsp;&nbsp;&nbsp;_(map) (Optional)_  
-&nbsp;&nbsp;&nbsp; MQTT configuration variables. See more details about MQTT interface [below](#mqtt-interface).  
+&nbsp;&nbsp;&nbsp; MQTT configuration variables.  
+&nbsp;&nbsp;&nbsp; See more details about MQTT interface [below](#mqtt-interface).  
 &nbsp;  
 <a id="mqtt-enable_mqtt"></a>
 &nbsp;&nbsp;&nbsp; **enable_mqtt**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Required)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Enables/disables MQTT interface of the alarm, i.e ability to control it with MQTT messages and get its status  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; by subscribing to its state topic.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; by subscribing to the state topic.  
 &nbsp;  
 <a id="mqtt-qos"></a>
 &nbsp;&nbsp;&nbsp; **qos**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(integer) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The maximum QoS level for MQTT messages.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -451,8 +449,8 @@
 &nbsp;&nbsp;&nbsp; **enable_weather**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, displays the weather summary in the status bar.  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note that `sensor.weather_summary` or `sensor.dark_sky_summary` must exist within your Home Assistant  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; configuration for this option to work.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note that `sensor.weather_summary` or `sensor.dark_sky_summary` must exist within your  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Home Assistant configuration for this option to work.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `false`  
@@ -484,8 +482,8 @@
 <a id="panel-hide_sidebar"></a>
 &nbsp;&nbsp;&nbsp; **hide_sidebar**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, this security feature hides the Home Assistant sidebar to prevent access to Home Assistant  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; settings when the alarm is set. The sidebar re-appears when the alarm is disarmed.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, this security feature hides the Home Assistant sidebar to prevent access to  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Home Assistant settings when the alarm is set. The sidebar re-appears when the alarm is disarmed.  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Note: if your Home Assistant is v96.3 or newer, go to your `Profile settings` in Home Assistant  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; and select `Always hide the sidebar` for this option to work correctly.  
 &nbsp;  
@@ -539,7 +537,7 @@
 &nbsp;  
 <a id="panel-camera_update_interval"></a>
 &nbsp;&nbsp;&nbsp; **camera_update_interval**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(number) (Optional)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Time _(in seconds)_ the camera(s)' image updates.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
@@ -736,7 +734,7 @@
 <br>
 ### BOOLEAN VALUES CONVENTION
 Boolean values `true` and `false` are **case-sensitive**.  
-Boolean `true` can be substituted by its **case-insensitive** string equivalent "1", "true", "yes", "on" or "enable", or any non-zero integer.  
+Boolean `true` can be substituted by its **case-insensitive** string equivalent "1", "true", "yes", "on" or "enable", or any non-zero number.  
 Boolean `false` can be substituted by any string apart from string equivalents of `true`, or number `0`.  
 
 ### SERVICE CALLS
@@ -745,12 +743,12 @@ All service calls use domain `alarm_control_panel` and accept the `entity_id` pa
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
 &nbsp;&nbsp;&nbsp; Full name _(domain.object\_id)_ of the alarm integration entity to control.  
 &nbsp;&nbsp;&nbsp; If no such variable used, the service call will applicable to all entities of this integration.  
-----
+
 **ARM PASSCODE REQUIREMENTS**  
 Service calls `alarm_arm_home`, `alarm_arm_away` and `alarm_arm_night` accept optional `code` parameter that has extended specification compared to [passcode requirements](#passcode_requirements) by allowing a special code "override".  
 This special code tells the alarm to set immediately, while with a normal code the alarm will change its state to `pending` first for the corresponding `pending_time` and then change to a corresponding Armed state.  
 These service calls also take into account value of [`ignore_open_sensors`](#ignore_open_sensors) configuration variable. If it is `false` (default value, i.e safe arming), the alarm will be set only if there is no active sensors detected.  
-----
+  
 There is `set_ignore_open_sensors` service call that allows to change value of `ignore_open_sensors` configuration variable.  
 Please refer to the [services' description](../../services.yaml) and the [Examples](examples.md#service-calls) page for more details.  
 
