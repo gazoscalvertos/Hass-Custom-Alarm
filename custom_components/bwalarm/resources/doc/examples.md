@@ -1,15 +1,17 @@
 <div id="#test">abc</div>
-  
-[link](#user-content-test)
 
 #### states
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
 &nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
-<s></s>  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <h4> armed_away </h4>
+<br>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<h4> armed_away </h4>
 
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
+<a id="#cba"></a>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **armed_away**  
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
 <s></s>  
 
 # Examples
