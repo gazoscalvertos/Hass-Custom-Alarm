@@ -1,87 +1,5 @@
-<div id="#test">abc</div>
-
-<a id="users"></a>
-**users**
-&nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; List of users' configuration variables grouped by their IDs.  
-&nbsp;  
-<a id="users-id"></a>
-&nbsp;&nbsp;&nbsp; **id**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Unique user ID.  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The integration gathers all necessary information automatically if the panel uses admin credentials when accessing Home Assistant.  
-&nbsp;  
-<a id="users-name"></a>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **name**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Human-friendly user name.  
-&nbsp;  
-<a id="users-picture"></a>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **picture**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Badge _(filename)_ to be used in the `Activity Log` next to this user's name.  
-&nbsp;  
-<a id="users-code"></a>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **code**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **Unique** individual passcode to set/disarm the alarm that fulfills the [passcode requirements](#passcode_requirements).  
-&nbsp;  
-<a id="users-enabled"></a>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **enabled**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(boolean) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; If `true`, this user can control the alarm.  
-&nbsp;  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; `true`  
-
-
-<a id="states"></a>
-**states**
-&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
-&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
-&nbsp;  
-<a id="armed_away"></a>
-&nbsp;&nbsp;&nbsp; **armed_away**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
-&nbsp;  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **immediate**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
-&nbsp;  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
-
-
-<a id="platform"></a>
-**platform\_abc**  
-&nbsp;&nbsp;&nbsp; _(string) (Required)_  
-&nbsp;&nbsp;&nbsp; Domain name of this integration. **Please do not change**.  
-&nbsp;  
-&nbsp;&nbsp;&nbsp; _Default value:_  
-&nbsp;&nbsp;&nbsp; bwalarm  
-  
-<a id="states"></a>
-**states**  
-&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
-&nbsp;  
-&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
-  
-<a id="armed_away"></a>
-&nbsp;&nbsp;&nbsp; **armed_away**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
-  
-<a id="states-armed_away-t2"></a>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **t2**  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Descr    
-<s></s>  
-
 # Examples
-<a id="cba2" class="anchor" aria-hidden="true" href="#cba2"></a>
-
+  
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
 
@@ -127,6 +45,3 @@ Disarm the alarm if `override_code` is `false`:
 ```javascript
   home/alarm/set DISARM {"code": 1234}
 ```
-[link](examples.md#armed_away)
-[link](#armed_away)
-[link](#states-armed_away-t2)
