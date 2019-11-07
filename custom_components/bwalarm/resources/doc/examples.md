@@ -1,5 +1,24 @@
 <div id="#test">abc</div>
 
+<a id="states"></a>
+**states**
+&nbsp;&nbsp;&nbsp; _(map) (Optional)_  
+&nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
+&nbsp;  
+<a id="armed_away"></a>
+&nbsp;&nbsp;&nbsp; **armed_away**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **immediate**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list immediately changes the alarm's mode to `Triggered`.  
+&nbsp;  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **delayed**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(list) (Optional)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Tripping sensors from this list starts warning countdown and changes the alarm's mode to `Warning` before triggering.  
+
+
 <a id="platform"></a>
 **platform\_abc**  
 &nbsp;&nbsp;&nbsp; _(string) (Required)_  
