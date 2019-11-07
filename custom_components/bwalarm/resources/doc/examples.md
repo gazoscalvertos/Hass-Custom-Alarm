@@ -1,7 +1,7 @@
 <div id="#test">abc</div>
 
 <a id="platform"></a>
-**platform**  
+**platform_abc**  
 &nbsp;&nbsp;&nbsp; _(string) (Required)_  
 &nbsp;&nbsp;&nbsp; Domain name of this integration. **Please do not change**.  
 &nbsp;  
