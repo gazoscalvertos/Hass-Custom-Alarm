@@ -9,6 +9,11 @@
 &nbsp;&nbsp;&nbsp; **armed_away**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
+  
+<a id="states-armed_away-t2"></a>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **t2**  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Descr    
 <s></s>  
 
 # Examples
@@ -60,3 +65,5 @@ Disarm the alarm if `override_code` is `false`:
   home/alarm/set DISARM {"code": 1234}
 ```
 [link](examples.md#armed_away)
+[link](#armed_away)
+[link](examples.md#states-armed_away-t2)
