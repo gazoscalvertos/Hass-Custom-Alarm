@@ -1,20 +1,18 @@
 <div id="#test">abc</div>
 
-<h4> states </h4>
-
+#### states  
 &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
 &nbsp;&nbsp;&nbsp; Configurations for supported alarm modes.  
   
 <a id="cba"></a>
 &nbsp;&nbsp;&nbsp; **armed_away**  
-  
+&nbsp;
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Required)_  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Away` mode.  
 <s></s>  
 
 # Examples
 <a id="cba2" class="anchor" aria-hidden="true" href="#cba2"></a>
-<s style="margin-left:1em;"></s> **armed_away2**  
 
 ### CONFIGURATION
 [Here](examples/my_bwalarm.yaml) is one of my configurations.
