@@ -30,6 +30,7 @@ To get things working with Home Assistant (HA) you need to add the following to 
 alarm_control_panel: !include resources/bwalarm/bwalarm.yaml
 ```
 You may need to restart HA if the integration doesn't load first time as HA will need to install a dependency (`ruamel.yaml`).  
+Note that if your Home Assistant's version is older than 0.93, you need to uncomment the `REQUIREMENTS` line at the beginning of `custom_components/bwalarm/alarm_control_panel.py` file and type in the ruamel.yaml's version used by Home Assistant (can be found in Home Assistant's `setup.py` on [GitHub](https://github.com/home-assistant/home-assistant)).
 It's advisable to start with a new ```bwalarm.yaml``` file (located in ```resources/bwalarm``` folder) with the minimum configuration set:
 ```
 platform: bwalarm
