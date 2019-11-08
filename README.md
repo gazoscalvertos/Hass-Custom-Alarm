@@ -36,7 +36,7 @@ platform: bwalarm
 ```
 You can always configure your alarm using web interface or by editing your ```bwalarm.yaml``` directly.  
 The default password to access the settings page is: **HG28!!&dn**  
-For more details please refer to the [configuration variables](custom_components/bwalarm/resources/doc/configuration.md) page, [Examples](custom_components/bwalarm/resources/doc/examples.md) and [notes](custom_components/bwalarm/resources/doc/notes.md).  
+For more details please refer to the [configuration variables](custom_components/bwalarm/resources/doc/configuration.md) page, [examples](custom_components/bwalarm/resources/doc/examples.md) and [notes](custom_components/bwalarm/resources/doc/notes.md).  
 
 ## How to: update
 Manually:  
