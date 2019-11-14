@@ -4,5 +4,5 @@
   "documentation": "https://github.com/akasma74/Hass-Custom-Alarm",
   "dependencies": [],
   "codeowners": ["@akasma74"],
-  "requirements": ["ruamel.yaml==0.15.42"]
+  "requirements": ["ruamel.yaml==0.15.100"]
 }

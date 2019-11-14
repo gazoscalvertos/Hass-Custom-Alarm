@@ -30,12 +30,13 @@ To get things working with Home Assistant (HA) you need to add the following to 
 alarm_control_panel: !include resources/bwalarm/bwalarm.yaml
 ```
 You may need to restart HA if the integration doesn't load first time as HA will need to install a dependency (`ruamel.yaml`).  
+
 It's advisable to start with a new ```bwalarm.yaml``` file (located in ```resources/bwalarm``` folder) with the minimum configuration set:
 ```
 platform: bwalarm
 ```
 You can always configure your alarm using web interface or by editing your ```bwalarm.yaml``` directly.  
-The default password to access the settings page is: **HG28!!&dn**  
+The default password to access the Settings tab of the panel is **HG28!!&dn**  
 For more details please refer to the [configuration variables](custom_components/bwalarm/resources/doc/configuration.md) page, [examples](custom_components/bwalarm/resources/doc/examples.md) and [notes](custom_components/bwalarm/resources/doc/notes.md).  
 
 ## How to: update
@@ -56,3 +57,5 @@ Updating by using HACS (even if you initially installed the integration manually
 ## After update (for all methods)
 Please note that the component's code is loaded on Home Assistant startup and the panels' code (`panel.html`) is cached by a browser.  
 Therefore, **every time you update** no matter how, **you HAVE to clear cache of ALL of your browsers and then RESTART Home Assistant** for changes to take effect.  
+
+If your Home Assistant's version is older than 0.93, you need to uncomment the `REQUIREMENTS` line at the beginning of `custom_components/bwalarm/alarm_control_panel.py` file and type in the ruamel.yaml's version used by Home Assistant (can be found in Home Assistant's `setup.py` file on [GitHub](https://github.com/home-assistant/home-assistant)).

@@ -1,7 +1,7 @@
 #### Code of the bwalarm integration ####
 
 # For legacy installations, this is not used in HA > 0.93
-REQUIREMENTS = ['ruamel.yaml==0.15.42']
+#REQUIREMENTS = ['ruamel.yaml==HomeAssistant_ruamel.yaml_version']
 
 import logging
 _LOGGER = logging.getLogger(__name__)

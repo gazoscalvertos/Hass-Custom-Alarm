@@ -225,7 +225,8 @@
 <a id="states-armed_night"></a>
 &nbsp;&nbsp;&nbsp; **armed_night**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(map) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Night` mode. Check [`enable_night_mode`](#enable_night_mode) variable for details.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Configuration variables for the `Night` mode.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Check [`enable_night_mode`](#enable_night_mode) variable description for details.  
 &nbsp;  
 <a id="states-armed_night-immediate"></a>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; **immediate**  
@@ -748,9 +749,9 @@ All service calls use domain `alarm_control_panel` and accept the `entity_id` pa
 Service calls `alarm_arm_home`, `alarm_arm_away` and `alarm_arm_night` accept optional `code` parameter that has extended specification compared to [passcode requirements](#passcode_requirements) by allowing a special code "override".  
 This special code tells the alarm to set immediately, while with a normal code the alarm will change its state to `pending` first for the corresponding `pending_time` and then change to a corresponding Armed state.  
 These service calls also take into account value of [`ignore_open_sensors`](#ignore_open_sensors) configuration variable. If it is `false` (default value, i.e safe arming), the alarm will be set only if there is no active sensors detected.  
-  
+
 There is `set_ignore_open_sensors` service call that allows to change value of `ignore_open_sensors` configuration variable.  
-Please refer to the [services' description](../../services.yaml) and the [Examples](examples.md#service-calls) page for more details.  
+Please refer to the [services' description](../../services.yaml) and [examples](examples.md#service-calls) for more details.  
 
 ### MQTT INTERFACE
 When MQTT interface is [enabled](#mqtt-enable_mqtt), the alarm publishes its status to the [state topic](#mqtt-state_topic) and listens to commands on the [command topic](#mqtt-command_topic).  
