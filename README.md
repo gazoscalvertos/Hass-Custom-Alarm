@@ -57,5 +57,5 @@ Updating by using HACS (even if you initially installed the integration manually
 ## After update (for all methods)
 Please note that the component's code is loaded on Home Assistant startup and the panels' code (`panel.html`) is cached by a browser.  
 Therefore, **every time you update** no matter how, **you HAVE to clear cache of ALL of your browsers and then RESTART Home Assistant** for changes to take effect.  
-  
-Note that if your Home Assistant's version is older than 0.93, you need to uncomment the `REQUIREMENTS` line at the beginning of `custom_components/bwalarm/alarm_control_panel.py` file and type in the ruamel.yaml's version used by Home Assistant (can be found in Home Assistant's `setup.py` file on [GitHub](https://github.com/home-assistant/home-assistant)).
+
+If your Home Assistant's version is older than 0.93, you need to uncomment the `REQUIREMENTS` line at the beginning of `custom_components/bwalarm/alarm_control_panel.py` file and type in the ruamel.yaml's version used by Home Assistant (can be found in Home Assistant's `setup.py` file on [GitHub](https://github.com/home-assistant/home-assistant)).
