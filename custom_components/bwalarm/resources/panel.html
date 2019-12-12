@@ -5,7 +5,7 @@
     const _NAME = 'Alarm Panel';
     const _URL = 'https://github.com/akasma74/Hass-Custom-Alarm';
     // don't forget to change HaPanelAlarm.version below!
-    const _VERSION = 'v1.11.0';
+    const _VERSION = 'v1.11.1';
 
     if (!window.CUSTOM_UI_LIST) window.CUSTOM_UI_LIST = [];
     window.CUSTOM_UI_LIST.push({
@@ -46,12 +46,14 @@
       </style>
       <!-- ha-app-layout has-scrolling-region -->
       <div id='layout'>
-        <div id='main-title'>
-          <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-            <ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
-          </template>
-          <div id='main-title-text'>[[panel_title]]</div>
-        </div>
+        <template is='dom-if' if='[[panel_title(alarm)]]'>
+          <div id='main-title'>
+            <!-- <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+              <ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
+            </template> -->
+            <div id='main-title-text'>[[panel_title(alarm)]]</div>
+          </div>
+        </template>
 
         <div id='content'>
           <div id='alarm-panel' >
@@ -1374,7 +1376,6 @@
 
             settingsUnlock:       { type: Boolean, value: false },
 
-            panel_title:          { type: String, value: 'Home Alarm'},
             alarm_state:          { type: String, value: 'Disarmed'},
 
             carouselMainSelected: { type: Object },
@@ -1420,7 +1421,7 @@
             switches:             { type: Array, value: [] },
 
             errors:               { type: Array },
-            version:              { type: String, value: 'v1.11.0'},
+            version:              { type: String, value: 'v1.11.1'},
 
             camera_update_interval: { type: Number, value: 5000 }, // ms
 
@@ -1771,9 +1772,11 @@
           return this.hass.states[entity];
         }
 
-        getPanelTitle(){
-          if (this.alarm.attributes.panel.panel_title != null && this.alarm.attributes.panel.panel_title != '')
-            this.panel_title = this.alarm.attributes.panel.panel_title;
+        panel_title(alarm){
+          if (alarm && alarm.attributes.panel && alarm.attributes.panel.panel_title != null )
+            return alarm.attributes.panel.panel_title;
+          else
+            return '';
         }
 
         isChecked(arg){
@@ -2177,8 +2180,12 @@
         updatePanelStyles(){
           //Re-aligns title bar
           var title = this.shadowRoot.querySelector('#main-title-text');
-          if (this.alarm.attributes.panel != null && (this.isDisarmed(this.alarm) || !this.isChecked(this.alarm.attributes.panel.hide_sidebar))) title.classList.add('margin-left');
-          else title.classList.remove('margin-left');
+          if (title){
+            if (this.alarm.attributes.panel != null && (this.isDisarmed(this.alarm) || !this.isChecked(this.alarm.attributes.panel.hide_sidebar)))
+              title.classList.add('margin-left');
+            else
+              title.classList.remove('margin-left');
+          }
 
           //Changes the shape of the buttons
           if (this.isChecked(this.alarm.attributes.panel.round_buttons))
@@ -2190,9 +2197,6 @@
             // Close the sidebar if alarm is set and the option is enabled
             this.sidebarTimerId = setInterval(this.closeSidebar, 100, this);
           }
-
-          //Updates the title of the panel
-          this.getPanelTitle();
 
           if (this.isChecked(this.alarm.attributes.panel.enable_serif_font)) this.updateStyles({'--font-header': "'Lobster'"});
           else this.updateStyles({'--font-header': "unset"});

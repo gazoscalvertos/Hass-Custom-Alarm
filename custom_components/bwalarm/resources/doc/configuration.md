@@ -424,10 +424,7 @@
 <a id="panel-panel_title"></a>
 &nbsp;&nbsp;&nbsp; **panel_title**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;The text that shows on the header bar.  
-&nbsp;  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _Default value:_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Home Alarm  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;The text to show as the top of the window.  
 &nbsp;  
 <a id="panel-enable_clock"></a>
 &nbsp;&nbsp;&nbsp; **enable_clock**  
