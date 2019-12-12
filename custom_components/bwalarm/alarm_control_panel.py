@@ -1,7 +1,10 @@
 #### Code of the bwalarm integration ####
 
+from homeassistant.const import __short_version__ as current_HA_version
+
 # For legacy installations, this is not used in HA > 0.93
-#REQUIREMENTS = ['ruamel.yaml==HomeAssistant_ruamel.yaml_version']
+if float(current_HA_version) < 0.93:
+    REQUIREMENTS = ['ruamel.yaml==HomeAssistant_ruamel.yaml_version']
 
 import logging
 _LOGGER = logging.getLogger(__name__)
@@ -53,6 +56,15 @@ from homeassistant.helpers.event import async_track_state_change
 from homeassistant.util          import sanitize_filename
 from homeassistant.exceptions    import HomeAssistantError
 from homeassistant.components.http import HomeAssistantView
+
+# require these constants from 0.103.0
+if float(current_HA_version) > 0.102:
+    from homeassistant.components.alarm_control_panel.const import (
+        SUPPORT_ALARM_ARM_AWAY,
+        SUPPORT_ALARM_ARM_HOME,
+        SUPPORT_ALARM_ARM_NIGHT,
+        SUPPORT_ALARM_TRIGGER,
+    )
 
 import voluptuous                                                    as vol
 import homeassistant.components.alarm_control_panel                  as alarm
@@ -770,6 +782,21 @@ class BWAlarm(alarm.AlarmControlPanel):
             results[CONF_STATES] = self._config[CONF_STATES]
 
         return results;
+
+    @property
+    def supported_features(self) -> int:
+        """Return the list of supported features."""
+        # it makes sense for HA >= 0.103
+        if float(current_HA_version) > 0.102:
+            return (
+                SUPPORT_ALARM_ARM_HOME
+                | SUPPORT_ALARM_ARM_AWAY
+                | SUPPORT_ALARM_ARM_NIGHT
+                | SUPPORT_ALARM_TRIGGER
+            )
+        else:
+            # and does not for the earlier ones
+            return 0
 
     def mqtt_enabled(self):
         # TODO : try/catch!
