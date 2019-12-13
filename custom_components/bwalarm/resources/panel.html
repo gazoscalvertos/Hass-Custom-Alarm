@@ -140,56 +140,73 @@
                     </div>
                   </template>
 
-                  <template is='dom-if' if='[[showCodePanel(alarm)]]'>
-                    <template is='dom-if' if='[[!attemptedArm]]'>
-                      <div id='codepanel' class='horizontal layout center-justified'>
-                        <div>
-                          <div class='digits horizontal layout center-justified'>
-                            <template is='dom-if' if='[[requiresCode()]]'>
-                              <mwc-button on-click='callcode' data-digit=1 raised>1</mwc-button>
-                              <mwc-button on-click='callcode' data-digit=2 raised>2</mwc-button>
-                              <mwc-button on-click='callcode' data-digit=3 raised>3</mwc-button>
-                            </template>
-                            <mwc-button class='sm action-button clear' on-click='callclearcode' raised>Clear</mwc-button>
+                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                    <div class='horizontal layout arm'  style='justify-content: center;'>
+                      <template is='dom-if' if='[[attemptedArmWithoutCode]]'>
+                        <div class='vertical layout'>
+                          <div style='text-align: center;'>
+                            <h1>Please enter code to arm!</h1>
                           </div>
-                          <div class='digits horizontal layout center-justified'>
-                            <template is='dom-if' if='[[requiresCode()]]'>
-                              <mwc-button on-click='callcode' data-digit=4 raised>4</mwc-button>
-                              <mwc-button on-click='callcode' data-digit=5 raised>5</mwc-button>
-                              <mwc-button on-click='callcode' data-digit=6 raised>6</mwc-button>
-                              <mwc-button class='sm'  on-click='callcode' data-digit=0 raised>0</mwc-button>
-                            </template>
-                          </div>
-                          <div class='digits horizontal layout center-justified'>
-                            <template is='dom-if' if='[[requiresCode()]]'>
-                              <mwc-button on-click='callcode' data-digit=7 raised>7</mwc-button>
-                              <mwc-button on-click='callcode' data-digit=8 raised>8</mwc-button>
-                              <mwc-button on-click='callcode' data-digit=9 raised>9</mwc-button>
-                              <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                <mwc-button class='sm action-button disarm' on-click='callAlarmService' data-call='disarm' raised>Disarm</mwc-button>
-                              </template>
-                            </template>
-                          </div>
-                          <div class='xs digits horizontal layout center-justified'>
-                            <mwc-button class='clear action-button' on-click='callclearcode' raised>C</mwc-button>
-                            <mwc-button on-click='callcode' data-digit=0 raised>0</mwc-button>
-                            <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                              <paper-icon-button class='disarm action-button' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
-                            </template>
-                          </div>
-                          <div class='digits horizontal layout' style='justify-content: space-evenly;'>
-                            <template is='dom-if' if='[[requiresCode()]]'>
-                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
-                                  <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
-                                </template>
-                                <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
-                                <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
-                              </template>
-                            </template>
+                          <div class='horizontal layout'>
+                            <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>OK</mwc-button>
                           </div>
                         </div>
-                      </div>
+                      </template>
+                    </div>
+                  </template>
+
+                  <template is='dom-if' if='[[showCodePanel(alarm)]]'>
+                    <template is='dom-if' if='[[!attemptedArm]]'>
+                      <template is='dom-if' if='[[!attemptedArmWithoutCode]]'>
+                        <div id='codepanel' class='horizontal layout center-justified'>
+                          <div>
+                            <div class='digits horizontal layout center-justified'>
+                              <template is='dom-if' if='[[requiresCode()]]'>
+                                <mwc-button on-click='callcode' data-digit=1 raised>1</mwc-button>
+                                <mwc-button on-click='callcode' data-digit=2 raised>2</mwc-button>
+                                <mwc-button on-click='callcode' data-digit=3 raised>3</mwc-button>
+                              </template>
+                              <mwc-button class='sm action-button clear' on-click='callclearcode' raised>Clear</mwc-button>
+                            </div>
+                            <div class='digits horizontal layout center-justified'>
+                              <template is='dom-if' if='[[requiresCode()]]'>
+                                <mwc-button on-click='callcode' data-digit=4 raised>4</mwc-button>
+                                <mwc-button on-click='callcode' data-digit=5 raised>5</mwc-button>
+                                <mwc-button on-click='callcode' data-digit=6 raised>6</mwc-button>
+                                <mwc-button class='sm'  on-click='callcode' data-digit=0 raised>0</mwc-button>
+                              </template>
+                            </div>
+                            <div class='digits horizontal layout center-justified'>
+                              <template is='dom-if' if='[[requiresCode()]]'>
+                                <mwc-button on-click='callcode' data-digit=7 raised>7</mwc-button>
+                                <mwc-button on-click='callcode' data-digit=8 raised>8</mwc-button>
+                                <mwc-button on-click='callcode' data-digit=9 raised>9</mwc-button>
+                                <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
+                                  <mwc-button class='sm action-button disarm' on-click='callAlarmService' data-call='disarm' raised>Disarm</mwc-button>
+                                </template>
+                              </template>
+                            </div>
+                            <div class='xs digits horizontal layout center-justified'>
+                              <mwc-button class='clear action-button' on-click='callclearcode' raised>C</mwc-button>
+                              <mwc-button on-click='callcode' data-digit=0 raised>0</mwc-button>
+                              <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
+                                <paper-icon-button class='disarm action-button' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
+                              </template>
+                            </div>
+                            <div class='digits horizontal layout' style='justify-content: space-evenly;'>
+                              <template is='dom-if' if='[[requiresCode()]]'>
+                                <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                                  <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
+                                    <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
+                                  </template>
+                                  <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
+                                  <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
+                                </template>
+                              </template>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
                     </template>
                   </template>
                 </div>
@@ -1397,6 +1414,7 @@
 
             cleanup:              { type: Array, value: [] },
             attemptedArm:         { type: Boolean, value: false },
+            attemptedArmWithoutCode:         { type: Boolean, value: false },
 
             settings:             { type: Boolean, value: false },
 
@@ -2119,7 +2137,7 @@
           this.updateStyles({'--time-display': 'initial'});
 
           if (this.isDisarmed(this.alarm)){
-            if (this.attemptedArm == true) this.resetUI();
+            if ((this.attemptedArm == true) || (this.attemptedArmWithoutCode == true)) this.resetUI();
 
           } else if (this.isPending(this.alarm)){
             this.updateStyles({'--countdown-timer-display': 'initial'});
@@ -2441,6 +2459,7 @@
               // do we have a code here?
               if (this.alarm.attributes.code_arm_required == true && !this.code) {
                 console.log("empty codes are not supported!");
+                this.attemptedArmWithoutCode = true;
                 this.$.content.classList.add('shake');
                 break;
               }
@@ -2815,6 +2834,7 @@
         //Cancel the attempted alarm and reset UI
         resetUI(){
           this.attemptedArm = false;
+          this.attemptedArmWithoutCode = false;
 
           //Remove the page shake from open sensors
           this.$.content.classList.remove('shake');
