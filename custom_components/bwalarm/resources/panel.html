@@ -110,8 +110,6 @@
                 <!-- ###########################################CONTROLS############################################### -->
                 <div id='controls' class='carousel-cell remove'>
                   <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-  <!--                  <div class='vLayout arm'> -->
-  <!--                  <div class='digits horizontal layout' style='justify-content: center;'> -->
                     <div class='horizontal layout arm'  style='justify-content: center;'>
                       <template is='dom-if' if='[[!showCodePanel(alarm)]]'>
                         <template is='dom-if' if='[[!attemptedArm]]'>
@@ -143,28 +141,9 @@
                   </template>
 
                   <template is='dom-if' if='[[showCodePanel(alarm)]]'>
-
                     <template is='dom-if' if='[[!attemptedArm]]'>
-
-                      <!--<template is='dom-if' if='[[requiresCode()]]'>
-                        <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
-                            <div id='code-display'>[[display_code]]</div>
-                        </template>
-                      </template>-->
-
                       <div id='codepanel' class='horizontal layout center-justified'>
                         <div>
-                          <div class='digits horizontal layout' style='justify-content: space-evenly;'>
-                            <template is='dom-if' if='[[requiresCode()]]'>
-                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
-                                  <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
-                                </template>
-                                <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
-                                <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
-                              </template>
-                            </template>
-                          </div>
                           <div class='digits horizontal layout center-justified'>
                             <template is='dom-if' if='[[requiresCode()]]'>
                               <mwc-button on-click='callcode' data-digit=1 raised>1</mwc-button>
@@ -196,6 +175,17 @@
                             <mwc-button on-click='callcode' data-digit=0 raised>0</mwc-button>
                             <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
                               <paper-icon-button class='disarm action-button' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
+                            </template>
+                          </div>
+                          <div class='digits horizontal layout' style='justify-content: space-evenly;'>
+                            <template is='dom-if' if='[[requiresCode()]]'>
+                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                                <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
+                                  <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
+                                </template>
+                                <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
+                                <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
+                              </template>
                             </template>
                           </div>
                         </div>
@@ -2170,11 +2160,6 @@
         }
 
         requiresCode(){
-        // original code
-        //  if (this.alarm.attributes.code_arm_required == false && this.alarm.state == 'disarmed') return false;
-        //  return true;
-
-        // code using isChecked
           return !this.isDisarmed(this.alarm) || this.isChecked(this.alarm.attributes.code_arm_required);
         }
 
