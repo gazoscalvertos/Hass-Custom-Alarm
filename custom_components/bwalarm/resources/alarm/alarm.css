@@ -54,7 +54,6 @@
 
    --panel-background-color:         var(--dark-background); /*The background color of the main content section.*/
 
-   /* --panel-outer-background-color:   var(--secondary-background-color); */
    --panel-outer-background-color:   var(--dark-inner); /*The background color of both the status bar and the menu bar*/
    --panel-text-color:               var(--dark-white-text); /*The color of the general text within the panel.*/
 
@@ -98,10 +97,10 @@ app-toolbar {
   color: var(--header-text-color);
 }
 #layout {
-  background-color: var(--panel-outer-background-color);
+  background-color: var(--panel-background-color);
   display: flex;
   flex-direction: column;
-  height: 100%;
+/*  height: 100%; */
   min-height: 100%;
   width: 100%;
   overflow: hidden;
@@ -274,7 +273,7 @@ border: 0px solid var(--action-button-border-color) !important;
 #carousel_main{
   position: relative;
   /* height: 60vh; */
-  padding: 15px;
+  padding: 0px 15px;
 
   /* transition: all 1s ease-in-out; */
   /* -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
@@ -394,7 +393,7 @@ ha-label-badge {
   #status-bar {
     margin-top: 15px;
     margin-bottom: 15px;
-    height: 87px;
+    /*height: 87px;*/
   }
 }
 
@@ -504,17 +503,11 @@ text-align: left;
   }
 }
 /* ############## SM > 768 ############### */
-
-#info-panel-selection paper-icon-button {
- width: 12vw;
- height: 12vw;
-}
-
 @media screen and (min-width: 768px) {
     .content-box {
       /*height: 100%;*/
       width: 100%;
-      padding-bottom: 20px;
+      /*padding-bottom: 20px;*/
   }
 .cameras{
     padding-right: 15px;
@@ -598,7 +591,7 @@ text-align: left;
    }
    div.digits mwc-button, div.digits paper-iron-button{
     border-radius: var(--button-shape);
-    min-width: 14vh;
+    min-width: 20vh;
     height: 14vh;
     border: 0px solid var(--arm-button-border-color); /* DS */
 /*    border: 2px solid var(--button-background-color);*/
@@ -607,18 +600,21 @@ text-align: left;
 /*    vertical-align: middle;*/
     justify-content: center;/* DS */
     align-items: center;/* DS */
-    margin: 8px;
-    padding: 5px;
+    margin: 0px 5px;
+    padding: 0px 5px;
     text-align: center;
     font-size: large;
   }
 }
 
-/* ######################################################### width => 1024 ################################################# */
+/* ######################################################### for Wide Screens (width >= 1024) ################################################# */
 @media screen and (min-width: 1024px) {
-  #weather, #clock, #alarm-status {
+  #weather, #clock {
      width: 33%;
    }
+   #alarm-status {
+      width: 34%;
+    }
    .info-detail {
     font-size: large;
    }
@@ -688,9 +684,15 @@ paper-listbox {
   flex-direction: column;
   flex: 1 1 auto;
   width: 100%;
+/*  justify-content: space-evenly;*/
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+#status-bar {
+  background: var(--panel-outer-background-color);
+}
+
 h1 {
   color: var(--title-color);
 }
@@ -742,19 +744,29 @@ h1 {
   background: var(--panel-outer-background-color);
   position: relative;
   bottom: 0;
-  height: auto;
-  display: inline;
+  max-height: 16vh;
+  min-height: 10vh;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   text-align: center;
-  justify-content: space-between;
-  padding: .5rem 1rem;
+  justify-content: center;
+/*  padding: .5rem 1rem;*/
+}
+
+#info-panel-selection paper-icon-button {
+ /*width: 60px;*/
+ height: 100%;
+ padding: 8px 0px;
 }
 
 #main-content {
   display: flex;
   justify-content: center;
-  flex-direction: row;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  padding: 0px 15px;
   background-color: var(--panel-background-color);
 }
 
@@ -865,6 +877,8 @@ div.options mwc-button{
    display: var(--time-display);
    font-size: xx-large;
    font-family: var(--font-header);
+   padding-top: 8px;
+   padding-bottom: 8px;
 }
 
 #middle {
@@ -887,6 +901,9 @@ div.options mwc-button{
    color: var( --alarmstatus-text-color);
    font-weight: bolder;
    text-align: center;
+   font-family: var(--font-header);
+   padding-top: 8px;
+   padding-bottom: 8px;
  }
 #weather-icon {
   width: 100px;

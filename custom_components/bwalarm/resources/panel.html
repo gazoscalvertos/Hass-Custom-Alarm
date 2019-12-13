@@ -56,7 +56,7 @@
         </template>
 
         <div id='content'>
-          <div id='alarm-panel' >
+          <div id='alarm-panel'>
             <div id='status-bar' class='horizontal layout center-justified'>
               <div id='clock' class='box box-header' >
                 <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_clock)]]'>
@@ -153,7 +153,7 @@
 
                       <div id='codepanel' class='horizontal layout center-justified'>
                         <div>
-                          <div class='digits horizontal layout' style='justify-content: center;'>
+                          <div class='digits horizontal layout' style='justify-content: space-evenly;'>
                             <template is='dom-if' if='[[requiresCode()]]'>
                               <template is='dom-if' if='[[isDisarmed(alarm)]]'>
                                 <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
@@ -164,7 +164,7 @@
                               </template>
                             </template>
                           </div>
-                          <div class='digits horizontal layout' style='justify-content: flex-start;'>
+                          <div class='digits horizontal layout center-justified'>
                             <template is='dom-if' if='[[requiresCode()]]'>
                               <mwc-button on-click='callcode' data-digit=1 raised>1</mwc-button>
                               <mwc-button on-click='callcode' data-digit=2 raised>2</mwc-button>
@@ -180,7 +180,7 @@
                               <mwc-button class='sm'  on-click='callcode' data-digit=0 raised>0</mwc-button>
                             </template>
                           </div>
-                          <div class='digits horizontal layout'>
+                          <div class='digits horizontal layout center-justified'>
                             <template is='dom-if' if='[[requiresCode()]]'>
                               <mwc-button on-click='callcode' data-digit=7 raised>7</mwc-button>
                               <mwc-button on-click='callcode' data-digit=8 raised>8</mwc-button>
@@ -2344,12 +2344,12 @@
         computeLabel(state){
           switch (state){
             case 'disarmed':      return 'disarmed';
-            case 'armed_away':    return 'away';
-            case 'armed_home':    return 'home';
-            case 'pending':       return 'leave';
+            case 'armed_away':    return 'armed - Away';
+            case 'armed_home':    return 'armed - Home';
+            case 'armed_night':   return 'armed - Night';
+            case 'pending':       return 'leave..';
             case 'warning':       return 'warning';
             case 'triggered':     return 'triggered';
-            case 'armed_night':   return 'night';
           }
           return state;
         }
@@ -2426,7 +2426,7 @@
           if (this.isChecked(this.alarm.attributes.panel.hide_passcode))
             display_digit = '*';
           this.display_code = this.display_code + display_digit;
-          this.alarm_state = this.display_code;
+          this.alarm_state = 'Code: ' + this.display_code;
         }
 
         //Reset the display alarm codes
