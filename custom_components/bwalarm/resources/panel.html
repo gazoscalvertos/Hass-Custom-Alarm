@@ -55,48 +55,49 @@
           </div>
         </template>
 
-        <div id='content'>
-          <div id='alarm-panel'>
-            <div id='status-bar' class='horizontal layout center-justified'>
-              <div id='clock' class='box box-header' >
-                <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_clock)]]'>
-                  <div id='time' class='time hours shadow'>
-                    <span>[[time]]</span>
-                  </div>
-                </template>
-                <div id='countdown' class='countdown-timer'></div>
+        <div id='status-bar' class='horizontal layout center-justified'>
+          <div id='clock' class='box box-header' >
+            <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_clock)]]'>
+              <div id='time' class='time hours shadow'>
+                <span>[[time]]</span>
               </div>
+            </template>
+            <div id='countdown' class='countdown-timer'></div>
+          </div>
 
-              <div id='alarm-status' class='box box-header'>
-                <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
-                  <span class='shadow'>[[alarm_state]]</span>
-                </template>
-                <template is='dom-if' if='[[showCodePanel(alarm)]]'>
-                  <template is='dom-if' if='[[alarm.attributes.panel_locked]]'>
-                    <span class='shadow'>PANEL LOCKED OUT</span>
+          <div id='alarm-status' class='box box-header'>
+            <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
+              <span class='shadow'>[[alarm_state]]</span>
+            </template>
+            <template is='dom-if' if='[[showCodePanel(alarm)]]'>
+              <template is='dom-if' if='[[alarm.attributes.panel_locked]]'>
+                <span class='shadow'>PANEL LOCKED OUT</span>
+              </template>
+            </template>
+          </div>
+
+          <div id='weather' class='box box-header weather'>
+            <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_weather)]]'>
+                <div class='weather-summary shadow'>
+                  <template is='dom-if' if='[[!isChecked(alarm.attributes.panel.enable_fahrenheit)]]'>
+                    <span>[[temp]] &#176;C</span>
                   </template>
-                </template>
-              </div>
+                  <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_fahrenheit)]]'>
+                    <span>[[temp]] &#176;F</span>
+                  </template>
+                </div>
+                <div id='weather-icon' class='weather-summary'>
+                  <object id='weather_svg' class='weather-summary' type='image/svg+xml' data='[[weather.attributes.entity_picture]]'></object>
+                </div>
+                <div class='weather-summary shadow'>
+                  <span>[[weather.state]]</span>
+                </div>
+            </template>
+          </div>
+        </div>
 
-              <div id='weather' class='box box-header weather'>
-                <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_weather)]]'>
-                    <div class='weather-summary shadow'>
-                      <template is='dom-if' if='[[!isChecked(alarm.attributes.panel.enable_fahrenheit)]]'>
-                        <span>[[temp]] &#176;C</span>
-                      </template>
-                      <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_fahrenheit)]]'>
-                        <span>[[temp]] &#176;F</span>
-                      </template>
-                    </div>
-                    <div id='weather-icon' class='weather-summary'>
-                      <object id='weather_svg' class='weather-summary' type='image/svg+xml' data='[[weather.attributes.entity_picture]]'></object>
-                    </div>
-                    <div class='weather-summary shadow'>
-                      <span>[[weather.state]]</span>
-                    </div>
-                </template>
-              </div>
-            </div>
+        <div id='content'>
+<!--          <div id='alarm-panel' style='display: flex; flex-direction: column; height: 100%;'>-->
 
             <div id='main-content'>
 
@@ -1266,7 +1267,7 @@
                 </div>
               </div>
             </div>
-          </div>
+<!--          </div>-->
         </div>
 
         <!-- ###########################################SELECTION BAR############################################### -->
