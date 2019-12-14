@@ -143,13 +143,11 @@
                   <template is='dom-if' if='[[isDisarmed(alarm)]]'>
                     <div class='horizontal layout arm'  style='justify-content: center;'>
                       <template is='dom-if' if='[[attemptedArmWithoutCode]]'>
-                        <div class='vertical layout'>
+                        <div id='no-code-to-arm-error' class='vertical layout'>
                           <div style='text-align: center;'>
                             <h1>Please enter code to arm!</h1>
                           </div>
-                          <div class='horizontal layout'>
-                            <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>OK</mwc-button>
-                          </div>
+                          <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>OK</mwc-button>
                         </div>
                       </template>
                     </div>
