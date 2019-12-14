@@ -114,10 +114,10 @@
                       <template is='dom-if' if='[[!showCodePanel(alarm)]]'>
                         <template is='dom-if' if='[[!attemptedArm]]'>
                           <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
-                            <mwc-button id='arm-night' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
+                            <mwc-button id='arm-night' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised title='Arm Night'>Night</mwc-button>
                           </template>
-                          <mwc-button id='arm-home' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
-                          <mwc-button id='arm-away' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
+                          <mwc-button id='arm-home' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised title='Arm Home'>Home</mwc-button>
+                          <mwc-button id='arm-away' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised title='Arm Away'>Away</mwc-button>
                         </template>
                       </template>
                       <template is='dom-if' if='[[attemptedArm]]'>

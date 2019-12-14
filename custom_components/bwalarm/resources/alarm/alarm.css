@@ -110,7 +110,7 @@ app-toolbar {
   position: relative !important;
   display: block !important;
   background-color: var(--header-background-color);
-/*  padding: 10px;*/
+  padding: 8px 0px;
 }
 ha-menu-button + [main-title] {
    margin-left: -50px;
@@ -691,6 +691,7 @@ paper-listbox {
 
 #status-bar {
   background: var(--panel-outer-background-color);
+  padding: 8px 0px;
 }
 
 h1 {
@@ -750,14 +751,14 @@ h1 {
   flex-wrap: wrap;
   align-items: center;
   text-align: center;
-  justify-content: center;
-/*  padding: .5rem 1rem;*/
+  justify-content: space-evenly;
+  padding: 8px 30vw;
 }
 
 #info-panel-selection paper-icon-button {
  /*width: 60px;*/
  height: 100%;
- padding: 8px 0px;
+ flex: 1 1 auto;
 }
 
 #main-content {
