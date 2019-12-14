@@ -47,11 +47,12 @@
       <!-- ha-app-layout has-scrolling-region -->
       <div id='layout'>
         <template is='dom-if' if='[[panel_title(alarm)]]'>
-          <div id='main-title'>
-            <!-- <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-              <ha-menu-button narrow='[[narrow]]' show-menu='[[showMenu]]'></ha-menu-button>
-            </template> -->
+          <div id='main-title' class='horizontal layout center-justified'>
+            <div id='clock' class='box box-header' >
+            </div>
             <div id='main-title-text'>[[panel_title(alarm)]]</div>
+          </div>
+          <div id='weather' class='box box-header weather'>
           </div>
         </template>
 
