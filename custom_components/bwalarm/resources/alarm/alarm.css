@@ -1,11 +1,12 @@
-/* CUSTOM ALARM COMPONENT PANEL CSS
-  https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.1.4
-  MODIFIED: 13/11/18
-*/
 :host {
    --countdown-timer-display: none;
    --time-display: initial;
+
+  /* for rounded/round buttons */
+   --button-shape:       4px;
+
+   /* default radius/size of a square button in warning/error message box */
+   --message-button-size: 115px;
 
    /* THEME - DARK */
    --dark-background:   #191A1F;
@@ -46,10 +47,6 @@
 
    --light-indigo:       #5771C2;
    --light-indigo-grey:  #37446B;
-
-   --button-shape:       4px;
-
-   --message-button-size: 115px;
 
    /* GUI SPECIFIC */
    --primary-text-color:             'white';
@@ -883,10 +880,10 @@ div.digits button.clear, div.digits button.disarm {
   font-size: inherit;
 }
 
-/* transparent button - placeholder */
-button.placeholder {
+/* invisible and inactive button - used as a placeholder to make layout the same with or without the button */
+button.invisible {
   opacity: 0; /* makes the button transparent */
-  cursor: auto; /* stop cursor from changing to pointer */
+  cursor: unset !important; /* stop cursor from changing its shape over the button */
 }
 
 /* OBSOLETE/UNUSED: open sensors: override, cancel buttons

@@ -158,7 +158,7 @@
                               </button>
                               <!-- insert transparent button to make the layout neat -->
                               <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                <button class='mdc-button mdc-button__ripple placeholder'></button>
+                                <button class='mdc-button mdc-button__ripple invisible'></button>
                               </template>
                               <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
                                 <button class='mdc-button mdc-button__ripple mdc-button--raised sm disarm' on-click='callAlarmService' data-call='disarm'>
@@ -176,7 +176,7 @@
                               </button>
                               <!-- placeholder if alarm disarmed -->
                               <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                <button class='mdc-button mdc-button__ripple placeholder'></button>
+                                <button class='mdc-button mdc-button__ripple invisible'></button>
                               </template>
                               <!-- real icon if alarm armed -->
                               <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
