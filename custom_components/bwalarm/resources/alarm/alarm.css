@@ -47,7 +47,9 @@
    --light-indigo:       #5771C2;
    --light-indigo-grey:  #37446B;
 
-   --button-shape:       0%;
+   --button-shape:       4px;
+
+   --message-button-size: 115px;
 
    /* GUI SPECIFIC */
    --primary-text-color:             'white';
@@ -91,6 +93,18 @@
 
    --shadow-effect:                   below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
 
+   --warning-message-border-color:    transparent;
+   --warning-message-text-color:        var(--primary-text-color);
+
+   --warning-message-button-text-color: var(--arm-button-text-color);
+   --warning-message-button-background-color: var(--arm-button-border-color);
+
+   --error-message-border-color:      transparent;
+   --error-message-text-color:        var(--primary-text-color);
+
+   --error-message-button-text-color: var(--arm-button-text-color);
+   --error-message-button-background-color: var(--arm-button-border-color);
+
 }
 app-toolbar {
   background-color: var(--header-background-color);
@@ -110,7 +124,7 @@ app-toolbar {
   position: relative !important;
   display: block !important;
   background-color: var(--header-background-color);
-  padding: 8px 0px;
+  padding: 2px 0px;
 }
 ha-menu-button + [main-title] {
    margin-left: -50px;
@@ -216,11 +230,10 @@ a:hover {
     border-style: groove;
     border-width: 2px;
 }
-
+/*
 .action-button{
-border: 0px solid var(--action-button-border-color) !important;
-/* DS */
-}
+  border: 3px solid var(--action-button-border-color) !important;
+}*/
 
 .dropdown-content{
   width: 90%;
@@ -389,12 +402,7 @@ ha-label-badge {
   justify-content: center;
 }
 
-#no-code-to-arm-error {
-  border: 2px solid white;
-  max-height: 40vh;
-  padding: 8px;
-  align-items: center;
-}
+
 /* ################################################# height > 600px ############################################# */
 @media screen and (min-height: 600px) {
   #status-bar {
@@ -404,7 +412,7 @@ ha-label-badge {
   }
 }
 
-/* ################################################# width XS < 767 ############################################# */
+/* ################################################# w1: width XS < 767 ############################################# */
 @media screen and (max-width: 767px) {
 
 #carousel_settings {
@@ -435,12 +443,22 @@ text-align: left;
   #main-content {
     /* padding-bottom: 30px; */
   }
-  div.arm mwc-button {
+  /* OLD STYLE/OBSOLETE: NIGHT, HOME & AWAY BUTTONS
+  div.arm button {
     width: 36vh;
     height: 36vh;
     margin: 15px;
     font-size: large;
+  }*/
+
+  /* NIGHT, HOME and AWAY buttons */
+  #arm-night, #arm-home, #arm-away {
+    margin: 15px;
+    height: 20vh;
+    width: 20vh;
+    font-size: large;
   }
+
   #alarm-status span {
     font-size: x-large;
   }
@@ -487,29 +505,33 @@ text-align: left;
       justify-content: center;
       text-align: center;
    }
-   div.arm mwc-button {
+
+   /* OLD STYLE/OBSOLETE: FOR NIGHT, HOME & AWAY BUTTONS
+   div.arm button {
     /*  margin-bottom: 10px;*/
-   }
-  div.digits mwc-button, div.digits paper-icon-button{
-    color: var(--arm-button-text-color);
-    border-radius: var(--button-shape);
+   /*}*/
+
+  /* ## codepanel ## */
+  /* numeric keys */
+  div.digits button, div.digits paper-icon-button{
+    margin: 5px;
+    padding: 0;
     min-width: 11vh;
     height: 11vh;
-    padding: 0;
-    border: 0px solid var(--arm-button-border-color); /* DS */
-/*    border: 2px solid var(--button-background-color);*/
+    border-radius: var(--button-shape);
     background-color: var(--button-background-color);
-    margin: 8px;
+
+    display: flex;
     justify-content: center;/* DS */
     align-items: center;/* DS */
     font-weight: 400;
-        display: flex;
   }
-    #code-display {
-       margin-bottom: 15px;
+
+  #code-display {
+    margin-bottom: 15px;
   }
 }
-/* ############## SM > 768 ############### */
+/* ############## w2: SM > 768 ############### */
 @media screen and (min-width: 768px) {
     .content-box {
       /*height: 100%;*/
@@ -554,14 +576,34 @@ text-align: left;
        margin-top: 5px;
        margin-bottom: 5px;
   }
-  div.arm mwc-button {
-    width: 36vh;
-    height: 36vh;
+
+  /* OBSOLETE: NIGHT, HOME AND AWAY buttons
+  div.arm button {
+    max-width: 25vw;
+    min-height: 10vh;*/
 /*    line-height: 110px;*/
-    margin: 20px;
+/*    margin: 20px;
     padding: 20px;
     font-size: x-large;
+}*/
+
+/* NIGHT, HOME and AWAY buttons */
+#arm-night, #arm-home, #arm-away {
+  margin: 20px;
+  padding: 20px;
+  height: 25vh;
+  width: 25vh;
+/*    line-height: 110px;*/
+  font-size: x-large;
 }
+
+div.digits button, div.digits paper-iron-button {
+  margin: 5px;
+  min-height: 80px;
+  min-width: 80px;
+  font-size: xx-large;
+}
+
   #alarm-status span {
    font-size: x-large;
 }
@@ -596,25 +638,9 @@ text-align: left;
       flex-wrap: wrap;
       text-align: center;
    }
-   div.digits mwc-button, div.digits paper-iron-button{
-    border-radius: var(--button-shape);
-    min-width: 20vh;
-    height: 14vh;
-    border: 0px solid var(--arm-button-border-color); /* DS */
-/*    border: 2px solid var(--button-background-color);*/
-    background-color: var(--button-background-color);
-    display: flex;
-/*    vertical-align: middle;*/
-    justify-content: center;/* DS */
-    align-items: center;/* DS */
-    margin: 0px 5px;
-    padding: 0px 5px;
-    text-align: center;
-    font-size: large;
-  }
 }
 
-/* ######################################################### for Wide Screens (width >= 1024) ################################################# */
+/* ######################################################### w3: for Wide Screens (width >= 1024) ################################################# */
 @media screen and (min-width: 1024px) {
   #weather, #clock {
      width: 33%;
@@ -652,7 +678,7 @@ text-align: left;
 
 }
 
-/* ######################################################### width => 1200 ################################################# */
+/* ######################################################### w4: width => 1200 ################################################# */
 @media screen and (min-width: 1200px) {
   .md {
     display: none !important;
@@ -679,6 +705,7 @@ text-align: left;
 
 
 /* ######################################################### ALL DEVICES ################################################# */
+/* define here only global properties that apply to all screen sizes as they will override same ones defined in particular screens */
 #icon {
   margin-right: 15px;
 }
@@ -698,7 +725,7 @@ paper-listbox {
 
 #status-bar {
   background: var(--panel-outer-background-color);
-  padding: 8px 0px;
+/*  padding: 8px 0px;*/
 }
 
 h1 {
@@ -752,14 +779,14 @@ h1 {
   background: var(--panel-outer-background-color);
   position: relative;
   bottom: 0;
-  max-height: 16vh;
-  min-height: 10vh;
+  max-height: 12vh;
+/*  min-height: 10vh;*/
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   text-align: center;
 /*  justify-content: space-evenly;*/
-  padding: 8px 8px;
+/*  padding: 8px 8px;*/
 }
 
 #info-panel-selection paper-icon-button {
@@ -823,51 +850,117 @@ div.code iron-label {
    font-size: x-large;
 }
 
-mwc-button {
-   background: #6b8d9c;
-   color: #ffffff;
-}
+@keyframes mdc-ripple-fg-radius-in{from{animation-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transform:translate(var(--mdc-ripple-fg-translate-start, 0)) scale(1)}to{transform:translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1))}}@keyframes mdc-ripple-fg-opacity-in{from{animation-timing-function:linear;opacity:0}to{opacity:var(--mdc-ripple-fg-opacity, 0)}}@keyframes mdc-ripple-fg-opacity-out{from{animation-timing-function:linear;opacity:var(--mdc-ripple-fg-opacity, 0)}to{opacity:0}}.mdc-ripple-surface--test-edge-var-bug{--mdc-ripple-surface-test-edge-var: 1px solid #000;visibility:hidden}.mdc-ripple-surface--test-edge-var-bug::before{border:var(--mdc-ripple-surface-test-edge-var)}.mdc-button{font-family:Roboto,sans-serif;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-size:.875rem;line-height:2.25rem;font-weight:500;letter-spacing:.0892857143em;text-decoration:none;text-transform:uppercase;--mdc-ripple-fg-size: 0;--mdc-ripple-left: 0;--mdc-ripple-top: 0;--mdc-ripple-fg-scale: 1;--mdc-ripple-fg-translate-end: 0;--mdc-ripple-fg-translate-start: 0;-webkit-tap-highlight-color:rgba(0,0,0,0);will-change:transform,opacity;padding:0 8px 0 8px;display:inline-flex;position:relative;align-items:center;justify-content:center;box-sizing:border-box;min-width:64px;height:36px;border:none;outline:none;line-height:inherit;user-select:none;-webkit-appearance:none;overflow:hidden;vertical-align:middle;border-radius:4px}.mdc-button::before,.mdc-button::after{position:absolute;border-radius:50%;opacity:0;pointer-events:none;content:""}.mdc-button::before{transition:opacity 15ms linear,background-color 15ms linear;z-index:1}.mdc-button.mdc-ripple-upgraded::before{transform:scale(var(--mdc-ripple-fg-scale, 1))}.mdc-button.mdc-ripple-upgraded::after{top:0;left:0;transform:scale(0);transform-origin:center center}.mdc-button.mdc-ripple-upgraded--unbounded::after{top:var(--mdc-ripple-top, 0);left:var(--mdc-ripple-left, 0)}.mdc-button.mdc-ripple-upgraded--foreground-activation::after{animation:225ms mdc-ripple-fg-radius-in forwards,75ms mdc-ripple-fg-opacity-in forwards}.mdc-button.mdc-ripple-upgraded--foreground-deactivation::after{animation:150ms mdc-ripple-fg-opacity-out;transform:translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1))}.mdc-button::before,.mdc-button::after{top:calc(50% - 100%);left:calc(50% - 100%);width:200%;height:200%}.mdc-button.mdc-ripple-upgraded::after{width:var(--mdc-ripple-fg-size, 100%);height:var(--mdc-ripple-fg-size, 100%)}.mdc-button::-moz-focus-inner{padding:0;border:0}.mdc-button:active{outline:none}.mdc-button:hover{cursor:pointer}.mdc-button:disabled{background-color:transparent;color:rgba(0,0,0,.37);cursor:default;pointer-events:none}.mdc-button.mdc-button--dense{border-radius:4px}.mdc-button:not(:disabled){background-color:transparent}.mdc-button:not(:disabled){color:#6200ee;color:var(--mdc-theme-primary, #6200ee)}.mdc-button::before,.mdc-button::after{background-color:#6200ee}@supports not (-ms-ime-align: auto){.mdc-button::before,.mdc-button::after{background-color:var(--mdc-theme-primary, #6200ee)}}.mdc-button:hover::before{opacity:.04}.mdc-button:not(.mdc-ripple-upgraded):focus::before,.mdc-button.mdc-ripple-upgraded--background-focused::before{transition-duration:75ms;opacity:.12}.mdc-button:not(.mdc-ripple-upgraded)::after{transition:opacity 150ms linear}.mdc-button:not(.mdc-ripple-upgraded):active::after{transition-duration:75ms;opacity:.16}.mdc-button.mdc-ripple-upgraded{--mdc-ripple-fg-opacity: 0.16}.mdc-button .mdc-button__icon{margin-left:0;margin-right:8px;display:inline-block;width:18px;height:18px;font-size:18px;vertical-align:top}[dir=rtl] .mdc-button .mdc-button__icon,.mdc-button .mdc-button__icon[dir=rtl]{margin-left:8px;margin-right:0}.mdc-button svg.mdc-button__icon{fill:currentColor}.mdc-button--raised .mdc-button__icon,.mdc-button--unelevated .mdc-button__icon,.mdc-button--outlined .mdc-button__icon{margin-left:-4px;margin-right:8px}[dir=rtl] .mdc-button--raised .mdc-button__icon,.mdc-button--raised .mdc-button__icon[dir=rtl],[dir=rtl] .mdc-button--unelevated .mdc-button__icon,.mdc-button--unelevated .mdc-button__icon[dir=rtl],[dir=rtl] .mdc-button--outlined .mdc-button__icon,.mdc-button--outlined .mdc-button__icon[dir=rtl]{margin-left:8px;margin-right:-4px}.mdc-button--raised,.mdc-button--unelevated{padding:0 16px 0 16px}.mdc-button--raised:disabled,.mdc-button--unelevated:disabled{background-color:rgba(0,0,0,.12);color:rgba(0,0,0,.37)}.mdc-button--raised:not(:disabled),.mdc-button--unelevated:not(:disabled){background-color:#6200ee}@supports not (-ms-ime-align: auto){.mdc-button--raised:not(:disabled),.mdc-button--unelevated:not(:disabled){background-color:var(--mdc-theme-primary, #6200ee)}}.mdc-button--raised:not(:disabled),.mdc-button--unelevated:not(:disabled){color:#fff;color:var(--mdc-theme-on-primary, #fff)}.mdc-button--raised::before,.mdc-button--raised::after,.mdc-button--unelevated::before,.mdc-button--unelevated::after{background-color:#fff}@supports not (-ms-ime-align: auto){.mdc-button--raised::before,.mdc-button--raised::after,.mdc-button--unelevated::before,.mdc-button--unelevated::after{background-color:var(--mdc-theme-on-primary, #fff)}}.mdc-button--raised:hover::before,.mdc-button--unelevated:hover::before{opacity:.08}.mdc-button--raised:not(.mdc-ripple-upgraded):focus::before,.mdc-button--raised.mdc-ripple-upgraded--background-focused::before,.mdc-button--unelevated:not(.mdc-ripple-upgraded):focus::before,.mdc-button--unelevated.mdc-ripple-upgraded--background-focused::before{transition-duration:75ms;opacity:.24}.mdc-button--raised:not(.mdc-ripple-upgraded)::after,.mdc-button--unelevated:not(.mdc-ripple-upgraded)::after{transition:opacity 150ms linear}.mdc-button--raised:not(.mdc-ripple-upgraded):active::after,.mdc-button--unelevated:not(.mdc-ripple-upgraded):active::after{transition-duration:75ms;opacity:.32}.mdc-button--raised.mdc-ripple-upgraded,.mdc-button--unelevated.mdc-ripple-upgraded{--mdc-ripple-fg-opacity: 0.32}.mdc-button--raised{box-shadow:0px 3px 1px -2px rgba(0, 0, 0, 0.2),0px 2px 2px 0px rgba(0, 0, 0, 0.14),0px 1px 5px 0px rgba(0,0,0,.12);transition:box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1)}.mdc-button--raised:hover,.mdc-button--raised:focus{box-shadow:0px 2px 4px -1px rgba(0, 0, 0, 0.2),0px 4px 5px 0px rgba(0, 0, 0, 0.14),0px 1px 10px 0px rgba(0,0,0,.12)}.mdc-button--raised:active{box-shadow:0px 5px 5px -3px rgba(0, 0, 0, 0.2),0px 8px 10px 1px rgba(0, 0, 0, 0.14),0px 3px 14px 2px rgba(0,0,0,.12)}.mdc-button--raised:disabled{box-shadow:0px 0px 0px 0px rgba(0, 0, 0, 0.2),0px 0px 0px 0px rgba(0, 0, 0, 0.14),0px 0px 0px 0px rgba(0,0,0,.12)}.mdc-button--outlined{border-style:solid;padding:0 14px 0 14px;border-width:2px}.mdc-button--outlined:disabled{border-color:rgba(0,0,0,.37)}.mdc-button--outlined:not(:disabled){border-color:#6200ee;border-color:var(--mdc-theme-primary, #6200ee)}.mdc-button--dense{height:32px;font-size:.8125rem}.material-icons{font-family:var(--mdc-icon-font, "Material Icons");font-weight:normal;font-style:normal;font-size:var(--mdc-icon-size, 24px);line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:"liga";-webkit-font-smoothing:antialiased}:host{display:inline-flex;outline:none}.mdc-button{flex:1}
+                :host {
+                    display: inherit;
+                }
 
 
-div.arm mwc-button {
-  background-color: var(--button-background-color);
+/* NIGHT, HOME and AWAY buttons */
+#arm-night, #arm-home, #arm-away {
   border-radius: var(--button-shape);
-  border: 0px solid var(--arm-button-border-color); /* DS */
-/*  border: 3px solid var(--button-background-color); */
-  display: flex;
+  background-color: var(--arm-button-border-color);
   color: var(--arm-button-text-color);
-  justify-content: center;/* DS */
-  align-items: center;/* DS */
 }
-div.arm mwc-button div {
+
+/* ## codepanel ## */
+div.digits button.mdc-button--outlined {
+  border: 3px solid var(--arm-button-border-color);
+}
+
+div.digits button.mdc-button--raised {
+  border: 0px solid;
+}
+
+/* numeric keys */
+div.digits button, div.digits paper-iron-button {
   border-radius: var(--button-shape);
-  width: 100px;
-  height: 100px;
-  border: 0px solid var(--arm-button-border-color); /* DS */
-/*  border: 3px solid var(--button-background-color);*/
-  display: flex;
-  line-height: 100px;
+  flex-grow: inherit;
+}
+
+/* special keys: clear, disarm */
+div.digits button.clear, div.digits button.disarm {
+  font-size: inherit;
+}
+
+/* transparent button - placeholder */
+button.placeholder {
+  opacity: 0; /* makes the button transparent */
+  cursor: auto; /* stop cursor from changing to pointer */
+}
+
+/* OBSOLETE/UNUSED: open sensors: override, cancel buttons
+div.arm button div {
   margin: 20px;
   padding: 20px;
-  justify-content: center;/* DS */
-  align-items: center;/* DS */
-}
-div.arm mwc-button.big {
+  width: 100px;
+  height: 100px;
+  border: 3px solid var(--arm-button-border-color);
+  border-radius: var(--button-shape);
+
+  display: flex;
+  line-height: 100px;
+  justify-content: center;
+  align-items: center;
+}*/
+/* UNUSED
+div.arm button.big {
    width: 68%;
+}*/
+
+/* error message styling */
+div.error-message {
+  padding: 8px;
+  border: 2px solid var(--error-message-border-color);
+  align-items: center;
 }
-div.arm mwc-button.cancel {
-       border: 0px solid var(--cancel-color);
-/*       border: 3px solid var(--cancel-color); DS */
+
+div.error-message button.mdc-button--outlined {
+  border: 2px solid var(--error-message-button-background-color);
 }
-div.arm mwc-button.override {
-       border: 0px solid var(--override-color);
-/*       border: 3px solid var(--override-color); DS */
+
+div.error-message button.mdc-button--raised {
+  border: 0px solid;
+}
+
+div.error-message button {
+  margin: 20px;
+  width: var(--message-button-size);
+  height: var(--message-button-size);
+  border-radius: var(--button-shape);
+  background-color: var(--error-message-button-background-color);
+  color: var(--error-message-button-text-color);
+  font-size: initial;
+}
+
+/* warning message styling */
+div.warning-message {
+  padding: 8px;
+  border: 2px solid var(--warning-message-border-color);
+  align-items: center;
+}
+
+div.error-message button.mdc-button--outlined {
+  border: 2px solid var(--warning-message-button-background-color);
+}
+
+div.error-message button.mdc-button--raised {
+  border: 0px solid;
+}
+
+div.warning-message button {
+  margin: 20px;
+  width: var(--message-button-size);
+  height: var(--message-button-size);
+  border-radius: var(--button-shape);
+  color: var(--warning-message-button-text-color);
+  font-size: initial;
 }
 
 div.options {
    padding-top: 10px;
 }
-div.options mwc-button{
+div.options button{
    width: 96.5%;
 }
 .tappable {

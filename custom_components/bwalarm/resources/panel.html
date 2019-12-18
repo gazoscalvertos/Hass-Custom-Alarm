@@ -48,16 +48,14 @@
       <div id='layout'>
         <template is='dom-if' if='[[panel_title(alarm)]]'>
           <div id='main-title' class='horizontal layout center-justified'>
-            <div id='clock' class='box box-header' >
-            </div>
+            <div id='clock' class='box box-header'></div>
             <div id='main-title-text'>[[panel_title(alarm)]]</div>
-          </div>
-          <div id='weather' class='box box-header weather'>
+            <div id='weather' class='box box-header weather'></div>
           </div>
         </template>
 
         <div id='status-bar' class='horizontal layout center-justified'>
-          <div id='clock' class='box box-header' >
+          <div id='clock' class='box box-header'>
             <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_clock)]]'>
               <div id='time' class='time hours shadow'>
                 <span>[[time]]</span>
@@ -97,7 +95,7 @@
           </div>
         </div>
 
-        <div id='content'>
+        <div id='content' style='display: flex; flex-direction: column; height: 100%;'>
 <!--          <div id='alarm-panel' style='display: flex; flex-direction: column; height: 100%;'>-->
 
             <div id='main-content'>
@@ -110,103 +108,154 @@
 
                 <!-- ###########################################CONTROLS############################################### -->
                 <div id='controls' class='carousel-cell remove'>
-                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                    <div class='horizontal layout arm'  style='justify-content: center;'>
-                      <template is='dom-if' if='[[!showCodePanel(alarm)]]'>
-                        <template is='dom-if' if='[[!attemptedArm]]'>
-                          <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
-                            <mwc-button id='arm-night' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised title='Arm Night'>Night</mwc-button>
-                          </template>
-                          <mwc-button id='arm-home' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised title='Arm Home'>Home</mwc-button>
-                          <mwc-button id='arm-away' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised title='Arm Away'>Away</mwc-button>
-                        </template>
-                      </template>
-                      <template is='dom-if' if='[[attemptedArm]]'>
-                        <div class='vertical layout'>
-                          <div style='text-align: center;'>
-                            <h1>Open Sensors Found</h1>
-                          </div>
-                        <!-- DS -->
-                          <div class='sensors'>
-                          <template is='dom-repeat' items='[[opensensors_for_attempted_arm()]]' as='entity'>
-                            <state-card-display state-obj='[[entity]]' hass='[[hass]]' class='tappable' on-tap='entityTapped' data-entity='[[entity.entity_id]]'></state-card-display>
-                          </template>
-                          <!-- DS -->
-                          <div class='horizontal layout'>
-                            <mwc-button id='arm-override' class='override' on-click='callAlarmService' data-call='override' data-arm='attemptArmMode' raised>Arm anyway</mwc-button>
-                            <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>Don't arm</mwc-button>
-                          </div>
-                        </div>
-                      </template>
-                    </div>
-                  </template>
-
-                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                    <div class='horizontal layout arm'  style='justify-content: center;'>
-                      <template is='dom-if' if='[[attemptedArmWithoutCode]]'>
-                        <div id='no-code-to-arm-error' class='vertical layout'>
-                          <div style='text-align: center;'>
-                            <h1>Please enter code to arm!</h1>
-                          </div>
-                          <mwc-button id='arm-cancel' class='cancel' on-click='callAlarmService' data-call='cancel' raised>OK</mwc-button>
-                        </div>
-                      </template>
-                    </div>
-                  </template>
-
+                  <!-- Armed/code to arm required - show code panel -->
                   <template is='dom-if' if='[[showCodePanel(alarm)]]'>
                     <template is='dom-if' if='[[!attemptedArm]]'>
                       <template is='dom-if' if='[[!attemptedArmWithoutCode]]'>
+                        <!-- codepanel -->
                         <div id='codepanel' class='horizontal layout center-justified'>
                           <div>
-                            <div class='digits horizontal layout center-justified'>
-                              <template is='dom-if' if='[[requiresCode()]]'>
-                                <mwc-button on-click='callcode' data-digit=1 raised>1</mwc-button>
-                                <mwc-button on-click='callcode' data-digit=2 raised>2</mwc-button>
-                                <mwc-button on-click='callcode' data-digit=3 raised>3</mwc-button>
-                              </template>
-                              <mwc-button class='sm action-button clear' on-click='callclearcode' raised>Clear</mwc-button>
+                            <!-- 1 2 3 CLEAR -->
+                            <div class='digits horizontal layout' style='justify-content: space-around;'>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=1>
+                                <span class="mdc-button__label" data-digit=1>1</span>
+                              </button>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=2>
+                                <span class="mdc-button__label" data-digit=2>2</span>
+                              </button>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=3>
+                                <span class="mdc-button__label" data-digit=3>3</span>
+                              </button>
+                              <button class='mdc-button mdc-button__ripple mdc-button--raised sm clear' on-click='callclearcode'>
+                                <span class="mdc-button__label">clear</span>
+                              </button>
                             </div>
-                            <div class='digits horizontal layout center-justified'>
-                              <template is='dom-if' if='[[requiresCode()]]'>
-                                <mwc-button on-click='callcode' data-digit=4 raised>4</mwc-button>
-                                <mwc-button on-click='callcode' data-digit=5 raised>5</mwc-button>
-                                <mwc-button on-click='callcode' data-digit=6 raised>6</mwc-button>
-                                <mwc-button class='sm'  on-click='callcode' data-digit=0 raised>0</mwc-button>
-                              </template>
+                            <!-- 4 5 6 0 -->
+                            <div class='digits horizontal layout' style='justify-content: space-around;'>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=4>
+                                <span class="mdc-button__label" data-digit=4>4</span>
+                              </button>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=5>
+                                <span class="mdc-button__label" data-digit=5>5</span>
+                              </button>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=6>
+                                <span class="mdc-button__label" data-digit=6>6</span>
+                              </button>
+                              <button class='mdc-button mdc-button__ripple mdc-button--outlined sm'  on-click='callcode' data-digit=0>
+                                <span class="mdc-button__label" data-digit=0>0</span>
+                              </button>
                             </div>
-                            <div class='digits horizontal layout center-justified'>
-                              <template is='dom-if' if='[[requiresCode()]]'>
-                                <mwc-button on-click='callcode' data-digit=7 raised>7</mwc-button>
-                                <mwc-button on-click='callcode' data-digit=8 raised>8</mwc-button>
-                                <mwc-button on-click='callcode' data-digit=9 raised>9</mwc-button>
-                                <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                  <mwc-button class='sm action-button disarm' on-click='callAlarmService' data-call='disarm' raised>Disarm</mwc-button>
-                                </template>
+                            <!-- 7 8 9 {DISARM if not disarmed} -->
+                            <div class='digits horizontal layout' style='justify-content: space-around;'>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=7>
+                                <span class="mdc-button__label" data-digit=7>7</span>
+                              </button>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=8>
+                                <span class="mdc-button__label" data-digit=8>8</span>
+                              </button>
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=9>
+                                <span class="mdc-button__label" data-digit=9>9</span>
+                              </button>
+                              <!-- insert transparent button to make the layout neat -->
+                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                                <button class='mdc-button mdc-button__ripple placeholder'></button>
                               </template>
-                            </div>
-                            <div class='xs digits horizontal layout center-justified'>
-                              <mwc-button class='clear action-button' on-click='callclearcode' raised>C</mwc-button>
-                              <mwc-button on-click='callcode' data-digit=0 raised>0</mwc-button>
                               <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                <paper-icon-button class='disarm action-button' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
+                                <button class='mdc-button mdc-button__ripple mdc-button--raised sm disarm' on-click='callAlarmService' data-call='disarm'>
+                                  <span class="mdc-button__label" data-call='disarm'>disarm</span>
+                                </button>
                               </template>
                             </div>
-                            <div class='digits horizontal layout' style='justify-content: space-evenly;'>
-                              <template is='dom-if' if='[[requiresCode()]]'>
-                                <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                  <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
-                                    <mwc-button id='arm-night1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel' raised>Night</mwc-button>
-                                  </template>
-                                  <mwc-button id='arm-home1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel' raised>Home</mwc-button>
-                                  <mwc-button id='arm-away1' class='action-button' on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel' raised>Away</mwc-button>
-                                </template>
+                            <!-- small buttons for small screen size -->
+                            <div class='xs digits horizontal layout center-justified'>
+                              <button class='mdc-button mdc-button__ripple mdc-button--raised clear' on-click='callclearcode'>
+                                <span class="mdc-button__label">C</span>
+                              </button>
+                              <button class='mdc-button mdc-button__ripple mdc-button--outlined' on-click='callcode' data-digit=0>
+                                <span class="mdc-button__label" data-digit=0>0</span>
+                              </button>
+                              <!-- placeholder if alarm disarmed -->
+                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                                <button class='mdc-button mdc-button__ripple placeholder'></button>
+                              </template>
+                              <!-- real icon if alarm armed -->
+                              <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
+                                <paper-icon-button class='disarm' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
                               </template>
                             </div>
                           </div>
                         </div>
                       </template>
                     </template>
+                  </template>
+
+                  <!-- when alarm disarmed -->
+                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                    <div class='horizontal layout arm' style='justify-content: center;'>
+                      <!-- If arming with open sensors - show the list -->
+                      <template is='dom-if' if='[[attemptedArm]]'>
+                        <div class='vertical layout warning-message'>
+                          <div style='text-align: center;'>
+                            <h1>Open Sensors Found</h1>
+                          </div>
+                          <div class='sensors'>
+                            <template is='dom-repeat' items='[[opensensors_for_attempted_arm()]]' as='entity'>
+                              <state-card-display state-obj='[[entity]]' hass='[[hass]]' class='tappable' on-tap='entityTapped' data-entity='[[entity.entity_id]]'></state-card-display>
+                            </template>
+                          </div>
+                          <div class='layout horizontal'>
+                            <div class="mdc-touch-target-wrapper">
+                              <button class="mdc-button mdc-button__ripple mdc-button--outlined mdc-button--touch" on-click='callAlarmService' data-call='override' data-arm='attemptArmMode'>
+                                <span class="mdc-button__label" data-call='override' data-arm='attemptArmMode'>override</span>
+                              </button>
+                            </div>
+                            <div class="mdc-touch-target-wrapper">
+                              <button class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='cancel'>
+                                <span class="mdc-button__label" data-call='cancel'>cancel</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- if arming with no code when code to arm required - show error message -->
+                      <template is='dom-if' if='[[attemptedArmWithoutCode]]'>
+                        <div class='vertical layout error-message'>
+                          <div style='text-align: center;'>
+                            <h1>Error</h1>
+                            <span>Please enter code to arm.</span>
+                          </div>
+                          <div class="mdc-touch-target-wrapper">
+                            <button class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='cancel'>
+                              <span class="mdc-button__label" on-click='callAlarmService' data-call='cancel'>ok</span>
+                            </button>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- show Arm buttons if there is no errors/sensors to show -->
+                      <template is='dom-if' if='[[!attemptedArm]]'>
+                        <template is='dom-if' if='[[!attemptedArmWithoutCode]]'>
+                          <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
+                            <div class="mdc-touch-target-wrapper">
+                              <button id='arm-night' class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>
+                                <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_night_from_panel'>night</span>
+                              </button>
+                            </div>
+                          </template>
+                          <div class="mdc-touch-target-wrapper">
+                            <button id='arm-home' class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel'>
+                              <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_home_from_panel'>home</span>
+                            </button>
+                          </div>
+                          <div class="mdc-touch-target-wrapper">
+                            <button id='arm-away' class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel'>
+                              <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_away_from_panel'>away</span>
+                            </button>
+                          </div>
+                        </template>
+                      </template>
+                    </div>
                   </template>
                 </div>
 
@@ -487,7 +536,7 @@
                         </template>
                       </div>
 
-                      <mwc-button id='restart' data-type='button' on-click='restartHA'><iron-icon icon='mdi:restart' style='padding-right: 8px'></iron-icon><span>Restart Home Assistant</span></mwc-button>
+                      <button id='restart' data-type='button' on-click='restartHA'><iron-icon icon='mdi:restart' style='padding-right: 8px'></iron-icon><span>Restart Home Assistant</span></button>
 
                     </div>
 
@@ -622,7 +671,7 @@
                             </template>
                           </paper-listbox>
                         </template>
-                        <mwc-button on-click='unhideDiv' data-div='#themeDetail' style='background: unset; text-transform: capitalize;'><iron-icon  on-click='unhideDiv' data-div='#themeDetail' icon='mdi:plus-circle-outline' style='padding-right: 7px;'></iron-icon>New</mwc-button>
+                        <button on-click='unhideDiv' data-div='#themeDetail' style='background: unset; text-transform: capitalize;'><iron-icon  on-click='unhideDiv' data-div='#themeDetail' icon='mdi:plus-circle-outline' style='padding-right: 7px;'></iron-icon>New</button>
                       </div>
 
                       <!-- /* Theme Name [Input] | Update [Button] | Delete [Button] */ -->
@@ -650,7 +699,7 @@
                                 <span class='info-header'>[[color.header]]: </span>
                               </div>
                               <div class='horizontal layout' style='float: right'>
-                                <mwc-button class='deleteThemeColor' on-click='settingsSave' name$='[[color.theme]]' data-attribute$='[[color.name]]' data-type='clear' data-setting='themes' style='background: unset;'><iron-icon icon='mdi:delete'></iron-icon>Clear?</mwc-button>
+                                <button class='deleteThemeColor' on-click='settingsSave' name$='[[color.theme]]' data-attribute$='[[color.name]]' data-type='clear' data-setting='themes' style='background: unset;'><iron-icon icon='mdi:delete'></iron-icon>Clear?</button>
                                 <span class='colPicker' id$='[[color.name]]_span' value='[[color.color]]' style='margin: auto;'></span>
                                 <paper-icon-button data-type='color' data-setting='themes' name$='[[color.theme]]' data-attribute$='[[color.name]]' on-click='settingsSave' icon='mdi:check-circle-outline'></paper-icon-button>
                               </div>
@@ -767,23 +816,23 @@
                             <div style='margin-top: auto; margin-bottom: auto; margin-left: 15px;'>
                               <ha-switch class='setting-toggle' checked='{{isChecked(user.enabled)}}' data-userid$='[[user.id]]' on-change='toggleUser'>Enable</ha-switch>
                             </div>
-                            <mwc-button data-type='button' style='background-color: unset; width: 40%;' data-userid$='{{user.id}}' on-click='editUser'>
+                            <button data-type='button' style='background-color: unset; width: 40%;' data-userid$='{{user.id}}' on-click='editUser'>
                               <div style='margin-left: 5px; margin-right: 10px; padding-left: 15px;' data-userid$='[[user.id]]' on-click='editUser'>
                                 <state-badge style$='background-image: url({{computeImage(user.picture)}});' data-userid$='[[user.id]]' on-click='editUser'></state-badge>
                               </div>
                               <div style='margin-top: auto; margin-bottom: auto; font-size: large;' data-userid$='[[user.id]]' on-click='editUser'>
                                 [[user.name]]
                               </div>
-                            </mwc-button>
+                            </button>
 
                             <div style='margin-top: auto; margin-bottom: auto;'>
-                              <mwc-button  data-userid$='[[user.id]]' on-click='deleteUser' style='color: white;background-color: unset;'><iron-icon icon='mdi:delete'></iron-icon>&nbsp;&nbsp;Delete</mwc-button>
+                              <button  data-userid$='[[user.id]]' on-click='deleteUser' style='color: white;background-color: unset;'><iron-icon icon='mdi:delete'></iron-icon>&nbsp;&nbsp;Delete</button>
                             </div>
                           </div>
                         </div>
                       </template>
 
-                      <mwc-button id='user-add' data-type='button' on-click='unhideDiv' data-div='#userDetail' style='background-color: unset; margin-bottom: 15px;'><iron-icon icon='mdi:account-plus'></iron-icon>&nbsp;&nbsp;Add A New User</mwc-button>
+                      <button id='user-add' data-type='button' on-click='unhideDiv' data-div='#userDetail' style='background-color: unset; margin-bottom: 15px;'><iron-icon icon='mdi:account-plus'></iron-icon>&nbsp;&nbsp;Add A New User</button>
 
                       <div id='userDetail' class='remove'>
 
@@ -861,8 +910,8 @@
                           </div>
                         </div> -->
 
-                        <mwc-button id='user-save' data-type='button' on-click='saveUser' style='background-color: unset; margin-bottom: 15px;'><iron-icon icon='mdi:content-save'></iron-icon>&nbsp;&nbsp;Save User</mwc-button>
-                        <mwc-button on-click='resetUserDetail' style='background-color: unset; margin-bottom: 15px;'><iron-icon icon='mdi:cancel'></iron-icon>&nbsp;&nbsp;Cancel</mwc-button>
+                        <button id='user-save' data-type='button' on-click='saveUser' style='background-color: unset; margin-bottom: 15px;'><iron-icon icon='mdi:content-save'></iron-icon>&nbsp;&nbsp;Save User</button>
+                        <button on-click='resetUserDetail' style='background-color: unset; margin-bottom: 15px;'><iron-icon icon='mdi:cancel'></iron-icon>&nbsp;&nbsp;Cancel</button>
                       </div>
 
                     </div>
@@ -2193,7 +2242,7 @@
           //Changes the shape of the buttons
           if (this.isChecked(this.alarm.attributes.panel.round_buttons))
             this.updateStyles({'--button-shape': '50%'});
-          else this.updateStyles({'--button-shape': '0%'});
+          else this.updateStyles({'--button-shape': '4px'});
 
           if (this.isChecked(this.alarm.attributes.panel.hide_sidebar)){
             clearInterval(this.sidebarTimerId);
