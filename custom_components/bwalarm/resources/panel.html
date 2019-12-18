@@ -95,7 +95,7 @@
           </div>
         </div>
 
-        <div id='content' style='display: flex; flex-direction: column; height: 100%;'>
+        <div id='content'>
 <!--          <div id='alarm-panel' style='display: flex; flex-direction: column; height: 100%;'>-->
 
             <div id='main-content'>
@@ -108,6 +108,12 @@
 
                 <!-- ###########################################CONTROLS############################################### -->
                 <div id='controls' class='carousel-cell remove'>
+                  <!--
+                  <button class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch">
+                    <span class="mdc-button__label">test</span>
+                  </button>
+                  -->
+
                   <!-- Armed/code to arm required - show code panel -->
                   <template is='dom-if' if='[[showCodePanel(alarm)]]'>
                     <template is='dom-if' if='[[!attemptedArm]]'>
@@ -115,73 +121,138 @@
                         <!-- codepanel -->
                         <div id='codepanel' class='horizontal layout center-justified'>
                           <div>
-                            <!-- 1 2 3 CLEAR -->
-                            <div class='digits horizontal layout' style='justify-content: space-around;'>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=1>
-                                <span class="mdc-button__label" data-digit=1>1</span>
-                              </button>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=2>
-                                <span class="mdc-button__label" data-digit=2>2</span>
-                              </button>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=3>
-                                <span class="mdc-button__label" data-digit=3>3</span>
-                              </button>
-                              <button class='mdc-button mdc-button__ripple mdc-button--raised sm clear' on-click='callclearcode'>
-                                <span class="mdc-button__label">clear</span>
-                              </button>
+                            <!-- 1 2 3 {CLEAR if code to arm required} -->
+                            <div class='horizontal layout' style='justify-content: space-around;'>
+                                <div class="mdc-touch-target-wrapper">
+                                  <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=1>
+                                    <span class="mdc-button__label" data-digit=1>1</span>
+                                  </button>
+                                </div>
+                                <div class="mdc-touch-target-wrapper">
+                                  <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=2>
+                                    <span class="mdc-button__label" data-digit=2>2</span>
+                                  </button>
+                                </div>
+                                <div class="mdc-touch-target-wrapper">
+                                  <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=3>
+                                    <span class="mdc-button__label" data-digit=3>3</span>
+                                  </button>
+                                </div>
+
+                                <template is='dom-if' if='[[requiresCode()]]'>
+                                  <div class="mdc-touch-target-wrapper">
+                                    <button class='mdc-button mdc-button__ripple  mdc-button--touch mdc-button--raised sm clear' on-click='callclearcode'>
+                                      <span class="mdc-button__label">clear</span>
+                                    </button>
+                                  </div>
+                                </template>
                             </div>
-                            <!-- 4 5 6 0 -->
-                            <div class='digits horizontal layout' style='justify-content: space-around;'>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=4>
-                                <span class="mdc-button__label" data-digit=4>4</span>
-                              </button>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=5>
-                                <span class="mdc-button__label" data-digit=5>5</span>
-                              </button>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=6>
-                                <span class="mdc-button__label" data-digit=6>6</span>
-                              </button>
-                              <button class='mdc-button mdc-button__ripple mdc-button--outlined sm'  on-click='callcode' data-digit=0>
-                                <span class="mdc-button__label" data-digit=0>0</span>
-                              </button>
-                            </div>
-                            <!-- 7 8 9 {DISARM if not disarmed} -->
-                            <div class='digits horizontal layout' style='justify-content: space-around;'>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=7>
-                                <span class="mdc-button__label" data-digit=7>7</span>
-                              </button>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=8>
-                                <span class="mdc-button__label" data-digit=8>8</span>
-                              </button>
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined" on-click='callcode' data-digit=9>
-                                <span class="mdc-button__label" data-digit=9>9</span>
-                              </button>
-                              <!-- insert transparent button to make the layout neat -->
-                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                <button class='mdc-button mdc-button__ripple invisible'></button>
-                              </template>
-                              <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                <button class='mdc-button mdc-button__ripple mdc-button--raised sm disarm' on-click='callAlarmService' data-call='disarm'>
-                                  <span class="mdc-button__label" data-call='disarm'>disarm</span>
+                            <!-- 4 5 6 {0 if code required to arm}-->
+                            <div class='horizontal layout' style='justify-content: space-around;'>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=4>
+                                  <span class="mdc-button__label" data-digit=4>4</span>
                                 </button>
+                              </div>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=5>
+                                  <span class="mdc-button__label" data-digit=5>5</span>
+                                </button>
+                              </div>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=6>
+                                  <span class="mdc-button__label" data-digit=6>6</span>
+                                </button>
+                              </div>
+                              <template is='dom-if' if='[[requiresCode()]]'>
+                                <div class="mdc-touch-target-wrapper">
+                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined sm' on-click='callcode' data-digit=0>
+                                    <span class="mdc-button__label" data-digit=0>0</span>
+                                  </button>
+                                </div>
                               </template>
                             </div>
+                            <!-- 7 8 9 {DISARM if code to arm required}-->
+                            <div class='horizontal layout' style='justify-content: space-around;'>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=7>
+                                  <span class="mdc-button__label" data-digit=7>7</span>
+                                </button>
+                              </div>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=8>
+                                  <span class="mdc-button__label" data-digit=8>8</span>
+                                </button>
+                              </div>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=9>
+                                  <span class="mdc-button__label" data-digit=9>9</span>
+                                </button>
+                              </div>
+                              <template is='dom-if' if='[[requiresCode()]]'>
+                                <div class="mdc-touch-target-wrapper">
+                                  <!-- insert transparent button to make the layout neat -->
+                                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                                    <button class='mdc-button mdc-button__ripple  mdc-button--touch mdc-button--raised sm disarm invisible'>disarm</button>
+                                  </template>
+                                  <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
+                                    <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm disarm' on-click='callAlarmService' data-call='disarm'>
+                                      <span class="mdc-button__label" data-call='disarm'>disarm</span>
+                                    </button>
+                                  </template>
+                                </div>
+                              </template>
+                            </div>
+                            <!-- only when no code to arm required: CLEAR 0 {DISARM if not disarmed} -->
+                            <template is='dom-if' if='[[!requiresCode()]]'>
+                              <div class='horizontal layout' style='justify-content: space-around;'>
+                                <div class="mdc-touch-target-wrapper">
+                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm clear' on-click='callclearcode'>
+                                    <span class="mdc-button__label">clear</span>
+                                  </button>
+                                </div>
+                                <div class="mdc-touch-target-wrapper">
+                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined sm' on-click='callcode' data-digit=0>
+                                    <span class="mdc-button__label" data-digit=0>0</span>
+                                  </button>
+                                </div>
+                                <div class="mdc-touch-target-wrapper">
+                                  <!-- insert transparent button to make the layout neat -->
+                                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                                    <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm disarm invisible'>disarm</button>
+                                  </template>
+                                  <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
+                                    <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm disarm' on-click='callAlarmService' data-call='disarm'>
+                                      <span class="mdc-button__label" data-call='disarm'>disarm</span>
+                                    </button>
+                                  </template>
+                                </div>
+                              </div>
+                            </template>
                             <!-- small buttons for small screen size -->
-                            <div class='xs digits horizontal layout center-justified'>
-                              <button class='mdc-button mdc-button__ripple mdc-button--raised clear' on-click='callclearcode'>
-                                <span class="mdc-button__label">C</span>
-                              </button>
-                              <button class='mdc-button mdc-button__ripple mdc-button--outlined' on-click='callcode' data-digit=0>
-                                <span class="mdc-button__label" data-digit=0>0</span>
-                              </button>
-                              <!-- placeholder if alarm disarmed -->
-                              <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                <button class='mdc-button mdc-button__ripple invisible'></button>
-                              </template>
-                              <!-- real icon if alarm armed -->
-                              <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                <paper-icon-button class='disarm' on-click='callAlarmService' data-call='disarm' icon='mdi:fingerprint' raised></paper-icon-button>
-                              </template>
+                            <div class='xs horizontal layout' style='justify-content: space-around;'>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised clear' on-click='callclearcode'>
+                                  <span class="mdc-button__label">clear</span>
+                                </button>
+                              </div>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined' on-click='callcode' data-digit=0>
+                                  <span class="mdc-button__label" data-digit=0>0</span>
+                                </button>
+                              </div>
+                              <div class="mdc-touch-target-wrapper">
+                                <!-- placeholder if alarm disarmed -->
+                                <template is='dom-if' if='[[isDisarmed(alarm)]]'>
+                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised invisible'>disarm</button>
+                                </template>
+                                <!-- real button if alarm armed -->
+                                <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
+                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised disarm' on-click='callAlarmService' data-call='disarm'>
+                                    <span class="mdc-button__label" data-call='disarm'>disarm</span>
+                                  </button>
+                                </template>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -191,7 +262,6 @@
 
                   <!-- when alarm disarmed -->
                   <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                    <div class='horizontal layout arm' style='justify-content: center;'>
                       <!-- If arming with open sensors - show the list -->
                       <template is='dom-if' if='[[attemptedArm]]'>
                         <div class='vertical layout warning-message'>
@@ -205,12 +275,12 @@
                           </div>
                           <div class='layout horizontal'>
                             <div class="mdc-touch-target-wrapper">
-                              <button class="mdc-button mdc-button__ripple mdc-button--outlined mdc-button--touch" on-click='callAlarmService' data-call='override' data-arm='attemptArmMode'>
+                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callAlarmService' data-call='override' data-arm='attemptArmMode'>
                                 <span class="mdc-button__label" data-call='override' data-arm='attemptArmMode'>override</span>
                               </button>
                             </div>
                             <div class="mdc-touch-target-wrapper">
-                              <button class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='cancel'>
+                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='cancel'>
                                 <span class="mdc-button__label" data-call='cancel'>cancel</span>
                               </button>
                             </div>
@@ -226,7 +296,7 @@
                             <span>Please enter code to arm.</span>
                           </div>
                           <div class="mdc-touch-target-wrapper">
-                            <button class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='cancel'>
+                            <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='cancel'>
                               <span class="mdc-button__label" on-click='callAlarmService' data-call='cancel'>ok</span>
                             </button>
                           </div>
@@ -236,26 +306,27 @@
                       <!-- show Arm buttons if there is no errors/sensors to show -->
                       <template is='dom-if' if='[[!attemptedArm]]'>
                         <template is='dom-if' if='[[!attemptedArmWithoutCode]]'>
-                          <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
+                          <div class='horizontal layout arm' style='justify-content: center;'>
+                            <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
+                              <div class="mdc-touch-target-wrapper">
+                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>
+                                  <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_night_from_panel'>night</span>
+                                </button>
+                              </div>
+                            </template>
                             <div class="mdc-touch-target-wrapper">
-                              <button id='arm-night' class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>
-                                <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_night_from_panel'>night</span>
+                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel'>
+                                <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_home_from_panel'>home</span>
                               </button>
                             </div>
-                          </template>
-                          <div class="mdc-touch-target-wrapper">
-                            <button id='arm-home' class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel'>
-                              <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_home_from_panel'>home</span>
-                            </button>
-                          </div>
-                          <div class="mdc-touch-target-wrapper">
-                            <button id='arm-away' class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel'>
-                              <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_away_from_panel'>away</span>
-                            </button>
+                            <div class="mdc-touch-target-wrapper">
+                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel'>
+                                <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_away_from_panel'>away</span>
+                              </button>
+                            </div>
                           </div>
                         </template>
                       </template>
-                    </div>
                   </template>
                 </div>
 
@@ -2226,8 +2297,9 @@
         }
 
         requiresCode(){
-          return !this.isDisarmed(this.alarm) || this.isChecked(this.alarm.attributes.code_arm_required);
+          return this.isChecked(this.alarm.attributes.code_arm_required);
         }
+
 
         updatePanelStyles(){
           //Re-aligns title bar
