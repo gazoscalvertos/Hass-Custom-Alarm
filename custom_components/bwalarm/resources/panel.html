@@ -46,11 +46,11 @@
       </style>
       <!-- ha-app-layout has-scrolling-region -->
       <div id='layout'>
-        <template is='dom-if' if='[[panel_title(alarm)]]'>
+        <template is='dom-if' if='[[!isEmpty(panel_title)]]'>
           <div id='main-title' class='horizontal layout center-justified'>
-            <div id='clock' class='box box-header'></div>
-            <div id='main-title-text'>[[panel_title(alarm)]]</div>
-            <div id='weather' class='box box-header weather'></div>
+            <div class='box box-header'></div>
+            <div id='main-title-text'>[[panel_title]]</div>
+            <div class='box box-header weather'></div>
           </div>
         </template>
 
@@ -108,121 +108,86 @@
 
                 <!-- ###########################################CONTROLS############################################### -->
                 <div id='controls' class='carousel-cell remove'>
-                  <!--
-                  <!-- Armed/code to arm required - show code panel -->
-                  <template is='dom-if' if='[[showCodePanel(alarm)]]'>
-                    <template is='dom-if' if='[[!attemptedArm]]'>
-                      <template is='dom-if' if='[[!attemptedArmWithoutCode]]'>
-                        <!-- codepanel -->
-                        <div id='codepanel' class='horizontal layout center-justified'>
-                          <div>
-                            <!-- 1 2 3 {CLEAR if code to arm required} -->
-                            <div class='horizontal layout' style='justify-content: space-around;'>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=1>1</button>
-                                </div>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=2>2</button>
-                                </div>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=3>3</button>
-                                </div>
-
-                                <template is='dom-if' if='[[requiresCode()]]'>
-                                  <div class$=[[mwc_button_wrapper_class]]>
-                                    <button class$="[[mwc_button__raised('sm clear')]]" on-click='callclearcode'>clear</button>
-                                  </div>
-                                </template>
+                  <template is='dom-if' if='[[showCodePanelWhenBothFalse(alarm, attemptedArm, attemptedArmWithoutCode)]]'>
+                    <div id='codepanel' class='horizontal layout center-justified'>
+                      <div>
+                        <!--<span>code to arm required=[[isChecked(alarm.attributes.code_arm_required)]]</span>
+                        <span>invisibleIfDisarmed: '[[invisibleIfDisarmed(alarm)]]'</span>-->
+                        <!-- 1 2 3 {CLEAR if code to arm required} -->
+                        <div class='horizontal layout' style='justify-content: space-around;'>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=1>1</button>
+                          </div>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=2>2</button>
+                          </div>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=3>3</button>
+                          </div>
+                          <template is='dom-if' if='[[isChecked(alarm.attributes.code_arm_required)]]'>
+                            <div class$=[[mwc_button_wrapper_class()]]>
+                              <button class$="[[mwc_button__raised()]] clear" on-click='callclearcode'>clear</button>
                             </div>
-                            <!-- 4 5 6 {0 if code required to arm}-->
-                            <div class='horizontal layout' style='justify-content: space-around;'>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=4>4</button>
-                              </div>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=5>5</button>
-                              </div>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=6>6</button>
-                              </div>
-                              <template is='dom-if' if='[[requiresCode()]]'>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <button class$="[[mwc_button__outlined('sm')]]" on-click='callcode' data-digit=0>0</button>
-                                </div>
-                              </template>
+                          </template>
+                        </div>
+                        <!-- 4 5 6 {0 if code required to arm}-->
+                        <div class='horizontal layout' style='justify-content: space-around;'>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=4>4</button>
+                          </div>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=5>5</button>
+                          </div>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=6>6</button>
+                          </div>
+                          <template is='dom-if' if='[[isChecked(alarm.attributes.code_arm_required)]]'>
+                            <div class$=[[mwc_button_wrapper_class()]]>
+                              <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=0>0</button>
                             </div>
-                            <!-- 7 8 9 {DISARM if code to arm required}-->
-                            <div class='horizontal layout' style='justify-content: space-around;'>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=7>
-                                  <span class="mdc-button__label" data-digit=7>7</span>
-                                </button>
-                              </div>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=8>
-                                  <span class="mdc-button__label" data-digit=8>8</span>
-                                </button>
-                              </div>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=9>
-                                  <span class="mdc-button__label" data-digit=9>9</span>
-                                </button>
-                              </div>
-                              <template is='dom-if' if='[[requiresCode()]]'>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <!-- insert transparent button to make the layout neat -->
-                                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                    <button class$="[[mwc_button__raised('sm disarm invisible')]]">disarm</button>
-                                  </template>
-                                  <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                    <button class$="[[mwc_button__raised('sm disarm')]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
-                                  </template>
-                                </div>
-                              </template>
+                          </template>
+                        </div>
+                        <!-- 7 8 9 {DISARM if code to arm required}-->
+                        <div class='horizontal layout' style='justify-content: space-around;'>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=7>
+                              <span class="mdc-button__label" data-digit=7>7</span>
+                            </button>
+                          </div>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=8>
+                              <span class="mdc-button__label" data-digit=8>8</span>
+                            </button>
+                          </div>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=9>
+                              <span class="mdc-button__label" data-digit=9>9</span>
+                            </button>
+                          </div>
+                          <template is='dom-if' if='[[isChecked(alarm.attributes.code_arm_required)]]'>
+                            <div class$=[[mwc_button_wrapper_class()]]>
+                              <!-- insert transparent button to make the layout neat -->
+                              <button class$="[[mwc_button__raised()]] disarm [[invisibleIfDisarmed(alarm)]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
                             </div>
-                            <!-- only when no code to arm required: CLEAR 0 {DISARM if not disarmed} -->
-                            <template is='dom-if' if='[[!requiresCode()]]'>
-                              <div class='horizontal layout' style='justify-content: space-around;'>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <button class$="[[mwc_button__raised('sm clear')]]" on-click='callclearcode'>clear</button>
-                                </div>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <button class$="[[mwc_button__outlined('sm')]]" on-click='callcode' data-digit=0>0</button>
-                                </div>
-                                <div class$=[[mwc_button_wrapper_class]]>
-                                  <!-- insert transparent button to make the layout neat -->
-                                  <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                    <button class$="[[mwc_button__raised('sm disarm invisible')]]">disarm</button>
-                                  </template>
-                                  <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                    <button class$="[[mwc_button__raised('sm disarm')]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
-                                  </template>
-                                </div>
-                              </div>
-                            </template>
-                            <!-- small buttons for small screen size -->
-                            <div class='xs horizontal layout' style='justify-content: space-around;'>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__raised('clear')]]" on-click='callclearcode'>clear</button>
-                              </div>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=0>0</button>
-                              </div>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <!-- placeholder if alarm disarmed -->
-                                <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                  <button class$="[[mwc_button__raised('disarm invisible')]]">disarm</button>
-                                </template>
-                                <!-- real button if alarm armed -->
-                                <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                  <button class$="[[mwc_button__raised('disarm')]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
-                                </template>
-                              </div>
+                          </template>
+                        </div>
+                        <!-- only when no code to arm required: CLEAR 0 {DISARM if not disarmed} -->
+                        <template is='dom-if' if='[[!isChecked(alarm.attributes.code_arm_required)]]'>
+                          <div class='horizontal layout' style='justify-content: space-around;'>
+                            <div class$=[[mwc_button_wrapper_class()]]>
+                              <button class$="[[mwc_button__raised()]] clear" on-click='callclearcode'>clear</button>
+                            </div>
+                            <div class$=[[mwc_button_wrapper_class()]]>
+                              <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=0>0</button>
+                            </div>
+                            <div class$=[[mwc_button_wrapper_class()]]>
+                              <!-- insert transparent button to make the layout neat -->
+                              <button class$="[[mwc_button__raised()]] disarm [[invisibleIfDisarmed(alarm)]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
                             </div>
                           </div>
-                        </div>
-                      </template>
-                    </template>
+                        </template>
+                      </div>
+                    </div>
                   </template>
 
                   <!-- when alarm disarmed -->
@@ -234,15 +199,15 @@
                             <h1>Open Sensors Found</h1>
                           </div>
                           <div class='sensors'>
-                            <template is='dom-repeat' items='[[opensensors_for_attempted_arm()]]' as='entity'>
+                            <template is='dom-repeat' items='[[opensensors_for_attempted_arm(alarm)]]' as='entity'>
                               <state-card-display state-obj='[[entity]]' hass='[[hass]]' class='tappable' on-tap='entityTapped' data-entity='[[entity.entity_id]]'></state-card-display>
                             </template>
                           </div>
                           <div class='layout horizontal'>
-                            <div class$=[[mwc_button_wrapper_class]]>
+                            <div class$=[[mwc_button_wrapper_class()]]>
                               <button class$="[[mwc_button__outlined()]]" on-click='callAlarmService' data-call='override' data-arm='attemptArmMode'>override</button>
                             </div>
-                            <div class$=[[mwc_button_wrapper_class]]>
+                            <div class$=[[mwc_button_wrapper_class()]]>
                               <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='cancel'>cancel</button>
                             </div>
                           </div>
@@ -256,29 +221,27 @@
                             <h1>Error</h1>
                             <span>Please enter code to arm.</span>
                           </div>
-                          <div class$=[[mwc_button_wrapper_class]]>
+                          <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='cancel'>ok</button>
                           </div>
                         </div>
                       </template>
 
                       <!-- show Arm buttons if there is no errors/sensors to show -->
-                      <template is='dom-if' if='[[!attemptedArm]]'>
-                        <template is='dom-if' if='[[!attemptedArmWithoutCode]]'>
-                          <div class='horizontal layout arm' style='justify-content: center;'>
-                            <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
-                              <div class$=[[mwc_button_wrapper_class]]>
-                                <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>night</button>
-                              </div>
-                            </template>
-                            <div class$=[[mwc_button_wrapper_class]]>
-                              <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel'>home</button>
+                      <template is='dom-if' if='[[bothFalse(attemptedArm, attemptedArmWithoutCode)]]'>
+                        <div class='horizontal layout arm' style='justify-content: center;'>
+                          <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
+                            <div class$=[[mwc_button_wrapper_class()]]>
+                              <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>night</button>
                             </div>
-                            <div class$=[[mwc_button_wrapper_class]]>
-                              <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel'>away</button>
-                            </div>
+                          </template>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel'>home</button>
                           </div>
-                        </template>
+                          <div class$=[[mwc_button_wrapper_class()]]>
+                            <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel'>away</button>
+                          </div>
+                        </div>
                       </template>
                   </template>
                 </div>
@@ -1457,6 +1420,7 @@
             settingsUnlock:       { type: Boolean, value: false },
 
             alarm_state:          { type: String, value: 'Disarmed'},
+            panel_title:          { type: String, value: ''},
 
             carouselMainSelected: { type: Object },
             carouselSettings:     { type: Object },
@@ -1512,7 +1476,7 @@
             // internal constants
             INT_ATTR_STATE_CHECK_BEFORE_ARM: { type: String, value: 'check_before_arm'},
 
-            mwc_button_wrapper_class: { type: String, value: "mdc-touch-target-wrapper"},
+            __mwc_button_wrapper_class: { type: String, value: "mdc-touch-target-wrapper"},
             __mwc_button__base_style: { type: String, value: "mdc-button mdc-button__ripple mdc-button--touch"},
 
             __mwc_button__outlined: { type: String, value: " mdc-button--outlined"},
@@ -1859,11 +1823,26 @@
           return this.hass.states[entity];
         }
 
-        panel_title(alarm){
-          if (alarm && alarm.attributes.panel && alarm.attributes.panel.panel_title != null )
-            return alarm.attributes.panel.panel_title;
-          else
-            return '';
+        getPanelTitle(){
+          if (this.alarm && this.alarm.attributes.panel && this.alarm.attributes.panel.panel_title != null ) {
+            this.panel_title = this.alarm.attributes.panel.panel_title.trim();
+            //console.log('getPanelTitle: panel_title="'+this.panel_title+'"');
+          }
+          else {
+            this.panel_title = '';
+            //console.log('getPanelTitle: panel_title="'+this.panel_title+'" (default)');
+          }
+        }
+
+        isEmpty(str) {
+          if (str.length == 0) {
+            //console.log('isEmpty('+str+')=true');
+            return true;
+          }
+          else {
+            //console.log('isEmpty('+str+')=false');
+            return false;
+          }
         }
 
         isChecked(arg){
@@ -2254,10 +2233,10 @@
             });
           }
         }
-
+/*
         requiresCode(){
           return this.isChecked(this.alarm.attributes.code_arm_required);
-        }
+        }*/
 
 
         updatePanelStyles(){
@@ -2280,6 +2259,9 @@
             // Close the sidebar if alarm is set and the option is enabled
             this.sidebarTimerId = setInterval(this.closeSidebar, 100, this);
           }
+
+          //Updates the title of the panel
+          this.getPanelTitle();
 
           if (this.isChecked(this.alarm.attributes.panel.enable_serif_font)) this.updateStyles({'--font-header': "'Lobster'"});
           else this.updateStyles({'--font-header': "unset"});
@@ -2385,10 +2367,10 @@
           return ret;
         }
 
-        opensensors_for_attempted_arm() {
+        opensensors_for_attempted_arm(alarm) {
           if (this.attemptedArm == true) {
             var arm_state = this.service_name2arm_state(this.attemptArmMode);
-            return this.opensensors(this.alarm, this.computeSensors(this.hass, this.alarm.attributes.states[arm_state][this.INT_ATTR_STATE_CHECK_BEFORE_ARM]) );
+            return this.opensensors(alarm, this.computeSensors(this.hass, alarm.attributes.states[arm_state][this.INT_ATTR_STATE_CHECK_BEFORE_ARM]) );
           }
           else
             return []
@@ -2522,7 +2504,13 @@
 
         //If you require a code to arm the system then force it here
         showCodePanel(alarm){
+          if (alarm === null || alarm === undefined)
+            return false;
           return this.isChecked(alarm.attributes.code_arm_required) || !this.isDisarmed(alarm);
+        }
+        // need it to avoid nesting 3 templates
+        showCodePanelWhenBothFalse(alarm, arg_1, arg_2) {
+          return this.showCodePanel(alarm) && ! arg_1 && !arg_2;
         }
 
         //An Alarm service has been requested, execute it
@@ -2751,8 +2739,10 @@
               case 'panel':
                 if (typeof ev.target.checked === 'boolean')
                   this.alarm.attributes.panel[attribute] = ev.target.checked;
-                else if (type == 'input_text')
+                else if (type == 'input_text') {
                   this.alarm.attributes.panel[attribute] = this.shadowRoot.querySelector('#' + attribute).value;
+                  console.log("settingsSave(this.alarm.attributes.panel["+attribute+"],'"+this.alarm.attributes.panel[attribute]+"')");
+                }
                 else if (type == 'listbox')
                   this.alarm.attributes.panel[attribute] = this.shadowRoot.querySelector('#' + attribute + '-listbox').selected;
                 this.settingsUpdate(setting, this.alarm.attributes.panel);
@@ -2939,17 +2929,26 @@
           return event;
         }
 
-        mwc_button__outlined(extra_styles) {
-          var style = this.__mwc_button__base_style + this.__mwc_button__outlined;
-          return extra_styles? style + ' ' + extra_styles : style;
+        mwc_button_wrapper_class() {
+          return this.__mwc_button_wrapper_class;
         }
 
-        mwc_button__raised(extra_styles) {
-          var style = this.__mwc_button__base_style + this.__mwc_button__raised;
-          return extra_styles? style + ' ' + extra_styles : style;
+        mwc_button__outlined() {
+          return this.__mwc_button__base_style + this.__mwc_button__outlined;
+        }
+
+        mwc_button__raised() {
+          return this.__mwc_button__base_style + this.__mwc_button__raised;
+        }
+
+        invisibleIfDisarmed(alarm) {
+          return this.isDisarmed(alarm)? 'invisible' : '';
+        }
+
+        bothFalse(arg_1, arg_2) {
+          return !arg_1 && !arg_2;
         }
       }
-
 
       customElements.define(HaPanelAlarm.is, HaPanelAlarm);
     }

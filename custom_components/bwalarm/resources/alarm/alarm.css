@@ -108,6 +108,7 @@ app-toolbar {
   background-color: var(--header-background-color);
   color: var(--header-text-color);
 }
+
 #layout {
   background-color: var(--panel-background-color);
   display: flex;
@@ -228,10 +229,6 @@ a:hover {
     border-style: groove;
     border-width: 2px;
 }
-/*
-.action-button{
-  border: 3px solid var(--action-button-border-color) !important;
-}*/
 
 .dropdown-content{
   width: 90%;
@@ -571,25 +568,6 @@ button.invisible {
   opacity: 0; /* makes the button transparent */
   cursor: unset !important; /* stop cursor from changing its shape over the button */
 }
-
-/* OBSOLETE/UNUSED: open sensors: override, cancel buttons
-div.arm button div {
-  margin: 20px;
-  padding: 20px;
-  width: 100px;
-  height: 100px;
-  border: 3px solid var(--arm-button-border-color);
-  border-radius: var(--button-shape);
-
-  display: flex;
-  line-height: 100px;
-  justify-content: center;
-  align-items: center;
-}*/
-/* UNUSED
-div.arm button.big {
-   width: 68%;
-}*/
 
 /* error message styling */
 div.error-message {
@@ -1021,11 +999,7 @@ text-align: left;
 
     font-size: large;
   }
-/*
-  div.arm button span {
-    font-size: large;
-  }
-*/
+
   #alarm-status span {
     font-size: x-large;
   }
@@ -1141,15 +1115,11 @@ text-align: left;
 /* NIGHT, HOME and AWAY buttons */
 div.arm button {
   margin: 10px;
-  height: 25vh;
-  width: 25vh;
+  height: 20vh;
+  width: 20vh;
 
   font-size: x-large;
 }
-/*
-div.arm button span {
-  font-size: x-large;
-}*/
 
 /* ## codepanel ## */
 #codepanel button {
@@ -1159,14 +1129,6 @@ div.arm button span {
 
   font-size: xx-large;
 }
-/*
-#codepanel button.mdc-button--outlined {
-  font-size: xx-large;
-}
-
-#codepanel button.mdc-button--raised {
-  font-size: large;
-}*/
 
 #codepanel button.clear, #codepanel button.disarm {
   font-size: large;
@@ -1209,6 +1171,7 @@ div.arm button span {
 
 /* ######################################################### w3: for Wide Screens (width >= 1024) ################################################# */
 @media screen and (min-width: 1024px) {
+  /* NO span here - breaks a lot! */
   li, .settings-nav-text{
     font-size: large;
   }
@@ -1238,15 +1201,8 @@ div.arm button span {
 
   /* NIGHT, HOME and AWAY buttons */
   div.arm button {
-    margin: 15px;
-    height: 30vh;
-    width: 30vh;
     font-size: xx-large;
   }
-/*
-  div.arm button span {
-    font-size: xx-large;
-  }*/
 
    #info-panel-selection paper-icon-button {
     width: 60px;
