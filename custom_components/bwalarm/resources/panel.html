@@ -109,11 +109,6 @@
                 <!-- ###########################################CONTROLS############################################### -->
                 <div id='controls' class='carousel-cell remove'>
                   <!--
-                  <button class="mdc-button mdc-button__ripple mdc-button--raised mdc-button--touch">
-                    <span class="mdc-button__label">test</span>
-                  </button>
-                  -->
-
                   <!-- Armed/code to arm required - show code panel -->
                   <template is='dom-if' if='[[showCodePanel(alarm)]]'>
                     <template is='dom-if' if='[[!attemptedArm]]'>
@@ -123,82 +118,64 @@
                           <div>
                             <!-- 1 2 3 {CLEAR if code to arm required} -->
                             <div class='horizontal layout' style='justify-content: space-around;'>
-                                <div class="mdc-touch-target-wrapper">
-                                  <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=1>
-                                    <span class="mdc-button__label" data-digit=1>1</span>
-                                  </button>
+                                <div class$=[[mwc_button_wrapper_class]]>
+                                  <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=1>1</button>
                                 </div>
-                                <div class="mdc-touch-target-wrapper">
-                                  <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=2>
-                                    <span class="mdc-button__label" data-digit=2>2</span>
-                                  </button>
+                                <div class$=[[mwc_button_wrapper_class]]>
+                                  <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=2>2</button>
                                 </div>
-                                <div class="mdc-touch-target-wrapper">
-                                  <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=3>
-                                    <span class="mdc-button__label" data-digit=3>3</span>
-                                  </button>
+                                <div class$=[[mwc_button_wrapper_class]]>
+                                  <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=3>3</button>
                                 </div>
 
                                 <template is='dom-if' if='[[requiresCode()]]'>
-                                  <div class="mdc-touch-target-wrapper">
-                                    <button class='mdc-button mdc-button__ripple  mdc-button--touch mdc-button--raised sm clear' on-click='callclearcode'>
-                                      <span class="mdc-button__label">clear</span>
-                                    </button>
+                                  <div class$=[[mwc_button_wrapper_class]]>
+                                    <button class$="[[mwc_button__raised('sm clear')]]" on-click='callclearcode'>clear</button>
                                   </div>
                                 </template>
                             </div>
                             <!-- 4 5 6 {0 if code required to arm}-->
                             <div class='horizontal layout' style='justify-content: space-around;'>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=4>
-                                  <span class="mdc-button__label" data-digit=4>4</span>
-                                </button>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=4>4</button>
                               </div>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=5>
-                                  <span class="mdc-button__label" data-digit=5>5</span>
-                                </button>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=5>5</button>
                               </div>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=6>
-                                  <span class="mdc-button__label" data-digit=6>6</span>
-                                </button>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=6>6</button>
                               </div>
                               <template is='dom-if' if='[[requiresCode()]]'>
-                                <div class="mdc-touch-target-wrapper">
-                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined sm' on-click='callcode' data-digit=0>
-                                    <span class="mdc-button__label" data-digit=0>0</span>
-                                  </button>
+                                <div class$=[[mwc_button_wrapper_class]]>
+                                  <button class$="[[mwc_button__outlined('sm')]]" on-click='callcode' data-digit=0>0</button>
                                 </div>
                               </template>
                             </div>
                             <!-- 7 8 9 {DISARM if code to arm required}-->
                             <div class='horizontal layout' style='justify-content: space-around;'>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=7>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=7>
                                   <span class="mdc-button__label" data-digit=7>7</span>
                                 </button>
                               </div>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=8>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=8>
                                   <span class="mdc-button__label" data-digit=8>8</span>
                                 </button>
                               </div>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callcode' data-digit=9>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=9>
                                   <span class="mdc-button__label" data-digit=9>9</span>
                                 </button>
                               </div>
                               <template is='dom-if' if='[[requiresCode()]]'>
-                                <div class="mdc-touch-target-wrapper">
+                                <div class$=[[mwc_button_wrapper_class]]>
                                   <!-- insert transparent button to make the layout neat -->
                                   <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                    <button class='mdc-button mdc-button__ripple  mdc-button--touch mdc-button--raised sm disarm invisible'>disarm</button>
+                                    <button class$="[[mwc_button__raised('sm disarm invisible')]]">disarm</button>
                                   </template>
                                   <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                    <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm disarm' on-click='callAlarmService' data-call='disarm'>
-                                      <span class="mdc-button__label" data-call='disarm'>disarm</span>
-                                    </button>
+                                    <button class$="[[mwc_button__raised('sm disarm')]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
                                   </template>
                                 </div>
                               </template>
@@ -206,51 +183,39 @@
                             <!-- only when no code to arm required: CLEAR 0 {DISARM if not disarmed} -->
                             <template is='dom-if' if='[[!requiresCode()]]'>
                               <div class='horizontal layout' style='justify-content: space-around;'>
-                                <div class="mdc-touch-target-wrapper">
-                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm clear' on-click='callclearcode'>
-                                    <span class="mdc-button__label">clear</span>
-                                  </button>
+                                <div class$=[[mwc_button_wrapper_class]]>
+                                  <button class$="[[mwc_button__raised('sm clear')]]" on-click='callclearcode'>clear</button>
                                 </div>
-                                <div class="mdc-touch-target-wrapper">
-                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined sm' on-click='callcode' data-digit=0>
-                                    <span class="mdc-button__label" data-digit=0>0</span>
-                                  </button>
+                                <div class$=[[mwc_button_wrapper_class]]>
+                                  <button class$="[[mwc_button__outlined('sm')]]" on-click='callcode' data-digit=0>0</button>
                                 </div>
-                                <div class="mdc-touch-target-wrapper">
+                                <div class$=[[mwc_button_wrapper_class]]>
                                   <!-- insert transparent button to make the layout neat -->
                                   <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                    <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm disarm invisible'>disarm</button>
+                                    <button class$="[[mwc_button__raised('sm disarm invisible')]]">disarm</button>
                                   </template>
                                   <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                    <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised sm disarm' on-click='callAlarmService' data-call='disarm'>
-                                      <span class="mdc-button__label" data-call='disarm'>disarm</span>
-                                    </button>
+                                    <button class$="[[mwc_button__raised('sm disarm')]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
                                   </template>
                                 </div>
                               </div>
                             </template>
                             <!-- small buttons for small screen size -->
                             <div class='xs horizontal layout' style='justify-content: space-around;'>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised clear' on-click='callclearcode'>
-                                  <span class="mdc-button__label">clear</span>
-                                </button>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__raised('clear')]]" on-click='callclearcode'>clear</button>
                               </div>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined' on-click='callcode' data-digit=0>
-                                  <span class="mdc-button__label" data-digit=0>0</span>
-                                </button>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=0>0</button>
                               </div>
-                              <div class="mdc-touch-target-wrapper">
+                              <div class$=[[mwc_button_wrapper_class]]>
                                 <!-- placeholder if alarm disarmed -->
                                 <template is='dom-if' if='[[isDisarmed(alarm)]]'>
-                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised invisible'>disarm</button>
+                                  <button class$="[[mwc_button__raised('disarm invisible')]]">disarm</button>
                                 </template>
                                 <!-- real button if alarm armed -->
                                 <template is='dom-if' if='[[!isDisarmed(alarm)]]'>
-                                  <button class='mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised disarm' on-click='callAlarmService' data-call='disarm'>
-                                    <span class="mdc-button__label" data-call='disarm'>disarm</span>
-                                  </button>
+                                  <button class$="[[mwc_button__raised('disarm')]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
                                 </template>
                               </div>
                             </div>
@@ -274,15 +239,11 @@
                             </template>
                           </div>
                           <div class='layout horizontal'>
-                            <div class="mdc-touch-target-wrapper">
-                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--outlined" on-click='callAlarmService' data-call='override' data-arm='attemptArmMode'>
-                                <span class="mdc-button__label" data-call='override' data-arm='attemptArmMode'>override</span>
-                              </button>
+                            <div class$=[[mwc_button_wrapper_class]]>
+                              <button class$="[[mwc_button__outlined()]]" on-click='callAlarmService' data-call='override' data-arm='attemptArmMode'>override</button>
                             </div>
-                            <div class="mdc-touch-target-wrapper">
-                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='cancel'>
-                                <span class="mdc-button__label" data-call='cancel'>cancel</span>
-                              </button>
+                            <div class$=[[mwc_button_wrapper_class]]>
+                              <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='cancel'>cancel</button>
                             </div>
                           </div>
                         </div>
@@ -295,10 +256,8 @@
                             <h1>Error</h1>
                             <span>Please enter code to arm.</span>
                           </div>
-                          <div class="mdc-touch-target-wrapper">
-                            <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='cancel'>
-                              <span class="mdc-button__label" on-click='callAlarmService' data-call='cancel'>ok</span>
-                            </button>
+                          <div class$=[[mwc_button_wrapper_class]]>
+                            <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='cancel'>ok</button>
                           </div>
                         </div>
                       </template>
@@ -308,21 +267,15 @@
                         <template is='dom-if' if='[[!attemptedArmWithoutCode]]'>
                           <div class='horizontal layout arm' style='justify-content: center;'>
                             <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
-                              <div class="mdc-touch-target-wrapper">
-                                <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>
-                                  <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_night_from_panel'>night</span>
-                                </button>
+                              <div class$=[[mwc_button_wrapper_class]]>
+                                <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>night</button>
                               </div>
                             </template>
-                            <div class="mdc-touch-target-wrapper">
-                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel'>
-                                <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_home_from_panel'>home</span>
-                              </button>
+                            <div class$=[[mwc_button_wrapper_class]]>
+                              <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_home_from_panel'>home</button>
                             </div>
-                            <div class="mdc-touch-target-wrapper">
-                              <button class="mdc-button mdc-button__ripple mdc-button--touch mdc-button--raised" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel'>
-                                <span class="mdc-button__label" data-call='arm' data-arm='alarm_arm_away_from_panel'>away</span>
-                              </button>
+                            <div class$=[[mwc_button_wrapper_class]]>
+                              <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_away_from_panel'>away</button>
                             </div>
                           </div>
                         </template>
@@ -1558,6 +1511,12 @@
 
             // internal constants
             INT_ATTR_STATE_CHECK_BEFORE_ARM: { type: String, value: 'check_before_arm'},
+
+            mwc_button_wrapper_class: { type: String, value: "mdc-touch-target-wrapper"},
+            __mwc_button__base_style: { type: String, value: "mdc-button mdc-button__ripple mdc-button--touch"},
+
+            __mwc_button__outlined: { type: String, value: " mdc-button--outlined"},
+            __mwc_button__raised: { type: String, value: " mdc-button--raised"},
           }
         }
 
@@ -2979,7 +2938,18 @@
           node.dispatchEvent(event);
           return event;
         }
+
+        mwc_button__outlined(extra_styles) {
+          var style = this.__mwc_button__base_style + this.__mwc_button__outlined;
+          return extra_styles? style + ' ' + extra_styles : style;
+        }
+
+        mwc_button__raised(extra_styles) {
+          var style = this.__mwc_button__base_style + this.__mwc_button__raised;
+          return extra_styles? style + ' ' + extra_styles : style;
+        }
       }
+
 
       customElements.define(HaPanelAlarm.is, HaPanelAlarm);
     }
