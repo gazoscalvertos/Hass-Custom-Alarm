@@ -46,13 +46,13 @@
       </style>
       <!-- ha-app-layout has-scrolling-region -->
       <div id='layout'>
-        <template is='dom-if' if='[[!isEmpty(panel_title)]]'>
+<!--        <template is='dom-if' if='[[panel_has_title]]'>
           <div id='main-title' class='horizontal layout center-justified'>
             <div class='box box-header'></div>
             <div id='main-title-text'>[[panel_title]]</div>
             <div class='box box-header weather'></div>
           </div>
-        </template>
+        </template>-->
 
         <div id='status-bar' class='horizontal layout center-justified'>
           <div id='clock' class='box box-header'>
@@ -66,7 +66,7 @@
 
           <div id='alarm-status' class='box box-header'>
             <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
-              <span class='shadow'>[[alarm_state]]</span>
+              <span class='shadow'>[[_alarmState(panel_title, alarm_state)]]</span>
             </template>
             <template is='dom-if' if='[[showCodePanel(alarm)]]'>
               <template is='dom-if' if='[[alarm.attributes.panel_locked]]'>
@@ -1824,24 +1824,19 @@
         }
 
         getPanelTitle(){
-          if (this.alarm && this.alarm.attributes.panel && this.alarm.attributes.panel.panel_title != null ) {
+          if (this.alarm && this.alarm.attributes.panel && this.alarm.attributes.panel.panel_title != null )
             this.panel_title = this.alarm.attributes.panel.panel_title.trim();
-            //console.log('getPanelTitle: panel_title="'+this.panel_title+'"');
-          }
-          else {
-            this.panel_title = '';
-            //console.log('getPanelTitle: panel_title="'+this.panel_title+'" (default)');
-          }
         }
-
-        isEmpty(str) {
-          if (str.length == 0) {
-            //console.log('isEmpty('+str+')=true');
-            return true;
-          }
+        
+        _alarmState(title, state) {
+          // if state starts with _ - don't prefix it with anything
+          if (state.match(/^_.+/))
+            return state.slice(1);
+          // if it's a number - they're disarming
+          // prefix with title if it isn't empty
           else {
-            //console.log('isEmpty('+str+')=false');
-            return false;
+            var prefix = state.match(/\d+/)? 'Disarm with ' : (title.length? title + ': ' : '');
+            return prefix + state;
           }
         }
 
@@ -2183,8 +2178,10 @@
 
           this.updateTheme();
 
-          if (this.alarm.attributes.panel)
+          if (this.alarm.attributes.panel) {
+            this.getPanelTitle();
             this.updatePanelStyles();
+          }
 
           //Resets countdown display
           if (!this.isPending(this.alarm) && this.$.countdown.querySelector('#countdown360'))
@@ -2233,21 +2230,16 @@
             });
           }
         }
-/*
-        requiresCode(){
-          return this.isChecked(this.alarm.attributes.code_arm_required);
-        }*/
-
 
         updatePanelStyles(){
           //Re-aligns title bar
-          var title = this.shadowRoot.querySelector('#main-title-text');
-          if (title){
-            if (this.alarm.attributes.panel != null && (this.isDisarmed(this.alarm) || !this.isChecked(this.alarm.attributes.panel.hide_sidebar)))
-              title.classList.add('margin-left');
-            else
-              title.classList.remove('margin-left');
-          }
+//          var title = this.shadowRoot.querySelector('#main-title-text');
+//          if (title){
+//            if (this.alarm.attributes.panel != null && (this.isDisarmed(this.alarm) || !this.isChecked(this.alarm.attributes.panel.hide_sidebar)))
+//              title.classList.add('margin-left');
+//            else
+//              title.classList.remove('margin-left');
+//          }
 
           //Changes the shape of the buttons
           if (this.isChecked(this.alarm.attributes.panel.round_buttons))
@@ -2259,9 +2251,6 @@
             // Close the sidebar if alarm is set and the option is enabled
             this.sidebarTimerId = setInterval(this.closeSidebar, 100, this);
           }
-
-          //Updates the title of the panel
-          this.getPanelTitle();
 
           if (this.isChecked(this.alarm.attributes.panel.enable_serif_font)) this.updateStyles({'--font-header': "'Lobster'"});
           else this.updateStyles({'--font-header': "unset"});
@@ -2412,9 +2401,9 @@
             case 'armed_away':    return 'armed - Away';
             case 'armed_home':    return 'armed - Home';
             case 'armed_night':   return 'armed - Night';
-            case 'pending':       return 'leave..';
-            case 'warning':       return 'warning';
-            case 'triggered':     return 'triggered';
+            case 'pending':       return '_leave..';
+            case 'warning':       return '_warning';
+            case 'triggered':     return '_triggered';
           }
           return state;
         }
@@ -2491,7 +2480,7 @@
           if (this.isChecked(this.alarm.attributes.panel.hide_passcode))
             display_digit = '*';
           this.display_code = this.display_code + display_digit;
-          this.alarm_state = 'Code: ' + this.display_code;
+          this.alarm_state = this.display_code;
         }
 
         //Reset the display alarm codes
@@ -2739,10 +2728,8 @@
               case 'panel':
                 if (typeof ev.target.checked === 'boolean')
                   this.alarm.attributes.panel[attribute] = ev.target.checked;
-                else if (type == 'input_text') {
+                else if (type == 'input_text')
                   this.alarm.attributes.panel[attribute] = this.shadowRoot.querySelector('#' + attribute).value;
-                  console.log("settingsSave(this.alarm.attributes.panel["+attribute+"],'"+this.alarm.attributes.panel[attribute]+"')");
-                }
                 else if (type == 'listbox')
                   this.alarm.attributes.panel[attribute] = this.shadowRoot.querySelector('#' + attribute + '-listbox').selected;
                 this.settingsUpdate(setting, this.alarm.attributes.panel);
