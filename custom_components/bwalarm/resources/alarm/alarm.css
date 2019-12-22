@@ -102,6 +102,9 @@
    --error-message-button-text-color: var(--arm-button-text-color);
    --error-message-button-background-color: var(--arm-button-border-color);
 
+  --default-toolbars-height: 87px;
+  --status-bar-height: var(--default-toolbars-height);
+  --info-panel-height: var(--default-toolbars-height);
 }
 
 app-toolbar {
@@ -416,6 +419,7 @@ paper-listbox {
 }
 
 #status-bar {
+  height: var(--status-bar-height);
   background: var(--panel-outer-background-color);
 /*  padding: 8px 0px;*/
 }
@@ -471,8 +475,8 @@ h1 {
   background: var(--panel-outer-background-color);
   position: relative;
   bottom: 0;
-  max-height: 12vh;
-/*  min-height: 10vh;*/
+  height: var(--info-panel-height);
+  /*max-height: 12vh; let's have it fixed*/
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
@@ -657,7 +661,7 @@ div.options button{
 }
 #alarm-status {
     flex-direction: column;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
 }
 #alarm-status span {
    color: var( --alarmstatus-text-color);
@@ -953,9 +957,9 @@ div.options button{
 /* ################################################# height > 600px ############################################# */
 @media screen and (min-height: 600px) {
   #status-bar {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    /*height: 87px;*/
+    /*margin-top: 15px;
+    margin-bottom: 15px;*/
+    /*height: var(--status-bar-height);*/
   }
 }
 

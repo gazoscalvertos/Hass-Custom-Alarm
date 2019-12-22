@@ -46,14 +46,6 @@
       </style>
       <!-- ha-app-layout has-scrolling-region -->
       <div id='layout'>
-<!--        <template is='dom-if' if='[[panel_has_title]]'>
-          <div id='main-title' class='horizontal layout center-justified'>
-            <div class='box box-header'></div>
-            <div id='main-title-text'>[[panel_title]]</div>
-            <div class='box box-header weather'></div>
-          </div>
-        </template>-->
-
         <div id='status-bar' class='horizontal layout center-justified'>
           <div id='clock' class='box box-header'>
             <template is='dom-if' if='[[isChecked(alarm.attributes.panel.enable_clock)]]'>
@@ -66,7 +58,7 @@
 
           <div id='alarm-status' class='box box-header'>
             <template is='dom-if' if='[[!alarm.attributes.panel_locked]]'>
-              <span class='shadow'>[[_alarmState(panel_title, alarm_state)]]</span>
+              <span class='shadow'>[[_alarmStatus(alarm_state, panel_title)]]</span>
             </template>
             <template is='dom-if' if='[[showCodePanel(alarm)]]'>
               <template is='dom-if' if='[[alarm.attributes.panel_locked]]'>
@@ -111,9 +103,7 @@
                   <template is='dom-if' if='[[showCodePanelWhenBothFalse(alarm, attemptedArm, attemptedArmWithoutCode)]]'>
                     <div id='codepanel' class='horizontal layout center-justified'>
                       <div>
-                        <!--<span>code to arm required=[[isChecked(alarm.attributes.code_arm_required)]]</span>
-                        <span>invisibleIfDisarmed: '[[invisibleIfDisarmed(alarm)]]'</span>-->
-                        <!-- 1 2 3 {CLEAR if code to arm required} -->
+                        <!-- 1 2 3 {CLEAR if code to arm required or in Landscape orientation} -->
                         <div class='horizontal layout' style='justify-content: space-around;'>
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=1>1</button>
@@ -124,13 +114,14 @@
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=3>3</button>
                           </div>
-                          <template is='dom-if' if='[[isChecked(alarm.attributes.code_arm_required)]]'>
+                          <template is='dom-if' if='[[needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
                             <div class$=[[mwc_button_wrapper_class()]]>
-                              <button class$="[[mwc_button__raised()]] clear" on-click='callclearcode'>clear</button>
+                              <!-- insert transparent button to make the layout neat -->
+                              <button class$="[[mwc_button__raised()]] clear" on-click='callAlarmService' data-call='clear'>clear</button>
                             </div>
                           </template>
                         </div>
-                        <!-- 4 5 6 {0 if code required to arm}-->
+                        <!-- 4 5 6 {0 if code required to arm or in Landscape orientation}-->
                         <div class='horizontal layout' style='justify-content: space-around;'>
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=4>4</button>
@@ -141,13 +132,13 @@
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=6>6</button>
                           </div>
-                          <template is='dom-if' if='[[isChecked(alarm.attributes.code_arm_required)]]'>
+                          <template is='dom-if' if='[[needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=0>0</button>
                             </div>
                           </template>
                         </div>
-                        <!-- 7 8 9 {DISARM if code to arm required}-->
+                        <!-- 7 8 9 {DISARM if code to arm required or in Landscape orientation}-->
                         <div class='horizontal layout' style='justify-content: space-around;'>
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=7>
@@ -164,15 +155,15 @@
                               <span class="mdc-button__label" data-digit=9>9</span>
                             </button>
                           </div>
-                          <template is='dom-if' if='[[isChecked(alarm.attributes.code_arm_required)]]'>
+                          <template is='dom-if' if='[[needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <!-- insert transparent button to make the layout neat -->
                               <button class$="[[mwc_button__raised()]] disarm [[invisibleIfDisarmed(alarm)]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
                             </div>
                           </template>
                         </div>
-                        <!-- only when no code to arm required: CLEAR 0 {DISARM if not disarmed} -->
-                        <template is='dom-if' if='[[!isChecked(alarm.attributes.code_arm_required)]]'>
+                        <!-- only when no code to arm required or in Portrait orientation: CLEAR 0 {DISARM if not disarmed} -->
+                        <template is='dom-if' if='[[!needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
                           <div class='horizontal layout' style='justify-content: space-around;'>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <button class$="[[mwc_button__raised()]] clear" on-click='callclearcode'>clear</button>
@@ -1473,6 +1464,9 @@
             settingColors:        { type: Array, value: [] },
             selectedUser:         { type: Object, value: null},
 
+            // window's orientation
+            orientationLandscape: { type: Boolean, value: true },
+
             // internal constants
             INT_ATTR_STATE_CHECK_BEFORE_ARM: { type: String, value: 'check_before_arm'},
 
@@ -1500,6 +1494,11 @@
           super.disconnectedCallback();
           clearInterval(this.camTimer);
         }
+
+//        _orientationLandscapeListener(query) {
+//          this.orientationLandscape = query.matches;
+//          console.log('orientationLandscape: ' + this.orientationLandscape);
+//        }
 
         //Page ready
         ready(){
@@ -1827,15 +1826,17 @@
           if (this.alarm && this.alarm.attributes.panel && this.alarm.attributes.panel.panel_title != null )
             this.panel_title = this.alarm.attributes.panel.panel_title.trim();
         }
-        
-        _alarmState(title, state) {
+
+        // returns combined (title and state) status
+        // depending on title and status content
+        _alarmStatus(state, title) {
           // if state starts with _ - don't prefix it with anything
           if (state.match(/^_.+/))
             return state.slice(1);
           // if it's a number - they're disarming
           // prefix with title if it isn't empty
           else {
-            var prefix = state.match(/\d+/)? 'Disarm with ' : (title.length? title + ': ' : '');
+            var prefix = state.match(/\d+/)? (this.isDisarmed(this.alarm)? 'Arm with ' : 'Disarm with ') : (title.length? title + ': ' : '');
             return prefix + state;
           }
         }
@@ -1984,9 +1985,28 @@
           return sha256_digest(password);
         }
 
+        _getScreenOrientation() {
+          this.orientationLandscape = window.matchMedia("(orientation: landscape)").matches;
+          console.log('_getScreenOrientation: orientationLandscape=' + this.orientationLandscape);
+        }
+
+        _auxSetupUI() {
+          this._getScreenOrientation();
+
+          var vh = $(window).height();
+          var vw = $(window).width();
+
+          var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+          var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+          console.log("setupUI: orientationLandscape=" + this.orientationLandscape + ", vw=" + vw + ", vh=" + vh + ", w=" + w + ", h=" + h);
+        }
+
         //Determine the screensize then set the appropriate UI
         setupUI(){
           //console.log("setupUI");
+
+          this._auxSetupUI();
 
           if (this.alarm.attributes.panel == null) {
             this.alarm.attributes.panel = {};
@@ -2167,6 +2187,8 @@
         //Monitors the alarm status for any changes
         monitorAlarm(){
           //console.log("monitorAlarm");
+
+          //this._getScreenOrientation();
 
           this.callclearcode(null);
 
@@ -2397,13 +2419,13 @@
         //Provide a readable label
         computeLabel(state){
           switch (state){
-            case 'disarmed':      return 'disarmed';
-            case 'armed_away':    return 'armed - Away';
-            case 'armed_home':    return 'armed - Home';
-            case 'armed_night':   return 'armed - Night';
-            case 'pending':       return '_leave..';
-            case 'warning':       return '_warning';
-            case 'triggered':     return '_triggered';
+            case 'disarmed':      return 'Disarmed';
+            case 'armed_away':    return 'Armed - Away';
+            case 'armed_home':    return 'Armed - Home';
+            case 'armed_night':   return 'Armed - Night';
+            case 'pending':       return '_Leave..';
+            case 'warning':       return '_Warning';
+            case 'triggered':     return '_Triggered';
           }
           return state;
         }
@@ -2934,6 +2956,12 @@
 
         bothFalse(arg_1, arg_2) {
           return !arg_1 && !arg_2;
+        }
+
+        needHorizontalCodepanel(orientationLandscape, code_arm_required) {
+          var result = orientationLandscape || this.isChecked(code_arm_required);
+          console.log('needHorizontalCodepanel: orientationLandscape=' + orientationLandscape + ', code_arm_required=' + this.isChecked(code_arm_required) + ', result=' + result);
+          return result;
         }
       }
 
