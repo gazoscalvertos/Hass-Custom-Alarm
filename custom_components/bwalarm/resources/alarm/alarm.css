@@ -77,8 +77,12 @@
 
    --info-panel-buttons-color:       var(--dark-light-blue); /*The color of the menu buttons*/
 
+   --button-text-color:              var(--primary-text-color);/* The defaul color of the text within buttons.*/
+   --button-border-color:            var(--dark-light-blue);/* The border color of the alarm buttons.*/
+
    --arm-button-border-color:        var(--dark-light-blue);/* The border color of the alarm buttons.*/
-   --arm-button-text-color:          white;/* The color of the text within the alarm buttons.*/
+   --arm-button-text-color:          var(--button-text-color);/* The color of the text within the alarm buttons.*/
+
 
    --paper-listbox-background-color: blue;/* The background color of the listboxes.*/
    --paper-listbox-color:            var(--dark-light-blue);/* The text color within the listboxes.*/
@@ -93,14 +97,14 @@
    --warning-message-border-color:    transparent;
    --warning-message-text-color:        var(--primary-text-color);
 
-   --warning-message-button-text-color: var(--arm-button-text-color);
-   --warning-message-button-background-color: var(--arm-button-border-color);
+   --warning-message-button-text-color: var(--button-text-color);
+   --warning-message-button-background-color: var(--button-border-color);
 
    --error-message-border-color:      transparent;
    --error-message-text-color:        var(--primary-text-color);
 
-   --error-message-button-text-color: var(--arm-button-text-color);
-   --error-message-button-background-color: var(--arm-button-border-color);
+   --error-message-button-text-color: var(--button-text-color);
+   --error-message-button-background-color: var(--button-border-color);
 
   --default-toolbars-height: 87px;
   --status-bar-height: var(--default-toolbars-height);
@@ -556,6 +560,7 @@ div.arm button {
 /* ## codepanel ## */
 #codepanel button.mdc-button--outlined {
   border: 3px solid var(--arm-button-border-color);
+  color: var(--button-text-color);
 }
 
 #codepanel button.mdc-button--raised {
@@ -593,8 +598,8 @@ div.error-message button {
   width: var(--message-button-size);
   height: var(--message-button-size);
   border-radius: var(--button-shape);
-  background-color: var(--error-message-button-background-color);
-  color: var(--error-message-button-text-color);
+/*  background-color: var(--error-message-button-background-color);*/
+  color: var(--button-text-color);
   font-size: initial;
 }
 
@@ -605,11 +610,11 @@ div.warning-message {
   align-items: center;
 }
 
-div.error-message button.mdc-button--outlined {
+div.warning-message button.mdc-button--outlined {
   border: 2px solid var(--warning-message-button-background-color);
 }
 
-div.error-message button.mdc-button--raised {
+div.warning-message button.mdc-button--raised {
   border: 0px solid;
 }
 
@@ -618,7 +623,8 @@ div.warning-message button {
   width: var(--message-button-size);
   height: var(--message-button-size);
   border-radius: var(--button-shape);
-  color: var(--warning-message-button-text-color);
+/*  background-color: var(--warning-message-button-background-color) !important; /* fix it by moving definitions around so these are after mdc-button! */
+  color: var(--button-text-color);
   font-size: initial;
 }
 
@@ -1137,7 +1143,8 @@ div.arm button {
 #codepanel button.clear, #codepanel button.disarm {
   font-size: large;
 }
-  #alarm-status span {
+
+#alarm-status span {
    font-size: x-large;
 }
   .xs {

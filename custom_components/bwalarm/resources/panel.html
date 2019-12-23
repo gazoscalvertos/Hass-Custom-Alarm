@@ -435,9 +435,9 @@
 
                     <!-- ########################################################################### LOGIN ##################################################################################################### -->
                     <div id='set-login' class='carousel-cell remove'>
-                      <div class='title'>Settings</div></br>
-                      <div class='info-detail'>Enter the admin password defined in your bwalarm.yaml to access this panel</div>
-                      <paper-input class="span11" id="passwordInput" type="password" placeholder="Enter Password..." on-keyup='checkSettingsPassword'></paper-input>
+                      <div class='title'>Settings</div>
+                      <!--<div class='info-detail'>Enter the admin password defined in your bwalarm.yaml to access this panel</div>-->
+                      <paper-input class="span11" id="passwordInput" type="password" placeholder="Enter admin password..." on-keyup='checkSettingsPassword'></paper-input>
                     </div>
 
                     <!-- ########################################################################### INFO ##################################################################################################### -->
@@ -1999,7 +1999,7 @@
           var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
           var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
-          console.log("setupUI: orientationLandscape=" + this.orientationLandscape + ", vw=" + vw + ", vh=" + vh + ", w=" + w + ", h=" + h);
+          console.log("_auxSetupUI: orientationLandscape=" + this.orientationLandscape + ", vw=" + vw + ", vh=" + vh + ", w=" + w + ", h=" + h);
         }
 
         //Determine the screensize then set the appropriate UI
@@ -2054,9 +2054,11 @@
   /*          //Remove the keypad and controls to the carousel
             this.controlsLoaded = false;*/
           }
-          if ($(window).width() > 767)
-            if (this.alarm.attributes.panel)
-              this.weatherTimer = setInterval(() => this.updateWeatherSVG(), 500);
+
+          /*this.updateStyles({'#codepanel button': 'margin: 5px; height: 40px; width: 150px;'});*/
+
+          if ( ($(window).width() > 767) && this.alarm.attributes.panel)
+            this.weatherTimer = setInterval(() => this.updateWeatherSVG(), 500);
 
           this.carouselMainSelected = this.$.carousel_template;
           this.carouselChange(this.$.controls);

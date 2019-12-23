@@ -726,7 +726,7 @@
 <a id="admin_password"></a>
 **admin_password**  
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
-&nbsp;&nbsp;&nbsp; Password to access the `Settings` tab.  
+&nbsp;&nbsp;&nbsp; Password to access the alarm configuration - `Settings` tab.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; _Default value:_  
 &nbsp;&nbsp;&nbsp; HG28!!&dn  

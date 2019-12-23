@@ -21,6 +21,7 @@ KNOWN POTENTIAL ISSUES
 
 panel.html
 ----------
+- make an option to have rectangular buttons rather than square
 - display "Invalid passcode" if code_to_arm and wrong passcode entered
 - timer after clear code/restore persistence is incorrect
 - warnings in JS console (about deprecated stuff)
