@@ -77,9 +77,18 @@
 
    --info-panel-buttons-color:       var(--dark-light-blue); /*The color of the menu buttons*/
 
+
+   --button-height:                  10vh;
+   --button-width:                   10vh;
+   --button-top-bottom-margin:       4px;
+   --button-left-right-margin:       10px;
    --button-text-color:              var(--primary-text-color);/* The defaul color of the text within buttons.*/
    --button-border-color:            var(--dark-light-blue);/* The border color of the alarm buttons.*/
 
+   --arm-button-height:              18vh;
+   --arm-button-width:               18vh;
+   --arm-button-top-bottom-margin:   10px;
+   --arm-button-left-right-margin:   10px;
    --arm-button-border-color:        var(--dark-light-blue);/* The border color of the alarm buttons.*/
    --arm-button-text-color:          var(--button-text-color);/* The color of the text within the alarm buttons.*/
 
@@ -106,9 +115,9 @@
    --error-message-button-text-color: var(--button-text-color);
    --error-message-button-background-color: var(--button-border-color);
 
-  --default-toolbars-height: 87px;
-  --status-bar-height: var(--default-toolbars-height);
-  --info-panel-height: var(--default-toolbars-height);
+  --default-bar-height: 87px;
+  --status-bar-height: var(--default-bar-height);
+  --info-panel-height: var(--default-bar-height);
 }
 
 app-toolbar {
@@ -552,6 +561,9 @@ div.code iron-label {
 
 /* NIGHT, HOME and AWAY buttons */
 div.arm button {
+  margin: var(--arm-button-top-bottom-margin) var(--arm-button-left-right-margin);
+  height: var(--arm-button-height);
+  width: var(--arm-button-width);
   border-radius: var(--button-shape);
   background-color: var(--arm-button-border-color);
   color: var(--arm-button-text-color);
@@ -569,6 +581,9 @@ div.arm button {
 
 /* numeric keys */
 #codepanel button {
+  margin: var(--button-top-bottom-margin) var(--button-left-right-margin);
+  height: var(--button-height);
+  width: var(--button-width);
   border-radius: var(--button-shape);
 }
 
@@ -722,9 +737,10 @@ div.options button{
    -webkit-perspective: 400;
    perspective: 400;
 }
+/*
 #codepanel {
    overflow: hidden;
-}
+}*/
 
 @-webkit-keyframes shake{
    0% {
@@ -1003,9 +1019,9 @@ text-align: left;
 
   /* NIGHT, HOME and AWAY buttons */
   div.arm button {
-    margin: 5px;
-    height: 18vh;
-    width: 18vh;
+    /*margin: 5px;*/
+    /*height: 18vh;
+    width: 18vh;*/
 
     font-size: large;
   }
@@ -1060,9 +1076,9 @@ text-align: left;
   /* ## codepanel ## */
   /* numeric keys */
   #codepanel button {
-    margin: 4px 10px;
+    /*margin: 4px 10px;
     height: 10vh;
-    width: 10vh;
+    width: 10vh;*/
 
     font-size: x-large;
   }
@@ -1124,18 +1140,18 @@ text-align: left;
 
 /* NIGHT, HOME and AWAY buttons */
 div.arm button {
-  margin: 10px;
-  height: 20vh;
-  width: 20vh;
+  /*margin: 10px;*/
+  /*height: 20vh;
+  width: 20vh;*/
 
   font-size: x-large;
 }
 
 /* ## codepanel ## */
 #codepanel button {
-  margin: 5px;
+  /*margin: 5px;
   height: 90px;
-  width: 90px;
+  width: 90px;*/
 
   font-size: xx-large;
 }

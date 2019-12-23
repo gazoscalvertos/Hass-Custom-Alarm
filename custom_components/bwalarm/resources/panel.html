@@ -102,9 +102,9 @@
                 <div id='controls' class='carousel-cell remove'>
                   <template is='dom-if' if='[[showCodePanelWhenBothFalse(alarm, attemptedArm, attemptedArmWithoutCode)]]'>
                     <div id='codepanel' class='horizontal layout center-justified'>
-                      <div>
+                      <div style='width: 100%'>
                         <!-- 1 2 3 {CLEAR if code to arm required or in Landscape orientation} -->
-                        <div class='horizontal layout' style='justify-content: space-around;'>
+                        <div class='horizontal layout' style='justify-content: space-evenly;'>
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=1>1</button>
                           </div>
@@ -122,7 +122,7 @@
                           </template>
                         </div>
                         <!-- 4 5 6 {0 if code required to arm or in Landscape orientation}-->
-                        <div class='horizontal layout' style='justify-content: space-around;'>
+                        <div class='horizontal layout' style='justify-content: space-evenly;'>
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=4>4</button>
                           </div>
@@ -139,7 +139,7 @@
                           </template>
                         </div>
                         <!-- 7 8 9 {DISARM if code to arm required or in Landscape orientation}-->
-                        <div class='horizontal layout' style='justify-content: space-around;'>
+                        <div class='horizontal layout' style='justify-content: space-evenly;'>
                           <div class$=[[mwc_button_wrapper_class()]]>
                             <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=7>
                               <span class="mdc-button__label" data-digit=7>7</span>
@@ -158,13 +158,13 @@
                           <template is='dom-if' if='[[needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <!-- insert transparent button to make the layout neat -->
-                              <button class$="[[mwc_button__raised()]] disarm [[invisibleIfDisarmed(alarm)]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
+                              <button class$="[[mwc_button__raised()]] disarm [[invisibleIfDisarmed(alarm)]]" disabled$=[[isDisarmed(alarm)]] on-click='callAlarmService' data-call='disarm'>disarm</button>
                             </div>
                           </template>
                         </div>
                         <!-- only when no code to arm required or in Portrait orientation: CLEAR 0 {DISARM if not disarmed} -->
                         <template is='dom-if' if='[[!needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
-                          <div class='horizontal layout' style='justify-content: space-around;'>
+                          <div class='horizontal layout' style='justify-content: space-evenly;'>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <button class$="[[mwc_button__raised()]] clear" on-click='callclearcode'>clear</button>
                             </div>
@@ -173,7 +173,7 @@
                             </div>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <!-- insert transparent button to make the layout neat -->
-                              <button class$="[[mwc_button__raised()]] disarm [[invisibleIfDisarmed(alarm)]]" on-click='callAlarmService' data-call='disarm'>disarm</button>
+                              <button class$="[[mwc_button__raised()]] disarm [[invisibleIfDisarmed(alarm)]]" disabled$=[[isDisarmed(alarm)]] on-click='callAlarmService' data-call='disarm'>disarm</button>
                             </div>
                           </div>
                         </template>
@@ -220,7 +220,7 @@
 
                       <!-- show Arm buttons if there is no errors/sensors to show -->
                       <template is='dom-if' if='[[bothFalse(attemptedArm, attemptedArmWithoutCode)]]'>
-                        <div class='horizontal layout arm' style='justify-content: center;'>
+                        <div class='horizontal layout arm' style='justify-content: space-evenly;'>
                           <template is='dom-if' if='[[isChecked(alarm.attributes.enable_night_mode)]]'>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <button class$="[[mwc_button__raised()]]" on-click='callAlarmService' data-call='arm' data-arm='alarm_arm_night_from_panel'>night</button>
@@ -1464,8 +1464,13 @@
             settingColors:        { type: Array, value: [] },
             selectedUser:         { type: Object, value: null},
 
-            // window's orientation
-            orientationLandscape: { type: Boolean, value: true },
+            viewport_width:       Number,
+            viewport_height:      Number,
+
+            // viewport orientation
+            orientationLandscape: { type: Boolean /*, value: true*/ },
+
+            buttonsShape:         { type: String /*, value: 'round'*/},  // valid options are: round, square or rectangular
 
             // internal constants
             INT_ATTR_STATE_CHECK_BEFORE_ARM: { type: String, value: 'check_before_arm'},
@@ -1482,8 +1487,29 @@
         static get observers() {
           return [
             'onPanelUpdate(hass, panel)',
-            'updateTime(hass)'
+            'updateTime(hass)',
+            'adjustContent(alarm, orientationLandscape)'
           ]
+        }
+
+        adjustContent(alarm, orientationLandscape) {
+          if ((alarm === null) || (alarm === undefined)) {
+            console.log('adjustContent: alarm undefined, returning');
+            return;
+          }
+          if ((orientationLandscape === null) || (orientationLandscape === undefined)) {
+            console.log('adjustContent: orientationLandscape undefined, returning');
+            return;
+          }
+
+          // temporarily!
+          if ( this.isChecked(alarm.attributes.panel.round_buttons) )
+            this.buttonsShape = 'round';
+          else
+            this.buttonsShape = 'square';
+
+          console.log('adjustContent: orientationLandscape=' + orientationLandscape + ', round_buttons=' + this.isChecked(alarm.attributes.panel.round_buttons) + ', buttonsShape="' + this.buttonsShape + '"');
+          this._updateButtonsStyles();
         }
 
         connectedCallback() {
@@ -1502,6 +1528,7 @@
 
         //Page ready
         ready(){
+          console.log('ready()');
           super.ready();
 
           // Check the alarm component successfully loaded if not then display an error
@@ -1985,33 +2012,35 @@
           return sha256_digest(password);
         }
 
-        _getScreenOrientation() {
+        _getViewportOrientation() {
           this.orientationLandscape = window.matchMedia("(orientation: landscape)").matches;
-          console.log('_getScreenOrientation: orientationLandscape=' + this.orientationLandscape);
+          console.log('_getViewportOrientation: orientationLandscape=' + this.orientationLandscape);
         }
 
-        _auxSetupUI() {
-          this._getScreenOrientation();
+        _getViewportSize() {
+          this.viewport_width = $(window).width();
+          this.viewport_height = $(window).height();
 
-          var vh = $(window).height();
-          var vw = $(window).width();
-
-          var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+          /*var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
           var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
-          console.log("_auxSetupUI: orientationLandscape=" + this.orientationLandscape + ", vw=" + vw + ", vh=" + vh + ", w=" + w + ", h=" + h);
+          console.log("_auxSetupUI: orientationLandscape=" + this.orientationLandscape + ", vw=" + vw + ", vh=" + vh + ", w=" + w + ", h=" + h);*/
+          console.log("_getViewportSize(): " + this.viewport_width + "x" + this.viewport_height);
         }
 
         //Determine the screensize then set the appropriate UI
         setupUI(){
-          //console.log("setupUI");
+          console.log("setupUI");
 
-          this._auxSetupUI();
+          this._getViewportSize();
+          this._getViewportOrientation();
 
           if (this.alarm.attributes.panel == null) {
             this.alarm.attributes.panel = {};
             this.settingsUpdate('panel', {});
           }
+
+          this._updateButtonsStyles();
 
           if (this.alarm.attributes.panel.cameras == null) {
             var panel = this.alarm.attributes.panel;
@@ -2188,9 +2217,7 @@
 
         //Monitors the alarm status for any changes
         monitorAlarm(){
-          //console.log("monitorAlarm");
-
-          //this._getScreenOrientation();
+          console.log("monitorAlarm");
 
           this.callclearcode(null);
 
@@ -2255,7 +2282,78 @@
           }
         }
 
+        // calculate and set buttons' width and height according to screen size and options enabled
+        _updateButtonsStyles() {
+          if (this.buttonsShape == undefined) {
+            console.log('_updateButtonsStyles: buttonsShape undefined, returning');
+            return;
+          }
+
+          console.log('_updateButtonsStyles: buttonsShape=' + this.buttonsShape);
+
+          var min_dimension = Math.min(this.viewport_width, this.viewport_height);
+          var arm_button_width = Math.trunc((18*min_dimension)/100);
+
+          var available_width = this.viewport_width;
+          var status_bar_height = 87;
+          var info_panel_height = status_bar_height;
+
+          // subtract hardcoded heights: --status-bar-height and --info-panel-height : and margins
+          var available_height = this.viewport_height - status_bar_height - info_panel_height;
+
+          var top_margin = 5; // margins at and bottom
+          var bottom_margin = 5; // margins and bottom
+          var left_margin = 5; // left margin
+          var right_margin = 5; // right margin
+
+          var button_top_bottom_margin = (min_dimension < 768)? 4: 5;
+          var button_left_right_margin = (min_dimension < 768)? 5: 10;
+
+          var arm_button_top_bottom_margin = (min_dimension < 768)? 5: 10;
+          var arm_button_left_right_margin = arm_button_top_bottom_margin;
+
+          var arm_buttons = this.isChecked(this.alarm.attributes.enable_night_mode)? 3 : 2;
+
+          var horizontalCodepanel = this.needHorizontalCodepanel(this.orientationLandscape, this.alarm.attributes.code_arm_required);
+          var buttons_in_row = horizontalCodepanel? 4 : 3;
+          var buttons_in_column = horizontalCodepanel? 3 : 4;
+          console.log('_updateButtonsStyles: min_dimension=' + min_dimension + ', available ' + available_width + 'x' + available_height + ', horizontalCodepanel=' + horizontalCodepanel + ', buttons_in_row=' + buttons_in_row + ', buttons_in_column=' + buttons_in_column + 'arm_buttons=' + arm_buttons);
+
+          switch(this.buttonsShape) {
+            case 'round':
+                          this.updateStyles({'--button-shape': '50%'});
+                          var arm_button_height = arm_button_width;
+                          var button_height = (available_height - top_margin - buttons_in_column*2*button_top_bottom_margin - 2*arm_button_top_bottom_margin - arm_button_height - bottom_margin)/buttons_in_column;
+                          var button_width = (available_width - left_margin - buttons_in_row*2*button_left_right_margin - right_margin)/buttons_in_row;
+
+                          var button_diameter = Math.trunc(Math.min(button_height, button_width)).toString() + 'px';
+                          console.log('_updateButtonsStyles: transform button ' + Math.trunc(button_width) + 'x' + Math.trunc(button_height) + 'px into a circle of diameter ' + button_diameter + ' with margins ' + button_top_bottom_margin.toString() + 'px; ' + button_left_right_margin.toString() + 'px');
+                          this.updateStyles({'--button-height': button_diameter});
+                          this.updateStyles({'--button-width': button_diameter});
+                          this.updateStyles({'--button-top-bottom-margin': button_top_bottom_margin.toString() + 'px'});
+                          this.updateStyles({'--button-left-right-margin': button_left_right_margin.toString() + 'px'});
+
+                          var arm_button_diameter = arm_button_width.toString() + 'px';
+                          console.log('_updateButtonsStyles: set arm buttons\' width and height to ' + arm_button_diameter + ' with margins ' + arm_button_top_bottom_margin.toString() + 'px; ' + arm_button_left_right_margin.toString() + 'px');
+                          this.updateStyles({'--arm-button-height': arm_button_diameter});
+                          this.updateStyles({'--arm-button-width': arm_button_diameter});
+                          this.updateStyles({'--arm-button-top-bottom-margin': arm_button_top_bottom_margin.toString() + 'px'});
+                          this.updateStyles({'--arm-button-left-right-margin': arm_button_left_right_margin.toString() + 'px'});
+                          return;
+            case 'square':
+                          this.updateStyles({'--button-shape': '4px'});
+                          this.updateStyles({'--arm-button-height': '12vh'});
+                          return;
+            case 'rectangular':
+                          this.updateStyles({'--button-shape': '4px'});
+                          this.updateStyles({'--arm-button-height': '12vh'});
+                          return;
+          }
+          console.error('_updateButtonsStyles: invalid buttonsShape "' + this.buttonsShape + '"');
+        }
+
         updatePanelStyles(){
+          console.log('updatePanelStyles');
           //Re-aligns title bar
 //          var title = this.shadowRoot.querySelector('#main-title-text');
 //          if (title){
@@ -2265,10 +2363,7 @@
 //              title.classList.remove('margin-left');
 //          }
 
-          //Changes the shape of the buttons
-          if (this.isChecked(this.alarm.attributes.panel.round_buttons))
-            this.updateStyles({'--button-shape': '50%'});
-          else this.updateStyles({'--button-shape': '4px'});
+          this._updateButtonsStyles();
 
           if (this.isChecked(this.alarm.attributes.panel.hide_sidebar)){
             clearInterval(this.sidebarTimerId);
