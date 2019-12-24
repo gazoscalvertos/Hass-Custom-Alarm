@@ -117,7 +117,7 @@
                           <template is='dom-if' if='[[needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <!-- insert transparent button to make the layout neat -->
-                              <button class$="[[mwc_button__raised()]] clear" on-click='callAlarmService' data-call='clear'>clear</button>
+                              <button class$="[[mwc_button__outlined()]] clear" on-click='callAlarmService' data-call='clear'>clear</button>
                             </div>
                           </template>
                         </div>
@@ -166,7 +166,7 @@
                         <template is='dom-if' if='[[!needHorizontalCodepanel(orientationLandscape, alarm.attributes.code_arm_required)]]'>
                           <div class='horizontal layout' style='justify-content: space-evenly;'>
                             <div class$=[[mwc_button_wrapper_class()]]>
-                              <button class$="[[mwc_button__raised()]] clear" on-click='callclearcode'>clear</button>
+                              <button class$="[[mwc_button__outlined()]] clear" on-click='callclearcode'>clear</button>
                             </div>
                             <div class$=[[mwc_button_wrapper_class()]]>
                               <button class$="[[mwc_button__outlined()]]" on-click='callcode' data-digit=0>0</button>
@@ -1468,9 +1468,9 @@
             viewport_height:      Number,
 
             // viewport orientation
-            orientationLandscape: { type: Boolean /*, value: true*/ },
+            orientationLandscape: { type: Boolean },
 
-            buttonsShape:         { type: String /*, value: 'circle'*/},  // valid options are: circle, square or rectangle
+            buttonsShape:         { type: String },  // valid options are: circle, square or rectangle
             buttonWidthToHeightRatio: { type: Number, computed: '_computeButtonWidthToHeightRatio(buttonsShape)'},
 
             // internal constants
@@ -1509,27 +1509,32 @@
           return [
             'onPanelUpdate(hass, panel)',
             'updateTime(hass)',
-            'adjustContent(alarm, orientationLandscape)'
+            '_round_buttons(alarm.attributes.panel.round_buttons)',
+            '_code_to_arm(alarm.attributes.code_arm_required)',
+            '_viewport_changed(viewport_height, viewport_width)'
           ]
         }
 
-        adjustContent(alarm, orientationLandscape) {
-          if ((alarm === null) || (alarm === undefined)) {
-            console.log('adjustContent: alarm undefined, returning');
-            return;
-          }
-          if ((orientationLandscape === null) || (orientationLandscape === undefined)) {
-            console.log('adjustContent: orientationLandscape undefined, returning');
-            return;
-          }
+        _viewport_changed(viewport_height, viewport_width) {
+          this._updateButtonsStyles();
+        }
 
+        _code_to_arm(code_arm_required) {
+          this._updateButtonsStyles();
+        }
+
+        _round_buttonsTobuttonsShape(round_buttons) {
           // temporarily!
-          if ( this.isChecked(alarm.attributes.panel.round_buttons) )
+          if ( this.isChecked(round_buttons) )
             this.buttonsShape = 'circle';
           else
             this.buttonsShape = 'rectangle'; // should be square!
+          console.log('_round_buttonsTobuttonsShape: round_buttons=' + round_buttons + ' => buttonsShape=' + this.buttonsShape);
+        }
 
-          console.log('adjustContent: orientationLandscape=' + orientationLandscape + ', round_buttons=' + this.isChecked(alarm.attributes.panel.round_buttons) + ', buttonsShape="' + this.buttonsShape + '"');
+        _round_buttons(round_buttons) {
+          console.log('_round_buttons: ' + round_buttons);
+          this._round_buttonsTobuttonsShape(round_buttons);
           this._updateButtonsStyles();
         }
 
@@ -1541,11 +1546,6 @@
           super.disconnectedCallback();
           clearInterval(this.camTimer);
         }
-
-//        _orientationLandscapeListener(query) {
-//          this.orientationLandscape = query.matches;
-//          console.log('orientationLandscape: ' + this.orientationLandscape);
-//        }
 
         //Page ready
         ready(){
@@ -2033,28 +2033,26 @@
           return sha256_digest(password);
         }
 
-        _getViewportOrientation() {
-          this.orientationLandscape = window.matchMedia("(orientation: landscape)").matches;
-          console.log('_getViewportOrientation: orientationLandscape=' + this.orientationLandscape);
+        _updateViewportProperties() {
+
+          var viewport_width = $(window).width();
+          var viewport_height = $(window).height();
+          var orientationLandscape = viewport_width > viewport_height;
+          // instead of var orientationLandscape = window.matchMedia("(orientation: landscape)").matches;
+
+          if ((this.viewport_width == undefined) || (this.viewport_height == undefined) || (this.viewport_width != viewport_width) || (this.viewport_height != viewport_height)) {
+            console.log("_updateViewportProperties(): " + viewport_width.toString() + "x" + viewport_height.toString() + ', orientationLandscape=' + orientationLandscape);
+            this.viewport_width = viewport_width;
+            this.viewport_height = viewport_height;
+            this.orientationLandscape = orientationLandscape;
+          }
         }
 
-        _getViewportSize() {
-          this.viewport_width = $(window).width();
-          this.viewport_height = $(window).height();
-
-          /*var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-          var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-
-          console.log("_auxSetupUI: orientationLandscape=" + this.orientationLandscape + ", vw=" + vw + ", vh=" + vh + ", w=" + w + ", h=" + h);*/
-          console.log("_getViewportSize(): " + this.viewport_width + "x" + this.viewport_height);
-        }
-
-        //Determine the screensize then set the appropriate UI
+        //Determine the screen size then set the appropriate UI
         setupUI(){
           console.log("setupUI");
 
-          this._getViewportSize();
-          this._getViewportOrientation();
+          this._updateViewportProperties();
 
           if (this.alarm.attributes.panel == null) {
             this.alarm.attributes.panel = {};
@@ -2105,15 +2103,11 @@
             this.controlsLoaded = false;*/
           }
 
-          /*this.updateStyles({'#codepanel button': 'margin: 5px; height: 40px; width: 150px;'});*/
-
           if ( ($(window).width() > 767) && this.alarm.attributes.panel)
             this.weatherTimer = setInterval(() => this.updateWeatherSVG(), 500);
 
           this.carouselMainSelected = this.$.carousel_template;
           this.carouselChange(this.$.controls);
-
-          //this.$.carousel_main.style.height = '40vh';
         }
 
         updateWeatherSVG() {
@@ -2305,8 +2299,18 @@
 
         // calculate and set buttons' width and height according to screen size and options enabled
         _updateButtonsStyles() {
-          if (this.buttonsShape == undefined) {
+          if (this.buttonsShape === undefined) {
             console.log('_updateButtonsStyles: buttonsShape undefined, returning');
+            return;
+          }
+
+          if ((this.viewport_width === undefined) || (this.viewport_height === undefined)) {
+            console.log('_updateButtonsStyles: viewport not initialized, returning');
+            return;
+          }
+
+          if (this.alarm === undefined) {
+            console.log('_updateButtonsStyles: alarm not initialized, returning');
             return;
           }
 
@@ -2413,7 +2417,7 @@
 //              title.classList.remove('margin-left');
 //          }
 
-          this._updateButtonsStyles();
+          //this._updateButtonsStyles();
 
           if (this.isChecked(this.alarm.attributes.panel.hide_sidebar)){
             clearInterval(this.sidebarTimerId);
