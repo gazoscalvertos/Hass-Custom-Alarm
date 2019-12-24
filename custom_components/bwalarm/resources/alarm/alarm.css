@@ -6,7 +6,9 @@
    --button-shape:       4px;
 
    /* default radius/size of a square button in warning/error message box */
-   --message-button-size: 115px;
+   --message-button-width: 115px;
+   --message-button-height: 115px;
+   --message-button-margin: 20px;
 
    /* THEME - DARK */
    --dark-background:   #191A1F;
@@ -609,9 +611,9 @@ div.error-message button.mdc-button--raised {
 }
 
 div.error-message button {
-  margin: 20px;
-  width: var(--message-button-size);
-  height: var(--message-button-size);
+  margin: var(--message-button-margin);
+  height: var(--message-button-height);
+  width: var(--message-button-width);
   border-radius: var(--button-shape);
 /*  background-color: var(--error-message-button-background-color);*/
   color: var(--button-text-color);
@@ -634,9 +636,9 @@ div.warning-message button.mdc-button--raised {
 }
 
 div.warning-message button {
-  margin: 20px;
-  width: var(--message-button-size);
-  height: var(--message-button-size);
+  margin: var(--message-button-margin);
+  height: var(--message-button-height);
+  width: var(--message-button-width);
   border-radius: var(--button-shape);
 /*  background-color: var(--warning-message-button-background-color) !important; /* fix it by moving definitions around so these are after mdc-button! */
   color: var(--button-text-color);

@@ -1470,7 +1470,8 @@
             // viewport orientation
             orientationLandscape: { type: Boolean /*, value: true*/ },
 
-            buttonsShape:         { type: String /*, value: 'round'*/},  // valid options are: round, square or rectangular
+            buttonsShape:         { type: String /*, value: 'circle'*/},  // valid options are: circle, square or rectangle
+            buttonWidthToHeightRatio: { type: Number, computed: '_computeButtonWidthToHeightRatio(buttonsShape)'},
 
             // internal constants
             INT_ATTR_STATE_CHECK_BEFORE_ARM: { type: String, value: 'check_before_arm'},
@@ -1480,6 +1481,26 @@
 
             __mwc_button__outlined: { type: String, value: " mdc-button--outlined"},
             __mwc_button__raised: { type: String, value: " mdc-button--raised"},
+          }
+        }
+
+        _computeButtonWidthToHeightRatio(buttonsShape) {
+          if (buttonsShape != undefined) {
+            switch(buttonsShape) {
+              case 'circle':
+              case 'square':
+                return 1;
+
+              case 'rectangle':
+                return 2;
+
+              default:
+                console.error('_computeButtonWidthToHeightRatio: invalid parameter ' + buttonsShape);
+            }
+          }
+          else {
+            console.error('_computeButtonWidthToHeightRatio: buttonsShape undefined, returning 0');
+            return 0;
           }
         }
 
@@ -1504,9 +1525,9 @@
 
           // temporarily!
           if ( this.isChecked(alarm.attributes.panel.round_buttons) )
-            this.buttonsShape = 'round';
+            this.buttonsShape = 'circle';
           else
-            this.buttonsShape = 'square';
+            this.buttonsShape = 'rectangle'; // should be square!
 
           console.log('adjustContent: orientationLandscape=' + orientationLandscape + ', round_buttons=' + this.isChecked(alarm.attributes.panel.round_buttons) + ', buttonsShape="' + this.buttonsShape + '"');
           this._updateButtonsStyles();
@@ -2290,12 +2311,20 @@
           }
 
           console.log('_updateButtonsStyles: buttonsShape=' + this.buttonsShape);
+          var button_shape = (this.buttonsShape == 'circle')? '50%' : '4px';
+          var symmetric_button = (this.buttonsShape == 'rectangle')? false : true;
 
           var min_dimension = Math.min(this.viewport_width, this.viewport_height);
-          // vh of arm buttons depending on code_arm_required (as we have less space on disarmed screen when code required)
           var code_arm_required = this.isChecked(this.alarm.attributes.code_arm_required);
+          var width_to_height_ratio = this.buttonWidthToHeightRatio;
+
+          // vh of arm buttons depending on code_arm_required (as we have less space on disarmed screen when code required)
           var arm_button_width_percentage = code_arm_required? 18 : 30;
           var arm_button_width = Math.trunc((arm_button_width_percentage*min_dimension)/100);
+          var arm_button_height = symmetric_button? arm_button_width : Math.trunc(arm_button_width/width_to_height_ratio); // same for symmetric buttons (circle/square) and half of it for rectangle
+
+          var message_button_width = 115;
+          var message_button_height = symmetric_button? message_button_width : Math.trunc(message_button_width/width_to_height_ratio);
 
           var available_width = this.viewport_width;
           var status_bar_height = 87;
@@ -2320,41 +2349,57 @@
           var horizontalCodepanel = this.needHorizontalCodepanel(this.orientationLandscape, this.alarm.attributes.code_arm_required);
           var buttons_in_row = horizontalCodepanel? 4 : 3;
           var buttons_in_column = horizontalCodepanel? 3 : 4;
+
           console.log('_updateButtonsStyles: min_dimension=' + min_dimension + ', available ' + available_width + 'x' + available_height + ', horizontalCodepanel=' + horizontalCodepanel + ', buttons_in_row=' + buttons_in_row + ', buttons_in_column=' + buttons_in_column + 'arm_buttons=' + arm_buttons);
 
-          switch(this.buttonsShape) {
-            case 'round':
-                          this.updateStyles({'--button-shape': '50%'});
-                          var arm_button_height = arm_button_width;
-                          var arm_button_total_height = code_arm_required? (2*arm_button_top_bottom_margin + arm_button_height) : 0; // don't take into account arm buttons' height if no code to arm required
+          var button_width;
+          var button_height;
+          var max_button_width = (available_width - left_margin - buttons_in_row*2*button_left_right_margin - right_margin)/buttons_in_row;
 
-                          var button_height = (available_height - top_margin - buttons_in_column*2*button_top_bottom_margin - arm_button_total_height - bottom_margin)/buttons_in_column;
-                          var button_width = (available_width - left_margin - buttons_in_row*2*button_left_right_margin - right_margin)/buttons_in_row;
+          if (symmetric_button) {
+            var arm_button_total_height = code_arm_required? (2*arm_button_top_bottom_margin + arm_button_height) : 0; // don't take into account arm buttons' height if no code to arm required
+            var max_button_height = (available_height - top_margin - buttons_in_column*2*button_top_bottom_margin - arm_button_total_height - bottom_margin)/buttons_in_column;
 
-                          var button_diameter = Math.trunc(Math.min(button_height, button_width)).toString() + 'px';
-                          console.log('_updateButtonsStyles: transform button ' + Math.trunc(button_width) + 'x' + Math.trunc(button_height) + 'px into a circle of diameter ' + button_diameter + ' with margins ' + button_top_bottom_margin.toString() + 'px; ' + button_left_right_margin.toString() + 'px');
-                          this.updateStyles({'--button-height': button_diameter});
-                          this.updateStyles({'--button-width': button_diameter});
-                          this.updateStyles({'--button-top-bottom-margin': button_top_bottom_margin.toString() + 'px'});
-                          this.updateStyles({'--button-left-right-margin': button_left_right_margin.toString() + 'px'});
-
-                          var arm_button_diameter = arm_button_width.toString() + 'px';
-                          console.log('_updateButtonsStyles: set arm buttons\' width and height to ' + arm_button_diameter + ' with margins ' + arm_button_top_bottom_margin.toString() + 'px; ' + arm_button_left_right_margin.toString() + 'px');
-                          this.updateStyles({'--arm-button-height': arm_button_diameter});
-                          this.updateStyles({'--arm-button-width': arm_button_diameter});
-                          this.updateStyles({'--arm-button-top-bottom-margin': arm_button_top_bottom_margin.toString() + 'px'});
-                          this.updateStyles({'--arm-button-left-right-margin': arm_button_left_right_margin.toString() + 'px'});
-                          return;
-            case 'square':
-                          this.updateStyles({'--button-shape': '4px'});
-                          this.updateStyles({'--arm-button-height': '12vh'});
-                          return;
-            case 'rectangular':
-                          this.updateStyles({'--button-shape': '4px'});
-                          this.updateStyles({'--arm-button-height': '12vh'});
-                          return;
+            // use min as it will surely not exceed the viewport
+            button_width = Math.trunc(Math.min(max_button_height, max_button_width));
+            button_height = button_width;
           }
-          console.error('_updateButtonsStyles: invalid buttonsShape "' + this.buttonsShape + '"');
+          else {
+            button_width = Math.min(max_button_width, arm_button_width); // to avoid too wide codepanel buttons
+            button_height = arm_button_height;
+          }
+
+          // apply computed styles
+
+          function _numberToPx(num) {
+            return num.toString() + 'px';
+          }
+
+          var styles = {};
+          // change shape of all buttons
+          styles['--button-shape'] = button_shape;
+
+          // set codepanel buttons' size and margins
+          console.log('_updateButtonsStyles: convert button ' + Math.trunc(max_button_width) + 'x' + Math.trunc(max_button_height) + 'px into a ' + this.buttonsShape + ' of ' + button_width + 'x' + button_height + 'px with margins ' + _numberToPx(button_top_bottom_margin) + '; ' + button_left_right_margin.toString() + 'px');
+          styles['--button-height'] = _numberToPx(button_height);
+          styles['--button-width'] = _numberToPx(button_width);
+          styles['--button-top-bottom-margin'] = _numberToPx(button_top_bottom_margin);
+          styles['--button-left-right-margin'] = _numberToPx(button_left_right_margin);
+
+          // set arm buttons' size and margins
+          console.log('_updateButtonsStyles: set arm buttons to ' + arm_button_width.toString() + 'x' + arm_button_height.toString() + 'px with margins ' + _numberToPx(arm_button_top_bottom_margin) +'; ' + _numberToPx(arm_button_left_right_margin));
+          styles['--arm-button-height'] = _numberToPx(arm_button_height);
+          styles['--arm-button-width'] = _numberToPx(arm_button_width);
+          styles['--arm-button-top-bottom-margin'] = _numberToPx(arm_button_top_bottom_margin);
+          styles['--arm-button-left-right-margin'] = _numberToPx(arm_button_left_right_margin);
+
+          // set error/warning messages' buttons' size and margins
+          console.log('_updateButtonsStyles: set message buttons to ' + message_button_width.toString() + 'x' + message_button_height.toString() + 'px with margins ' + _numberToPx(button_top_bottom_margin) + '; ' + _numberToPx(button_left_right_margin));
+          styles['--message-button-height'] = _numberToPx(message_button_height);
+          styles['--message-button-width'] = _numberToPx(message_button_width);
+          styles['--message-button-margin'] = '20px';
+
+          this.updateStyles(styles);
         }
 
         updatePanelStyles(){
