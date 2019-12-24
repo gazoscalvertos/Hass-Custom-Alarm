@@ -1,125 +1,123 @@
 :host {
-   --countdown-timer-display: none;
-   --time-display: initial;
+  --countdown-timer-display: none;
+  --time-display: initial;
 
-  /* for rounded/round buttons */
-   --button-shape:       4px;
+  /* THEME - DARK */
+  --dark-background:   #191A1F;
+  --dark-inner:        #212227;
 
-   /* default radius/size of a square button in warning/error message box */
-   --message-button-width: 115px;
-   --message-button-height: 115px;
-   --message-button-margin: 20px;
+  --dark-green:        #23C48E;
+  --dark-black:        #1A1E22;
 
-   /* THEME - DARK */
-   --dark-background:   #191A1F;
-   --dark-inner:        #212227;
+  --dark-grey:         #7F7F7F;
+  --dark-grey-text:    #BCBCBE;
 
-   --dark-green:        #23C48E;
-   --dark-black:        #1A1E22;
+  --dark-white-text:   #FFFFFF;
+  --dark-greyout-text: #77787A;
 
-   --dark-grey:         #7F7F7F;
-   --dark-grey-text:    #BCBCBE;
+  --dark-red:          #D3435C;
+  --dark-light-blue:   #04C0F8;
+  --dark-orange:       #ED9D00;
 
-   --dark-white-text:   #FFFFFF;
-   --dark-greyout-text: #77787A;
+  --dark-indigo:       #5771C2;
+  --dark-indigo-grey:  #37446B;
 
-   --dark-red:          #D3435C;
-   --dark-light-blue:   #04C0F8;
-   --dark-orange:       #ED9D00;
+  /* THEME - LIGHT */
+  --light-background:   white;
+  --light-inner:        #f3f3f3;
 
-   --dark-indigo:       #5771C2;
-   --dark-indigo-grey:  #37446B;
+  --light-green:        #23C48E;
+  --light-black:        #1A1E22;
 
-   /* THEME - LIGHT */
-   --light-background:   white;
-   --light-inner:        #f3f3f3;
+  --light-grey:         #7F7F7F;
+  --light-grey-text:    #BCBCBE;
 
-   --light-green:        #23C48E;
-   --light-black:        #1A1E22;
+  --light-white-text:   #FFFFFF;
+  --light-greyout-text: #77787A;
 
-   --light-grey:         #7F7F7F;
-   --light-grey-text:    #BCBCBE;
+  --light-red:          #D3435C;
+  --light-light-blue:   #04C0F8;
+  --light-orange:       #ED9D00;
 
-   --light-white-text:   #FFFFFF;
-   --light-greyout-text: #77787A;
+  --light-indigo:       #5771C2;
+  --light-indigo-grey:  #37446B;
 
-   --light-red:          #D3435C;
-   --light-light-blue:   #04C0F8;
-   --light-orange:       #ED9D00;
+  /* GUI SPECIFIC */
+  --primary-text-color:             'white';
 
-   --light-indigo:       #5771C2;
-   --light-indigo-grey:  #37446B;
+  --panel-background-color:         var(--dark-background); /*The background color of the main content section.*/
 
-   /* GUI SPECIFIC */
-   --primary-text-color:             'white';
+  --panel-outer-background-color:   var(--dark-inner); /*The background color of both the status bar and the menu bar*/
+  --panel-text-color:               var(--dark-white-text); /*The color of the general text within the panel.*/
 
-   --panel-background-color:         var(--dark-background); /*The background color of the main content section.*/
+  --header-background-color:        var(--dark-background); /*The background color of very top header bar.*/
+  --header-text-color:              var(--dark-white-text); /*The text color on very top header bar.*/
 
-   --panel-outer-background-color:   var(--dark-inner); /*The background color of both the status bar and the menu bar*/
-   --panel-text-color:               var(--dark-white-text); /*The color of the general text within the panel.*/
+  --alarmstatus-text-color:         var(--dark-green); /*The text color of the Alarm Status*/
+  --time-text-color:                var(--dark-white-text); /*The text color of the Time label*/
+  --weather-text-color:             var(--dark-white-text); /*The text color of the Weather label.*/
+  --weather-image-color:            var(--dark-light-blue); /*The color of the Weather image*/
 
-   --header-background-color:        var(--dark-background); /*The background color of very top header bar.*/
-   --header-text-color:              var(--dark-white-text); /*The text color on very top header bar.*/
+  --info-header-text-color:         white; /* The color of the Heading within a particular Section*/
+  --info-detail-text-color:         var(--dark-green); /*The color of the descriptive text within a particular Section.*/
 
-   --alarmstatus-text-color:         var(--dark-green); /*The text color of the Alarm Status*/
-   --time-text-color:                var(--dark-white-text); /*The text color of the Time label*/
-   --weather-text-color:             var(--dark-white-text); /*The text color of the Weather label.*/
-   --weather-image-color:            var(--dark-light-blue); /*The color of the Weather image*/
+  --title-color:                    var(--dark-orange); /*The color of the Title text within a particular section.*/
+  --subtitle-text-color:            var(--dark-light-blue); /*The color of the Subtitle text within a particular section.*/
+  --openSensors-title-color:        var(--dark-orange); /*The color of the Open Sensors Title to draw attention to the open sensor*/
+  --button-background-color:        var(--dark-background); /*The background color of the alarm buttons.*/
+  --cancel-color:                   var(--dark-red);  /*The background color of the cancel button.*/
+  --override-color:                 var(--dark-orange); /* The background color of the override button.*/
+  --action-button-border-color:     var(--dark-green);/* The border color of the action button.*/
 
-   --info-header-text-color:         white; /* The color of the Heading within a particular Section*/
-   --info-detail-text-color:         var(--dark-green); /*The color of the descriptive text within a particular Section.*/
+  --info-panel-buttons-color:       var(--dark-light-blue); /*The color of the menu buttons*/
 
-   --title-color:                    var(--dark-orange); /*The color of the Title text within a particular section.*/
-   --subtitle-text-color:            var(--dark-light-blue); /*The color of the Subtitle text within a particular section.*/
-   --openSensors-title-color:        var(--dark-orange); /*The color of the Open Sensors Title to draw attention to the open sensor*/
-   --button-background-color:        var(--dark-background); /*The background color of the alarm buttons.*/
-   --cancel-color:                   var(--dark-red);  /*The background color of the cancel button.*/
-   --override-color:                 var(--dark-orange); /* The background color of the override button.*/
-   --action-button-border-color:     var(--dark-green);/* The border color of the action button.*/
+  --paper-listbox-background-color: blue;/* The background color of the listboxes.*/
+  --paper-listbox-color:            var(--dark-light-blue);/* The text color within the listboxes.*/
 
-   --info-panel-buttons-color:       var(--dark-light-blue); /*The color of the menu buttons*/
+  --paper-item-selected_-_color:     var(--dark-orange);/* The text color of the item selected within a selection box.*/
+  --paper-input-container-shared-input-style_-_color: white;
 
+  --font-header:                     unset; /*Font of the header, time and weather text*/
 
-   --button-height:                  10vh;
-   --button-width:                   10vh;
-   --button-top-bottom-margin:       4px;
-   --button-left-right-margin:       10px;
-   --button-text-color:              var(--primary-text-color);/* The defaul color of the text within buttons.*/
-   --button-border-color:            var(--dark-light-blue);/* The border color of the alarm buttons.*/
-
-   --arm-button-height:              18vh;
-   --arm-button-width:               18vh;
-   --arm-button-top-bottom-margin:   10px;
-   --arm-button-left-right-margin:   10px;
-   --arm-button-border-color:        var(--dark-light-blue);/* The border color of the alarm buttons.*/
-   --arm-button-text-color:          var(--button-text-color);/* The color of the text within the alarm buttons.*/
+  --shadow-effect:                   below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
 
 
-   --paper-listbox-background-color: blue;/* The background color of the listboxes.*/
-   --paper-listbox-color:            var(--dark-light-blue);/* The text color within the listboxes.*/
+  --inner-panel-default-height:               87px;
+  --status-bar-height:                        var(--inner-panel-default-height);
+  --info-panel-height:                        var(--inner-panel-default-height);
 
-   --paper-item-selected_-_color:     var(--dark-orange);/* The text color of the item selected within a selection box.*/
-   --paper-input-container-shared-input-style_-_color: white;
+  --button-default-shape:                     4px;  /* Npx for rounded edges or 50% for circles */
 
-   --font-header:                     unset; /*Font of the header, time and weather text*/
+  --button-default-height:                    10vh;
+  --button-default-width:                     10vh;
+  --button-default-top-bottom-margin:         4px;
+  --button-default-left-right-margin:         10px;
+  --button-text-color:                        var(--primary-text-color);/* The defaul color of the text within buttons.*/
+  --button-border-color:                      var(--dark-light-blue);/* The border color of the alarm buttons.*/
 
-   --shadow-effect:                   below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
+  --arm-button-default-height:                18vh;
+  --arm-button-default-width:                 18vh;
+  --arm-button-default-top-bottom-margin:     10px;
+  --arm-button-default-left-right-margin:     10px;
+  --arm-button-border-color:                  var(--dark-light-blue);/* The border color of the alarm buttons.*/
+  --arm-button-text-color:                    var(--button-text-color);/* The color of the text within the alarm buttons.*/
 
-   --warning-message-border-color:    transparent;
-   --warning-message-text-color:        var(--primary-text-color);
+  /* default radius/size of a square button in warning/error message box */
+  --message-button-default-margin:            20px;
+  --message-button-default-height:            115px;
+  --message-button-default-width:             115px;
 
-   --warning-message-button-text-color: var(--button-text-color);
-   --warning-message-button-background-color: var(--button-border-color);
+  --warning-message-border-color:             transparent;
+  --warning-message-text-color:               var(--primary-text-color);
 
-   --error-message-border-color:      transparent;
-   --error-message-text-color:        var(--primary-text-color);
+  --warning-message-button-text-color:        var(--button-text-color);
+  --warning-message-button-background-color:  var(--button-border-color);
 
-   --error-message-button-text-color: var(--button-text-color);
-   --error-message-button-background-color: var(--button-border-color);
+  --error-message-border-color:               transparent;
+  --error-message-text-color:                 var(--primary-text-color);
 
-  --default-bar-height: 87px;
-  --status-bar-height: var(--default-bar-height);
-  --info-panel-height: var(--default-bar-height);
+  --error-message-button-text-color:          var(--button-text-color);
+  --error-message-button-background-color:    var(--button-border-color);
 }
 
 app-toolbar {
@@ -563,10 +561,10 @@ div.code iron-label {
 
 /* NIGHT, HOME and AWAY buttons */
 div.arm button {
-  margin: var(--arm-button-top-bottom-margin) var(--arm-button-left-right-margin);
-  height: var(--arm-button-height);
-  width: var(--arm-button-width);
-  border-radius: var(--button-shape);
+  margin: var(--arm-button-top-bottom-margin, var(--arm-button-default-top-bottom-margin)) var(--arm-button-left-right-margin, var(--arm-button-default-left-right-margin));
+  height: var(--arm-button-height, var(--arm-button-default-height));
+  width: var(--arm-button-width, var(--arm-button-default-width));
+  border-radius: var(--button-shape, var(--button-default-shape));
   background-color: var(--arm-button-border-color);
   color: var(--arm-button-text-color);
 }
@@ -583,10 +581,10 @@ div.arm button {
 
 /* numeric keys */
 #codepanel button {
-  margin: var(--button-top-bottom-margin) var(--button-left-right-margin);
-  height: var(--button-height);
-  width: var(--button-width);
-  border-radius: var(--button-shape);
+  margin: var(--button-top-bottom-margin, var(--button-default-top-bottom-margin)) var(--button-left-right-margin, var(--button-default-left-right-margin));
+  height: var(--button-height, var(--button-default-height));
+  width: var(--button-width, var(--button-default-width));
+  border-radius: var(--button-shape, var(--button-default-shape));
 }
 
 /* invisible and inactive button - used as a placeholder to make layout the same with or without the button */
@@ -611,10 +609,10 @@ div.error-message button.mdc-button--raised {
 }
 
 div.error-message button {
-  margin: var(--message-button-margin);
-  height: var(--message-button-height);
-  width: var(--message-button-width);
-  border-radius: var(--button-shape);
+  margin: var(--message-button-margin, var(--message-button-default-margin));
+  height: var(--message-button-height, var(--message-button-default-height));
+  width: var(--message-button-width, var(--message-button-default-width));
+  border-radius: var(--button-shape, var(--button-default-shape));
 /*  background-color: var(--error-message-button-background-color);*/
   color: var(--button-text-color);
   font-size: initial;
@@ -636,10 +634,10 @@ div.warning-message button.mdc-button--raised {
 }
 
 div.warning-message button {
-  margin: var(--message-button-margin);
-  height: var(--message-button-height);
-  width: var(--message-button-width);
-  border-radius: var(--button-shape);
+  margin: var(--message-button-margin, var(--message-button-default-margin));
+  height: var(--message-button-height, var(--message-button-default-height));
+  width: var(--message-button-width, var(--message-button-default-width));
+  border-radius: var(--button-shape, var(--button-default-shape));
 /*  background-color: var(--warning-message-button-background-color) !important; /* fix it by moving definitions around so these are after mdc-button! */
   color: var(--button-text-color);
   font-size: initial;
