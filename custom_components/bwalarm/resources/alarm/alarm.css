@@ -88,8 +88,8 @@
 
   /* button - codepanel */
   --button-default-shape:                     4px;  /* Npx for rounded edges or 50% for circles */
-  --button-default-height:                    10vh;
-  --button-default-width:                     10vh;
+  --button-default-height:                    10vmin;
+  --button-default-width:                     10vmin;
   --button-default-top-bottom-margin:         4px;
   --button-default-left-right-margin:         10px;
   --button-border-width:                      3px;
@@ -102,8 +102,8 @@
   --button-raised-background-color:           var(--button-border-color);/* The defaul background of raised (action) buttons.*/
   --button-raised-text-color:                 var(--button-text-color);/* The defaul color of the text within raised (action) buttons.*/
 
-  --arm-button-default-height:                18vh;
-  --arm-button-default-width:                 18vh;
+  --arm-button-default-height:                18vmin;
+  --arm-button-default-width:                 18vmin;
   --arm-button-default-top-bottom-margin:     10px;
   --arm-button-default-left-right-margin:     10px;
   --arm-button-border-width:                  var(--button-raised-border-width);
@@ -524,13 +524,10 @@ h1 {
   position: relative;
   bottom: 0;
   height: var(--info-panel-height);
-  /*max-height: 12vh; let's have it fixed*/
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   text-align: center;
-/*  justify-content: space-evenly;*/
-/*  padding: 8px 8px;*/
 }
 
 #info-panel-selection paper-icon-button {
@@ -1063,10 +1060,6 @@ text-align: left;
 
   /* NIGHT, HOME and AWAY buttons */
   div.arm button {
-    /*margin: 5px;*/
-    /*height: 18vh;
-    width: 18vh;*/
-
     font-size: large;
   }
 
@@ -1120,10 +1113,6 @@ text-align: left;
   /* ## codepanel ## */
   /* numeric keys */
   #codepanel button {
-    /*margin: 4px 10px;
-    height: 10vh;
-    width: 10vh;*/
-
     font-size: x-large;
   }
 
@@ -1184,19 +1173,11 @@ text-align: left;
 
 /* NIGHT, HOME and AWAY buttons */
 div.arm button {
-  /*margin: 10px;*/
-  /*height: 20vh;
-  width: 20vh;*/
-
   font-size: x-large;
 }
 
 /* ## codepanel ## */
 #codepanel button {
-  /*margin: 5px;
-  height: 90px;
-  width: 90px;*/
-
   font-size: xx-large;
 }
 
