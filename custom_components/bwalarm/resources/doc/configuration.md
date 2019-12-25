@@ -424,7 +424,8 @@
 <a id="panel-panel_title"></a>
 &nbsp;&nbsp;&nbsp; **panel_title**  
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;The text to show as the top of the window.  
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;Prefix to show in front of alarm status in the status bar.    
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;Use empty string or remove the attribute completely to hide it from the screen.    
 &nbsp;  
 <a id="panel-enable_clock"></a>
 &nbsp;&nbsp;&nbsp; **enable_clock**  
@@ -725,7 +726,7 @@
 <a id="admin_password"></a>
 **admin_password**  
 &nbsp;&nbsp;&nbsp; _(string) (Optional)_  
-&nbsp;&nbsp;&nbsp; Password to access the `Settings` tab.  
+&nbsp;&nbsp;&nbsp; Password to access the alarm configuration - `Settings` tab.  
 &nbsp;  
 &nbsp;&nbsp;&nbsp; _Default value:_  
 &nbsp;&nbsp;&nbsp; HG28!!&dn  

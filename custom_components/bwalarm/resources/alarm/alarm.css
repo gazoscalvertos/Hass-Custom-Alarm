@@ -1,104 +1,167 @@
-/* CUSTOM ALARM COMPONENT PANEL CSS
-  https://github.com/gazoscalvertos/Hass-Custom-Alarm
-  VERSION:  1.1.4
-  MODIFIED: 13/11/18
-*/
 :host {
-   --countdown-timer-display: none;
-   --time-display: initial;
+  --countdown-timer-display: none;
+  --time-display: initial;
 
-   /* THEME - DARK */
-   --dark-background:   #191A1F;
-   --dark-inner:        #212227;
+  /* THEME - DARK */
+  --dark-background:   #191A1F;
+  --dark-inner:        #212227;
 
-   --dark-green:        #23C48E;
-   --dark-black:        #1A1E22;
+  --dark-green:        #23C48E;
+  --dark-black:        #1A1E22;
 
-   --dark-grey:         #7F7F7F;
-   --dark-grey-text:    #BCBCBE;
+  --dark-grey:         #7F7F7F;
+  --dark-grey-text:    #BCBCBE;
 
-   --dark-white-text:   #FFFFFF;
-   --dark-greyout-text: #77787A;
+  --dark-white-text:   #FFFFFF;
+  --dark-greyout-text: #77787A;
 
-   --dark-red:          #D3435C;
-   --dark-light-blue:   #04C0F8;
-   --dark-orange:       #ED9D00;
+  --dark-red:          #D3435C;
+  --dark-light-blue:   #04C0F8;
+  --dark-orange:       #ED9D00;
 
-   --dark-indigo:       #5771C2;
-   --dark-indigo-grey:  #37446B;
+  --dark-indigo:       #5771C2;
+  --dark-indigo-grey:  #37446B;
 
-   /* THEME - LIGHT */
-   --light-background:   white;
-   --light-inner:        #f3f3f3;
+  /* THEME - LIGHT */
+  --light-background:   white;
+  --light-inner:        #f3f3f3;
 
-   --light-green:        #23C48E;
-   --light-black:        #1A1E22;
+  --light-green:        #23C48E;
+  --light-black:        #1A1E22;
 
-   --light-grey:         #7F7F7F;
-   --light-grey-text:    #BCBCBE;
+  --light-grey:         #7F7F7F;
+  --light-grey-text:    #BCBCBE;
 
-   --light-white-text:   #FFFFFF;
-   --light-greyout-text: #77787A;
+  --light-white-text:   #FFFFFF;
+  --light-greyout-text: #77787A;
 
-   --light-red:          #D3435C;
-   --light-light-blue:   #04C0F8;
-   --light-orange:       #ED9D00;
+  --light-red:          #D3435C;
+  --light-light-blue:   #04C0F8;
+  --light-orange:       #ED9D00;
 
-   --light-indigo:       #5771C2;
-   --light-indigo-grey:  #37446B;
+  --light-indigo:       #5771C2;
+  --light-indigo-grey:  #37446B;
 
-   --button-shape:       0%;
+  /* GUI SPECIFIC */
+  --primary-text-color:             'white';
 
-   /* GUI SPECIFIC */
-   --primary-text-color:             'white';
+  --panel-background-color:         var(--dark-background); /*The background color of the main content section.*/
 
-   --panel-background-color:         var(--dark-background); /*The background color of the main content section.*/
+  --panel-outer-background-color:   var(--dark-inner); /*The background color of both the status bar and the menu bar*/
+  --panel-text-color:               var(--dark-white-text); /*The color of the general text within the panel.*/
 
-   /* --panel-outer-background-color:   var(--secondary-background-color); */
-   --panel-outer-background-color:   var(--dark-inner); /*The background color of both the status bar and the menu bar*/
-   --panel-text-color:               var(--dark-white-text); /*The color of the general text within the panel.*/
+  --header-background-color:        var(--dark-background); /*The background color of very top header bar.*/
+  --header-text-color:              var(--dark-white-text); /*The text color on very top header bar.*/
 
-   --header-background-color:        var(--dark-background); /*The background color of very top header bar.*/
-   --header-text-color:              var(--dark-white-text); /*The text color on very top header bar.*/
+  --alarmstatus-text-color:         var(--dark-green); /*The text color of the Alarm Status*/
+  --time-text-color:                var(--dark-white-text); /*The text color of the Time label*/
+  --weather-text-color:             var(--dark-white-text); /*The text color of the Weather label.*/
+  --weather-image-color:            var(--dark-light-blue); /*The color of the Weather image*/
 
-   --alarmstatus-text-color:         var(--dark-green); /*The text color of the Alarm Status*/
-   --time-text-color:                var(--dark-white-text); /*The text color of the Time label*/
-   --weather-text-color:             var(--dark-white-text); /*The text color of the Weather label.*/
-   --weather-image-color:            var(--dark-light-blue); /*The color of the Weather image*/
+  --info-header-text-color:         white; /* The color of the Heading within a particular Section*/
+  --info-detail-text-color:         var(--dark-green); /*The color of the descriptive text within a particular Section.*/
 
-   --info-header-text-color:         white; /* The color of the Heading within a particular Section*/
-   --info-detail-text-color:         var(--dark-green); /*The color of the descriptive text within a particular Section.*/
+  --title-color:                    var(--dark-orange); /*The color of the Title text within a particular section.*/
+  --subtitle-text-color:            var(--dark-light-blue); /*The color of the Subtitle text within a particular section.*/
+  --openSensors-title-color:        var(--dark-orange); /*The color of the Open Sensors Title to draw attention to the open sensor*/
+  --button-background-color:        var(--dark-background); /*The background color of the alarm buttons.*/
+  --cancel-color:                   var(--dark-red);  /*The background color of the cancel button.*/
+  --override-color:                 var(--dark-orange); /* The background color of the override button.*/
+  --action-button-border-color:     var(--dark-green);/* The border color of the action button.*/
 
-   --title-color:                    var(--dark-orange); /*The color of the Title text within a particular section.*/
-   --subtitle-text-color:            var(--dark-light-blue); /*The color of the Subtitle text within a particular section.*/
-   --openSensors-title-color:        var(--dark-orange); /*The color of the Open Sensors Title to draw attention to the open sensor*/
-   --button-background-color:        var(--dark-background); /*The background color of the alarm buttons.*/
-   --cancel-color:                   var(--dark-red);  /*The background color of the cancel button.*/
-   --override-color:                 var(--dark-orange); /* The background color of the override button.*/
-   --action-button-border-color:     var(--dark-green);/* The border color of the action button.*/
+  --info-panel-buttons-color:       var(--dark-light-blue); /*The color of the menu buttons*/
 
-   --info-panel-buttons-color:       var(--dark-light-blue); /*The color of the menu buttons*/
+  --paper-listbox-background-color: blue;/* The background color of the listboxes.*/
+  --paper-listbox-color:            var(--dark-light-blue);/* The text color within the listboxes.*/
 
-   --arm-button-border-color:        var(--dark-light-blue);/* The border color of the alarm buttons.*/
-   --arm-button-text-color:          white;/* The color of the text within the alarm buttons.*/
+  --paper-item-selected_-_color:     var(--dark-orange);/* The text color of the item selected within a selection box.*/
+  --paper-input-container-shared-input-style_-_color: white;
 
-   --paper-listbox-background-color: blue;/* The background color of the listboxes.*/
-   --paper-listbox-color:            var(--dark-light-blue);/* The text color within the listboxes.*/
+  --font-header:                     unset; /*Font of the header, time and weather text*/
 
-   --paper-item-selected_-_color:     var(--dark-orange);/* The text color of the item selected within a selection box.*/
-   --paper-input-container-shared-input-style_-_color: white;
+  --shadow-effect:                   below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
 
-   --font-header:                     unset; /*Font of the header, time and weather text*/
 
-   --shadow-effect:                   below 0 linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
+  --inner-panel-default-height:               87px;
+  --status-bar-height:                        var(--inner-panel-default-height);
+  --info-panel-height:                        var(--inner-panel-default-height);
 
+  /* button - codepanel */
+  --button-default-shape:                     4px;  /* Npx for rounded edges or 50% for circles */
+  --button-default-height:                    10vmin;
+  --button-default-width:                     10vmin;
+  --button-default-top-bottom-margin:         4px;
+  --button-default-left-right-margin:         10px;
+  --button-border-width:                      3px;
+  --button-border-style:                      solid;
+  --button-border-color:                      var(--mdc-theme-primary);/* The border color of the alarm buttons. --mdc-theme-secondary*/
+  --button-text-color:                        var(--mdc-theme-on-primary);/* The defaul color of the text within buttons. --mdc-theme-on-secondary*/
+  --button-raised-border-width:               2px;/* The defaul background of raised (action) buttons.*/
+  --button-raised-border-style:               solid;
+  --button-raised-border-color:               var(--button-raised-text-color);/* The defaul background of raised (action) buttons.*/
+  --button-raised-background-color:           var(--button-border-color);/* The defaul background of raised (action) buttons.*/
+  --button-raised-text-color:                 var(--button-text-color);/* The defaul color of the text within raised (action) buttons.*/
+
+  --arm-button-default-height:                18vmin;
+  --arm-button-default-width:                 18vmin;
+  --arm-button-default-top-bottom-margin:     10px;
+  --arm-button-default-left-right-margin:     10px;
+  --arm-button-border-width:                  var(--button-raised-border-width);
+  --arm-button-border-style:                  var(--button-raised-border-style);
+  --arm-button-border-color:                  var(--button-raised-text-color);/* The border color of the alarm buttons.*/
+  --arm-button-background-color:              var(--button-raised-background-color);/* The border color of the alarm buttons.*/
+  --arm-button-text-color:                    var(--button-raised-text-color);/* The color of the text within the alarm buttons.*/
+
+  /* default radius/size of a square button in warning/error message box */
+  --message-button-default-margin:            20px;
+  --message-button-default-height:            115px;
+  --message-button-default-width:             115px;
+  --message-button-default-border-width:      2px;
+  --message-button-default-border-style:      var(--button-border-style);
+  --message-button-border-color:              var(--button-border-color);
+  --message-button-text-color:                  var(--button-text-color);
+  --message-button-raised-default-border-width: 1px;
+  --message-button-raised-border-color:              var(--button-raised-border-color);
+  --message-button-raised-background-color:     var(--button-raised-background-color);
+  --message-button-raised-text-color:           var(--button-raised-text-color);
+
+  --warning-message-border-color:                   transparent;
+  --warning-message-text-color:                     var(--primary-text-color);
+  --warning-message-button-border-width:            var(--message-button-default-border-width);
+  --warning-message-button-border-style:            var(--message-button-default-border-style);
+  --warning-message-button-border-color:            var(--message-button-border-color);
+  --warning-message-button-text-color:              var(--message-button-text-color);
+  --warning-message-button-raised-border-width: var(--message-button-raised-default-border-width);
+  --warning-message-button-raised-border-color: var(--warning-message-button-raised-text-color);
+  --warning-message-button-raised-background-color: var(--message-button-raised-background-color);
+  --warning-message-button-raised-text-color:       var(--message-button-raised-text-color);
+
+  --error-message-border-color:                     transparent;
+  --error-message-text-color:                       var(--primary-text-color);
+  --error-message-button-border-width:              var(--message-button-default-border-width);
+  --error-message-button-border-style:              var(--message-button-default-border-style);
+  --error-message-button-border-color:              var(--message-button-border-color);
+  --error-message-button-text-color:                var(--message-button-text-color);
+  --error-message-button-raised-border-width:       var(--message-button-raised-default-border-width);
+  --error-message-button-raised-border-color:       var(--error-message-button-raised-text-color);
+  --error-message-button-raised-background-color:   var(--message-button-raised-background-color);
+  --error-message-button-raised-text-color:         var(--message-button-raised-text-color);
 }
+
+/* mwc-button stuff - begin */
+@keyframes mdc-ripple-fg-radius-in{from{animation-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transform:translate(var(--mdc-ripple-fg-translate-start, 0)) scale(1)}to{transform:translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1))}}@keyframes mdc-ripple-fg-opacity-in{from{animation-timing-function:linear;opacity:0}to{opacity:var(--mdc-ripple-fg-opacity, 0)}}@keyframes mdc-ripple-fg-opacity-out{from{animation-timing-function:linear;opacity:var(--mdc-ripple-fg-opacity, 0)}to{opacity:0}}.mdc-ripple-surface--test-edge-var-bug{--mdc-ripple-surface-test-edge-var: 1px solid #000;visibility:hidden}.mdc-ripple-surface--test-edge-var-bug::before{border:var(--mdc-ripple-surface-test-edge-var)}.mdc-button{font-family:Roboto,sans-serif;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-size:.875rem;line-height:2.25rem;font-weight:500;letter-spacing:.0892857143em;text-decoration:none;text-transform:uppercase;--mdc-ripple-fg-size: 0;--mdc-ripple-left: 0;--mdc-ripple-top: 0;--mdc-ripple-fg-scale: 1;--mdc-ripple-fg-translate-end: 0;--mdc-ripple-fg-translate-start: 0;-webkit-tap-highlight-color:rgba(0,0,0,0);will-change:transform,opacity;padding:0 8px 0 8px;display:inline-flex;position:relative;align-items:center;justify-content:center;box-sizing:border-box;min-width:64px;height:36px;border:none;outline:none;line-height:inherit;user-select:none;-webkit-appearance:none;overflow:hidden;vertical-align:middle;border-radius:4px}.mdc-button::before,.mdc-button::after{position:absolute;border-radius:50%;opacity:0;pointer-events:none;content:""}.mdc-button::before{transition:opacity 15ms linear,background-color 15ms linear;z-index:1}.mdc-button.mdc-ripple-upgraded::before{transform:scale(var(--mdc-ripple-fg-scale, 1))}.mdc-button.mdc-ripple-upgraded::after{top:0;left:0;transform:scale(0);transform-origin:center center}.mdc-button.mdc-ripple-upgraded--unbounded::after{top:var(--mdc-ripple-top, 0);left:var(--mdc-ripple-left, 0)}.mdc-button.mdc-ripple-upgraded--foreground-activation::after{animation:225ms mdc-ripple-fg-radius-in forwards,75ms mdc-ripple-fg-opacity-in forwards}.mdc-button.mdc-ripple-upgraded--foreground-deactivation::after{animation:150ms mdc-ripple-fg-opacity-out;transform:translate(var(--mdc-ripple-fg-translate-end, 0)) scale(var(--mdc-ripple-fg-scale, 1))}.mdc-button::before,.mdc-button::after{top:calc(50% - 100%);left:calc(50% - 100%);width:200%;height:200%}.mdc-button.mdc-ripple-upgraded::after{width:var(--mdc-ripple-fg-size, 100%);height:var(--mdc-ripple-fg-size, 100%)}.mdc-button::-moz-focus-inner{padding:0;border:0}.mdc-button:active{outline:none}.mdc-button:hover{cursor:pointer}.mdc-button:disabled{background-color:transparent;color:rgba(0,0,0,.37);cursor:default;pointer-events:none}.mdc-button.mdc-button--dense{border-radius:4px}.mdc-button:not(:disabled){background-color:transparent}.mdc-button:not(:disabled){color:#6200ee;color:var(--mdc-theme-primary, #6200ee)}.mdc-button::before,.mdc-button::after{background-color:#6200ee}@supports not (-ms-ime-align: auto){.mdc-button::before,.mdc-button::after{background-color:var(--mdc-theme-primary, #6200ee)}}.mdc-button:hover::before{opacity:.04}.mdc-button:not(.mdc-ripple-upgraded):focus::before,.mdc-button.mdc-ripple-upgraded--background-focused::before{transition-duration:75ms;opacity:.12}.mdc-button:not(.mdc-ripple-upgraded)::after{transition:opacity 150ms linear}.mdc-button:not(.mdc-ripple-upgraded):active::after{transition-duration:75ms;opacity:.16}.mdc-button.mdc-ripple-upgraded{--mdc-ripple-fg-opacity: 0.16}.mdc-button .mdc-button__icon{margin-left:0;margin-right:8px;display:inline-block;width:18px;height:18px;font-size:18px;vertical-align:top}[dir=rtl] .mdc-button .mdc-button__icon,.mdc-button .mdc-button__icon[dir=rtl]{margin-left:8px;margin-right:0}.mdc-button svg.mdc-button__icon{fill:currentColor}.mdc-button--raised .mdc-button__icon,.mdc-button--unelevated .mdc-button__icon,.mdc-button--outlined .mdc-button__icon{margin-left:-4px;margin-right:8px}[dir=rtl] .mdc-button--raised .mdc-button__icon,.mdc-button--raised .mdc-button__icon[dir=rtl],[dir=rtl] .mdc-button--unelevated .mdc-button__icon,.mdc-button--unelevated .mdc-button__icon[dir=rtl],[dir=rtl] .mdc-button--outlined .mdc-button__icon,.mdc-button--outlined .mdc-button__icon[dir=rtl]{margin-left:8px;margin-right:-4px}.mdc-button--raised,.mdc-button--unelevated{padding:0 16px 0 16px}.mdc-button--raised:disabled,.mdc-button--unelevated:disabled{background-color:rgba(0,0,0,.12);color:rgba(0,0,0,.37)}.mdc-button--raised:not(:disabled),.mdc-button--unelevated:not(:disabled){background-color:#6200ee}@supports not (-ms-ime-align: auto){.mdc-button--raised:not(:disabled),.mdc-button--unelevated:not(:disabled){background-color:var(--mdc-theme-primary, #6200ee)}}.mdc-button--raised:not(:disabled),.mdc-button--unelevated:not(:disabled){color:#fff;color:var(--mdc-theme-on-primary, #fff)}.mdc-button--raised::before,.mdc-button--raised::after,.mdc-button--unelevated::before,.mdc-button--unelevated::after{background-color:#fff}@supports not (-ms-ime-align: auto){.mdc-button--raised::before,.mdc-button--raised::after,.mdc-button--unelevated::before,.mdc-button--unelevated::after{background-color:var(--mdc-theme-on-primary, #fff)}}.mdc-button--raised:hover::before,.mdc-button--unelevated:hover::before{opacity:.08}.mdc-button--raised:not(.mdc-ripple-upgraded):focus::before,.mdc-button--raised.mdc-ripple-upgraded--background-focused::before,.mdc-button--unelevated:not(.mdc-ripple-upgraded):focus::before,.mdc-button--unelevated.mdc-ripple-upgraded--background-focused::before{transition-duration:75ms;opacity:.24}.mdc-button--raised:not(.mdc-ripple-upgraded)::after,.mdc-button--unelevated:not(.mdc-ripple-upgraded)::after{transition:opacity 150ms linear}.mdc-button--raised:not(.mdc-ripple-upgraded):active::after,.mdc-button--unelevated:not(.mdc-ripple-upgraded):active::after{transition-duration:75ms;opacity:.32}.mdc-button--raised.mdc-ripple-upgraded,.mdc-button--unelevated.mdc-ripple-upgraded{--mdc-ripple-fg-opacity: 0.32}.mdc-button--raised{box-shadow:0px 3px 1px -2px rgba(0, 0, 0, 0.2),0px 2px 2px 0px rgba(0, 0, 0, 0.14),0px 1px 5px 0px rgba(0,0,0,.12);transition:box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1)}.mdc-button--raised:hover,.mdc-button--raised:focus{box-shadow:0px 2px 4px -1px rgba(0, 0, 0, 0.2),0px 4px 5px 0px rgba(0, 0, 0, 0.14),0px 1px 10px 0px rgba(0,0,0,.12)}.mdc-button--raised:active{box-shadow:0px 5px 5px -3px rgba(0, 0, 0, 0.2),0px 8px 10px 1px rgba(0, 0, 0, 0.14),0px 3px 14px 2px rgba(0,0,0,.12)}.mdc-button--raised:disabled{box-shadow:0px 0px 0px 0px rgba(0, 0, 0, 0.2),0px 0px 0px 0px rgba(0, 0, 0, 0.14),0px 0px 0px 0px rgba(0,0,0,.12)}.mdc-button--outlined{border-style:solid;padding:0 14px 0 14px;border-width:2px}.mdc-button--outlined:disabled{border-color:rgba(0,0,0,.37)}.mdc-button--outlined:not(:disabled){border-color:#6200ee;border-color:var(--mdc-theme-primary, #6200ee)}.mdc-button--dense{height:32px;font-size:.8125rem}.material-icons{font-family:var(--mdc-icon-font, "Material Icons");font-weight:normal;font-style:normal;font-size:var(--mdc-icon-size, 24px);line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:"liga";-webkit-font-smoothing:antialiased}:host{display:inline-flex;outline:none}.mdc-button{flex:1}
+                :host {
+                    display: inherit;
+                }
+/* mwc-button stuff - end */
+
 app-toolbar {
   background-color: var(--header-background-color);
   color: var(--header-text-color);
 }
+
 #layout {
-  background-color: var(--panel-outer-background-color);
+  background-color: var(--panel-background-color);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -111,7 +174,7 @@ app-toolbar {
   position: relative !important;
   display: block !important;
   background-color: var(--header-background-color);
-  padding: 10px;
+  padding: 2px 0px;
 }
 ha-menu-button + [main-title] {
    margin-left: -50px;
@@ -218,11 +281,6 @@ a:hover {
     border-width: 2px;
 }
 
-.action-button{
-border: 0px solid var(--action-button-border-color) !important;
-/* DS */
-}
-
 .dropdown-content{
   width: 90%;
 }
@@ -274,7 +332,7 @@ border: 0px solid var(--action-button-border-color) !important;
 #carousel_main{
   position: relative;
   /* height: 60vh; */
-  padding: 15px;
+  padding: 0px 15px;
 
   /* transition: all 1s ease-in-out; */
   /* -webkit-transition: all 1s ease-in-out; /** Chrome & Safari **/
@@ -389,291 +447,6 @@ ha-label-badge {
   flex-direction: column;
   justify-content: center;
 }
-/* ################################################# height > 600px ############################################# */
-@media screen and (min-height: 600px) {
-  #status-bar {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    height: 87px;
-  }
-}
-
-/* ################################################# width XS < 767 ############################################# */
-@media screen and (max-width: 767px) {
-
-#carousel_settings {
-    margin-right: 10px;
-    margin-left: 10px;
-        /*text-align: center;*/
-}
-#carousel_settings h1{
-text-align: center;
-  }
-#carousel_settings li{
-text-align: left;
-  }
-  .log-item-date {
-    font-weight: 300;
-    font-style: italic;
-    font-size: smaller;
-}
-.camera-feed {
-  width: 300px;
-  }
-  .content-box {
-      width: 100%;
-  }
-  #code-display {
-       margin-top: 10px;
-  }
-  #main-content {
-    /* padding-bottom: 30px; */
-  }
-  div.arm mwc-button {
-    width: 36vh;
-    height: 36vh;
-    margin: 15px;
-    font-size: large;
-  }
-  #alarm-status span {
-    font-size: x-large;
-  }
-  .sm {
-    display: none !important;
-  }
-  .sign {
-      font-size: x-large;
-   }
-   #clock, #weather {
-    display: none;
-   }
-   #hour, #minute, #middle {
-      font-size: xx-large;
-   }
-   #meridiem {
-      font-size: 10px;
-      margin-left: -20px;
-      margin-right: 3px;
-   }
-   #weather-icon img {
-      width: 40px;
-   }
-   .weather {
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      justify-content: center;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      color: var(--weather-text-color);
-   }
-   .vLayout {
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      text-align: center;
-   }
-   div.arm mwc-button {
-    /*  margin-bottom: 10px;*/
-   }
-  div.digits mwc-button, div.digits paper-icon-button{
-    color: var(--arm-button-text-color);
-    border-radius: var(--button-shape);
-    min-width: 11vh;
-    height: 11vh;
-    padding: 0;
-    border: 0px solid var(--arm-button-border-color); /* DS */
-/*    border: 2px solid var(--button-background-color);*/
-    background-color: var(--button-background-color);
-    margin: 8px;
-    justify-content: center;/* DS */
-    align-items: center;/* DS */
-    font-weight: 400;
-        display: flex;
-  }
-    #code-display {
-       margin-bottom: 15px;
-  }
-}
-/* ############## SM > 768 ############### */
-
-#info-panel-selection paper-icon-button {
- width: 12vw;
- height: 12vw;
-}
-
-@media screen and (min-width: 768px) {
-    .content-box {
-      /*height: 100%;*/
-      width: 100%;
-      padding-bottom: 20px;
-  }
-.cameras{
-    padding-right: 15px;
-  }
-  .camera-feed {
-  width: 400px;
-
-}
-
-.log-item{
-  display:flex;
-  flex-direction:row;
-  width: 100%;
-}
-
-.log-item > span{
-  flex-grow:1;
-}
-
-.log-item > div{
-  flex-grow:0;
-  font-size: large;
-  margin: auto;
-  font-family:  var(--paper-font-body1_-_font-family);;
-}
-
-.log-item-date {
-    font-weight: 300;
-    font-style: italic;
-    text-align: right;
-}
-  #main-content {
-    /* padding-top: 20px;
-    padding-bottom: 120px; */
-  }
-  #code-display {
-       margin-top: 5px;
-       margin-bottom: 5px;
-  }
-  div.arm mwc-button {
-    width: 36vh;
-    height: 36vh;
-/*    line-height: 110px;*/
-    margin: 20px;
-    padding: 20px;
-    font-size: x-large;
-}
-  #alarm-status span {
-   font-size: x-large;
-}
-  .xs {
-    display: none !important;
-  }
-   .sign {
-      font-size: xx-large;
-   }
-   #meridiem {
-      font-size: small;
-      margin-left: -29px;
-   }
-   #weather, #clock {
-     width: 30%;
-   }
-   #alarm-status {
-    width: 40%
-   }
-   #weather-icon img {
-      width: 70px;
-   }
-   .vLayout {
-      -webkit-box-orient: horizontal;
-      -webkit-box-direction: normal;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      justify-content: center;
-      display: flex;
-      min-width: 50%;
-      justify-content: center;
-      flex-wrap: wrap;
-      text-align: center;
-   }
-   div.digits mwc-button, div.digits paper-iron-button{
-    border-radius: var(--button-shape);
-    min-width: 14vh;
-    height: 14vh;
-    border: 0px solid var(--arm-button-border-color); /* DS */
-/*    border: 2px solid var(--button-background-color);*/
-    background-color: var(--button-background-color);
-    display: flex;
-/*    vertical-align: middle;*/
-    justify-content: center;/* DS */
-    align-items: center;/* DS */
-    margin: 8px;
-    padding: 5px;
-    text-align: center;
-    font-size: large;
-  }
-}
-
-/* ######################################################### width => 1024 ################################################# */
-@media screen and (min-width: 1024px) {
-  #weather, #clock, #alarm-status {
-     width: 33%;
-   }
-   .info-detail {
-    font-size: large;
-   }
-   h1 {
-    font-size: x-large;
-   }
-
-   .settings-nav-inner{
-    margin-right: 20px;
-   }
-
-  .settings-nav-inner paper-icon-button {
-    width: 60px;
-    height: 60px;
-
-  }
-
-
-   #info-panel-selection paper-icon-button {
-    width: 60px;
-    height: 60px;
-    margin-left: 15px;
-  }
-  span, li, .settings-nav-text{
-    font-size: large;
-  }
-
-
-}
-
-/* ######################################################### width => 1200 ################################################# */
-@media screen and (min-width: 1200px) {
-  .md {
-    display: none !important;
-  }
-  .lg{
-    display: flex !important;
-  }
-  .initial {
-    display: flex;
-  }
-
-  .content-box {
-      width: 75%;
-  }
-  #controls {
-/*    width: 50% !important;
-    max-height: 60vh;
-    height: auto;*/
-  }
-
-
-
-}
-
 
 /* ######################################################### ALL DEVICES ################################################# */
 #icon {
@@ -688,9 +461,17 @@ paper-listbox {
   flex-direction: column;
   flex: 1 1 auto;
   width: 100%;
+/*  justify-content: space-evenly;*/
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+#status-bar {
+  height: var(--status-bar-height);
+  background: var(--panel-outer-background-color);
+/*  padding: 8px 0px;*/
+}
+
 h1 {
   color: var(--title-color);
 }
@@ -742,19 +523,26 @@ h1 {
   background: var(--panel-outer-background-color);
   position: relative;
   bottom: 0;
-  height: auto;
-  display: inline;
+  height: var(--info-panel-height);
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   text-align: center;
-  justify-content: space-between;
-  padding: .5rem 1rem;
+}
+
+#info-panel-selection paper-icon-button {
+ /*width: 60px;*/
+ height: 100%;
+ flex: 1 1 auto;
 }
 
 #main-content {
   display: flex;
   justify-content: center;
-  flex-direction: row;
+  align-items: center;
+  flex-direction: column;
+  flex: 1 1 auto;
+  padding: 0px 15px;
   background-color: var(--panel-background-color);
 }
 
@@ -803,51 +591,103 @@ div.code iron-label {
    font-size: x-large;
 }
 
-mwc-button {
-   background: #6b8d9c;
-   color: #ffffff;
+/* NIGHT, HOME and AWAY buttons */
+div.arm button {
+  margin: var(--arm-button-top-bottom-margin, var(--arm-button-default-top-bottom-margin)) var(--arm-button-left-right-margin, var(--arm-button-default-left-right-margin));
+  height: var(--arm-button-height, var(--arm-button-default-height));
+  width: var(--arm-button-width, var(--arm-button-default-width));
+  border: var(--arm-button-border-width) var(--arm-button-border-style) var(--arm-button-border-color);
+  border-radius: var(--button-shape, var(--button-default-shape));
+  background-color: var(--arm-button-background-color) !important;
+  color: var(--arm-button-text-color) !important;
+}
+
+/* ## codepanel ## */
+/* numeric keys */
+#codepanel button {
+  margin: var(--button-top-bottom-margin, var(--button-default-top-bottom-margin)) var(--button-left-right-margin, var(--button-default-left-right-margin));
+  height: var(--button-height, var(--button-default-height));
+  width: var(--button-width, var(--button-default-width));
+  border-radius: var(--button-shape, var(--button-default-shape));
+}
+
+#codepanel button.mdc-button--outlined {
+  border: var(--button-border-width) var(--button-border-style) var(--button-border-color);
+  color: var(--button-text-color);
+}
+
+#codepanel button.mdc-button--raised {
+  border: var(--button-raised-border-width) var(--button-raised-border-style) var(--button-raised-border-color);
+  background-color: var(--button-raised-background-color);
+}
+
+#codepanel button.clear {
+  border: var(--button-border-width) var(--button-border-style) red;
+}
+
+/* invisible and inactive button - used as a placeholder to make layout the same with or without the button */
+button.invisible {
+  opacity: 0; /* makes the button transparent */
+  cursor: unset !important; /* stop cursor from changing its shape over the button */
+}
+
+/* warning message styling */
+div.warning-message {
+  padding: 8px;
+  border: 2px solid var(--warning-message-border-color);
+  align-items: center;
+}
+
+div.warning-message button {
+  margin: var(--message-button-margin, var(--message-button-default-margin));
+  height: var(--message-button-height, var(--message-button-default-height));
+  width: var(--message-button-width, var(--message-button-default-width));
+  border-radius: var(--button-shape, var(--button-default-shape));
+  font-size: initial;
+}
+
+div.warning-message button.mdc-button--outlined {
+  border: var(--warning-message-button-border-width) var(--warning-message-button-border-style) var(--warning-message-button-border-color);
+  color: var(--warning-message-button-text-color);
+}
+
+div.warning-message button.mdc-button--raised {
+  border: var(--warning-message-button-raised-border-width) solid var(--warning-message-button-raised-border-color);
+  background-color: var(--warning-message-button-raised-background-color);
+  color: var(--warning-message-button-raised-text-color);
 }
 
 
-div.arm mwc-button {
-  background-color: var(--button-background-color);
-  border-radius: var(--button-shape);
-  border: 0px solid var(--arm-button-border-color); /* DS */
-/*  border: 3px solid var(--button-background-color); */
-  display: flex;
-  color: var(--arm-button-text-color);
-  justify-content: center;/* DS */
-  align-items: center;/* DS */
+/* error message styling */
+div.error-message {
+  padding: 8px;
+  border: 2px solid var(--error-message-border-color);
+  align-items: center;
 }
-div.arm mwc-button div {
-  border-radius: var(--button-shape);
-  width: 100px;
-  height: 100px;
-  border: 0px solid var(--arm-button-border-color); /* DS */
-/*  border: 3px solid var(--button-background-color);*/
-  display: flex;
-  line-height: 100px;
-  margin: 20px;
-  padding: 20px;
-  justify-content: center;/* DS */
-  align-items: center;/* DS */
+
+div.error-message button {
+  margin: var(--message-button-margin, var(--message-button-default-margin));
+  height: var(--message-button-height, var(--message-button-default-height));
+  width: var(--message-button-width, var(--message-button-default-width));
+  border-radius: var(--button-shape, var(--button-default-shape));
+  font-size: initial;
 }
-div.arm mwc-button.big {
-   width: 68%;
+
+div.error-message button.mdc-button--outlined {
+  border: var(--error-message-border-width) var(--error-message-button-border-style) var(--error-message-button-border-color);
+  color: var(--error-message-button-text-color);
 }
-div.arm mwc-button.cancel {
-       border: 0px solid var(--cancel-color);
-/*       border: 3px solid var(--cancel-color); DS */
-}
-div.arm mwc-button.override {
-       border: 0px solid var(--override-color);
-/*       border: 3px solid var(--override-color); DS */
+
+div.error-message button.mdc-button--raised {
+  border: var(--error-message-button-raised-border-width) solid var(--error-message-button-raised-border-color);
+  background-color: var(--error-message-button-raised-background-color);
+  color: var(--error-message-button-raised-text-color);
 }
 
 div.options {
    padding-top: 10px;
 }
-div.options mwc-button{
+div.options button{
    width: 96.5%;
 }
 .tappable {
@@ -865,6 +705,8 @@ div.options mwc-button{
    display: var(--time-display);
    font-size: xx-large;
    font-family: var(--font-header);
+   padding-top: 8px;
+   padding-bottom: 8px;
 }
 
 #middle {
@@ -881,12 +723,15 @@ div.options mwc-button{
 }
 #alarm-status {
     flex-direction: column;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
 }
 #alarm-status span {
    color: var( --alarmstatus-text-color);
    font-weight: bolder;
    text-align: center;
+   font-family: var(--font-header);
+   padding-top: 8px;
+   padding-bottom: 8px;
  }
 #weather-icon {
   width: 100px;
@@ -933,9 +778,10 @@ div.options mwc-button{
    -webkit-perspective: 400;
    perspective: 400;
 }
+/*
 #codepanel {
    overflow: hidden;
-}
+}*/
 
 @-webkit-keyframes shake{
    0% {
@@ -1169,4 +1015,273 @@ div.options mwc-button{
 }
 #paypal .logo, .paypal .logo{
   background-image: url('data:image/png;base64,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');
+}
+
+/* ################################################# height > 600px ############################################# */
+@media screen and (min-height: 600px) {
+  #status-bar {
+    /*margin-top: 15px;
+    margin-bottom: 15px;*/
+    /*height: var(--status-bar-height);*/
+  }
+}
+
+/* ################################################# w1: width XS < 767 ############################################# */
+@media screen and (max-width: 767px) {
+
+#carousel_settings {
+    margin-right: 10px;
+    margin-left: 10px;
+        /*text-align: center;*/
+}
+#carousel_settings h1{
+text-align: center;
+  }
+#carousel_settings li{
+text-align: left;
+  }
+  .log-item-date {
+    font-weight: 300;
+    font-style: italic;
+    font-size: smaller;
+}
+.camera-feed {
+  width: 300px;
+  }
+  .content-box {
+      width: 100%;
+  }
+  #code-display {
+       margin-top: 10px;
+  }
+  #main-content {
+    /* padding-bottom: 30px; */
+  }
+
+  /* NIGHT, HOME and AWAY buttons */
+  div.arm button {
+    font-size: large;
+  }
+
+  #alarm-status span {
+    font-size: x-large;
+  }
+  .sm {
+    display: none !important;
+  }
+  .sign {
+      font-size: x-large;
+   }
+   #clock, #weather {
+    display: none;
+   }
+   #hour, #minute, #middle {
+      font-size: xx-large;
+   }
+   #meridiem {
+      font-size: 10px;
+      margin-left: -20px;
+      margin-right: 3px;
+   }
+   #weather-icon img {
+      width: 40px;
+   }
+   .weather {
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      color: var(--weather-text-color);
+   }
+   .vLayout {
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
+   }
+
+  /* ## codepanel ## */
+  /* numeric keys */
+  #codepanel button {
+    font-size: x-large;
+  }
+
+  /* special keys: clear, disarm */
+  #codepanel button.clear, #codepanel button.disarm {
+    font-size: small;
+  }
+
+  #code-display {
+    margin-bottom: 15px;
+  }
+}
+/* ############## w2: SM > 768 ############### */
+@media screen and (min-width: 768px) {
+    .content-box {
+      /*height: 100%;*/
+      width: 100%;
+      /*padding-bottom: 20px;*/
+  }
+.cameras{
+    padding-right: 15px;
+  }
+  .camera-feed {
+  width: 400px;
+
+}
+
+.log-item{
+  display:flex;
+  flex-direction:row;
+  width: 100%;
+}
+
+.log-item > span{
+  flex-grow:1;
+}
+
+.log-item > div{
+  flex-grow:0;
+  font-size: large;
+  margin: auto;
+  font-family:  var(--paper-font-body1_-_font-family);;
+}
+
+.log-item-date {
+    font-weight: 300;
+    font-style: italic;
+    text-align: right;
+}
+  #main-content {
+    /* padding-top: 20px;
+    padding-bottom: 120px; */
+  }
+  #code-display {
+       margin-top: 5px;
+       margin-bottom: 5px;
+  }
+
+/* NIGHT, HOME and AWAY buttons */
+div.arm button {
+  font-size: x-large;
+}
+
+/* ## codepanel ## */
+#codepanel button {
+  font-size: xx-large;
+}
+
+#codepanel button.clear, #codepanel button.disarm {
+  font-size: large;
+}
+
+#alarm-status span {
+   font-size: x-large;
+}
+  .xs {
+    display: none !important;
+  }
+   .sign {
+      font-size: xx-large;
+   }
+   #meridiem {
+      font-size: small;
+      margin-left: -29px;
+   }
+   #weather, #clock {
+     width: 30%;
+   }
+   #alarm-status {
+    width: 40%
+   }
+   #weather-icon img {
+      width: 70px;
+   }
+   .vLayout {
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      justify-content: center;
+      display: flex;
+      min-width: 50%;
+      justify-content: center;
+      flex-wrap: wrap;
+      text-align: center;
+   }
+}
+
+/* ######################################################### w3: for Wide Screens (width >= 1024) ################################################# */
+@media screen and (min-width: 1024px) {
+  /* NO span here - breaks a lot! */
+  li, .settings-nav-text{
+    font-size: large;
+  }
+
+  #weather, #clock {
+     width: 33%;
+   }
+   #alarm-status {
+      width: 34%;
+    }
+   .info-detail {
+    font-size: large;
+   }
+   h1 {
+    font-size: x-large;
+   }
+
+   .settings-nav-inner{
+    margin-right: 20px;
+   }
+
+  .settings-nav-inner paper-icon-button {
+    width: 60px;
+    height: 60px;
+
+  }
+
+  /* NIGHT, HOME and AWAY buttons */
+  div.arm button {
+    font-size: xx-large;
+  }
+
+   #info-panel-selection paper-icon-button {
+    width: 60px;
+    height: 60px;
+    margin-left: 15px;
+  }
+}
+
+/* ######################################################### w4: width => 1200 ################################################# */
+@media screen and (min-width: 1200px) {
+  .md {
+    display: none !important;
+  }
+  .lg{
+    display: flex !important;
+  }
+  .initial {
+    display: flex;
+  }
+
+  .content-box {
+      width: 75%;
+  }
+  #controls {
+/*    width: 50% !important;
+    max-height: 60vh;
+    height: auto;*/
+  }
+
 }

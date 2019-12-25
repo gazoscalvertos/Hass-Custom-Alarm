@@ -21,9 +21,10 @@ KNOWN POTENTIAL ISSUES
 
 panel.html
 ----------
+- make an option to have rectangular buttons rather than square
+- display "Invalid passcode" if code_to_arm and wrong passcode entered
 - timer after clear code/restore persistence is incorrect
 - warnings in JS console (about deprecated stuff)
-- prev style buttons/code panel?
 - use another way to find out the integration's entity_id (as someone can change name: in bwalarm.yaml and there is no panel_custom.yaml anymore!)
 - service calls: this.platform hardcoded, change
 - Beware that html imports are deprecated and support will be removed: https://www.chromestatus.com/feature/5144752345317376
