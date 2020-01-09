@@ -2,7 +2,7 @@
   "domain": "bwalarm",
   "name": "BWAlarm (ak74 edition)",
   "documentation": "https://github.com/akasma74/Hass-Custom-Alarm",
-  "dependencies": [],
+  "dependencies": ["mqtt"],
   "codeowners": ["@akasma74"],
   "requirements": ["ruamel.yaml==0.15.100"]
 }
