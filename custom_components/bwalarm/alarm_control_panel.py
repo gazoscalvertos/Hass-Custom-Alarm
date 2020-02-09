@@ -1538,14 +1538,12 @@ class BWAlarm(alarm.AlarmControlPanel):
             return
 
     #### MQTT support####
-    @asyncio.coroutine
-    def async_added_to_hass(self):
+    async def async_added_to_hass(self):
         """Subscribe mqtt events.
         This method must be run in the event loop and returns a coroutine.
         """
 
-        @callback
-        def message_received(msg):
+        async def message_received(msg):
             """Run when new MQTT message has been received."""
             FNAME = '[message_received]'
 
@@ -1584,15 +1582,11 @@ class BWAlarm(alarm.AlarmControlPanel):
             #_LOGGER.debug("{} command: \"{}\", code: \"{}\", ignore_open_sensors: {}".format(FNAME, command, code, ignore_open_sensors))
 
             if command == self._payload_arm_home:
-                self.async_alarm_arm_home(code)
+                await self.async_alarm_arm_home(code)
             elif command == self._payload_arm_away:
-                self.async_alarm_arm_away(code)
+                await self.async_alarm_arm_away(code)
             elif command == self._payload_arm_night:
-                if self._enable_night_mode:
-                    self.async_alarm_arm_night(code)
-                else:
-                    _LOGGER.error("{} {} disabled".format(FNAME, command))
-                    return
+                await self.async_alarm_arm_night(code)
             elif command == self._payload_disarm:
                 # True if master/user code required to disarm the alarm
                 code_to_disarm = not self._override_code
@@ -1608,7 +1602,7 @@ class BWAlarm(alarm.AlarmControlPanel):
                     code = self._code
                 # safe to disarm with a code or admin code (override mode, no need to supply one externally)
                 _LOGGER.info("{} {} with{}".format(FNAME, command, " passcode \"" + code + "\"" if code_to_disarm else "out passcode (override mode)"))
-                self.async_alarm_disarm(code)
+                await self.async_alarm_disarm(code)
             else:
                 _LOGGER.error("{} Ignore unsupported command \"{}\"".format(FNAME, command))
                 return
@@ -1624,7 +1618,7 @@ class BWAlarm(alarm.AlarmControlPanel):
 
             if self._mqtt:
                 _LOGGER.debug("{} mqtt enabled, call async_subscribe({})".format(FNAME, self.entity_id))
-                return self._mqtt.async_subscribe(
+                await self._mqtt.async_subscribe(
                     self._hass, self._command_topic, message_received, self._qos)
             else:
                 _LOGGER.error("{} _mqtt is undefined!".format(FNAME))
