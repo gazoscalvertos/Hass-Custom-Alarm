@@ -41,12 +41,10 @@ Steps to reproduce the behavior:
 <!-- If applicable, paste content of your config to help explain your problem.  -->
 ```yaml
 ```
-
 **Home Assistant log**
 <!-- If applicable, paste messages from Home assistant log related to your problem here.  -->
 ```txt
 ```
-
 **Screenshots**
 <!-- If applicable, add screenshots to help explain your problem. -->
 
