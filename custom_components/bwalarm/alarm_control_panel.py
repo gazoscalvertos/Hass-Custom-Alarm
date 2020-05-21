@@ -44,9 +44,6 @@ from homeassistant.const         import (
     EVENT_STATE_CHANGED, EVENT_TIME_CHANGED
     )
 
-from homeassistant.components.alarm_control_panel \
-                                import ALARM_SERVICE_SCHEMA
-
 from operator                    import attrgetter
 from homeassistant.core          import callback
 from homeassistant.util.dt       import utcnow                       as now
@@ -57,6 +54,11 @@ from homeassistant.util          import sanitize_filename
 from homeassistant.exceptions    import HomeAssistantError
 from homeassistant.components.http import HomeAssistantView
 
+import homeassistant.components.alarm_control_panel                  as parent
+try:
+    from homeassistant.components.alarm_control_panel import AlarmControlPanelEntity
+except ImportError:
+    from homeassistant.components.alarm_control_panel import AlarmControlPanel as AlarmControlPanelEntity
 # require these constants from 0.103.0
 if float(current_HA_version) > 0.102:
     from homeassistant.components.alarm_control_panel.const import (
@@ -445,9 +447,9 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     hass.services.async_register('alarm_control_panel', SERVICE_ALARM_YAML_USER, alarm_yaml_user)
 
     # For web panel - they set alarm anyway #
-    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_NIGHT_FROM_PANEL, alarm_arm_night_from_panel, ALARM_SERVICE_SCHEMA)
-    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_HOME_FROM_PANEL, alarm_arm_home_from_panel, ALARM_SERVICE_SCHEMA)
-    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_AWAY_FROM_PANEL, alarm_arm_away_from_panel, ALARM_SERVICE_SCHEMA)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_NIGHT_FROM_PANEL, alarm_arm_night_from_panel, parent.ALARM_SERVICE_SCHEMA)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_HOME_FROM_PANEL, alarm_arm_home_from_panel, parent.ALARM_SERVICE_SCHEMA)
+    hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_AWAY_FROM_PANEL, alarm_arm_away_from_panel, parent.ALARM_SERVICE_SCHEMA)
 
     _LOGGER.debug("{} end".format(FNAME))
 
@@ -482,7 +484,7 @@ class BwResources(HomeAssistantView):
 #        else:
 #            return None
 
-class BWAlarm(alarm.AlarmControlPanel):
+class BWAlarm(AlarmControlPanelEntity):
 
     def __init__(self, hass, config, mqtt):
         FNAME = '[__init__]'
@@ -709,7 +711,7 @@ class BWAlarm(alarm.AlarmControlPanel):
         # affects Lovelace keypad presence (None means no keypad)
     #        return None if self._code is None else '.+'
         FNAME = '[code_format]'
-        res = None if (self._code is None or (self._state == STATE_ALARM_DISARMED and not self.code_arm_required)) else alarm.FORMAT_NUMBER
+        res = None if (self._code is None or (self._state == STATE_ALARM_DISARMED and not self.code_arm_required)) else parent.FORMAT_NUMBER
         _LOGGER.debug("{} self._code: {}, self._state: {}, code_arm_required: {}, returning {}".format(FNAME, self._code, self._state, self.code_arm_required, res))
         return res
 
@@ -789,10 +791,10 @@ class BWAlarm(alarm.AlarmControlPanel):
         # it makes sense for HA >= 0.103
         if float(current_HA_version) > 0.102:
             return (
-                SUPPORT_ALARM_ARM_HOME
-                | SUPPORT_ALARM_ARM_AWAY
-                | SUPPORT_ALARM_ARM_NIGHT
-                | SUPPORT_ALARM_TRIGGER
+                SUPPORT_ALARM_ARM_HOME |
+                SUPPORT_ALARM_ARM_AWAY |
+                SUPPORT_ALARM_ARM_NIGHT |
+                SUPPORT_ALARM_TRIGGER
             )
         else:
             # and does not for the earlier ones
