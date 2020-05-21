@@ -222,7 +222,7 @@ a:hover {
   text-align: center;
   margin: auto;
 }
-#error-icon iron-icon{
+#error-icon ha-icon{
   height: 100px;
   width: 100px;
   color: var(--title-color);
@@ -285,7 +285,7 @@ a:hover {
   width: 90%;
 }
 
-.dropdown-content iron-icon {
+.dropdown-content ha-icon {
   padding-right: 10px;
 }
 .sensors {
@@ -510,7 +510,7 @@ h1 {
 .setting-input > paper-input{
   flex-grow: 3;
 }
-.setting-input > paper-icon-button{
+.setting-input > ha-icon-button{
   flex-grow: 1;
   width: 50px;
   height: 50px;
@@ -530,9 +530,10 @@ h1 {
   text-align: center;
 }
 
-#info-panel-selection paper-icon-button {
+#info-panel-selection ha-icon-button {
  /*width: 60px;*/
- height: 100%;
+ --mdc-icon-size: calc(var(--info-panel-height) + 0);
+ max-width: 30%;
  flex: 1 1 auto;
 }
 
@@ -1245,7 +1246,7 @@ div.arm button {
     margin-right: 20px;
    }
 
-  .settings-nav-inner paper-icon-button {
+  .settings-nav-inner ha-icon-button {
     width: 60px;
     height: 60px;
 
@@ -1256,7 +1257,7 @@ div.arm button {
     font-size: xx-large;
   }
 
-   #info-panel-selection paper-icon-button {
+   #info-panel-selection ha-icon-button {
     width: 60px;
     height: 60px;
     margin-left: 15px;
