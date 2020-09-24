@@ -386,20 +386,23 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     FNAME = '[async_setup_platform]'
     _LOGGER.debug("{} begin".format(FNAME))
 
-    hass.http.register_view(BwResources(str(hass.config.path())))
+    # only execute panel-related code if HA version is older than 0.115
+    # as html panels are now deprecated
+    if float(current_HA_version) < 0.115:
+        hass.http.register_view(BwResources(str(hass.config.path())))
 
-    # Register the panel
-    url = "/api/panel_custom/alarm"
-    resources = os.path.join(_resources_folder(hass), PANEL_FNAME)
-    hass.http.register_static_path(url, resources)
-    await hass.components.panel_custom.async_register_panel(
-        webcomponent_name='alarm',
-        frontend_url_path="alarm",
-        html_url=url,
-        sidebar_title='Alarm',
-        sidebar_icon='mdi:shield-home',
-        config={"alarmid": "alarm_control_panel.house"},
-    )
+        # Register the panel
+        url = "/api/panel_custom/alarm"
+        resources = os.path.join(_resources_folder(hass), PANEL_FNAME)
+        hass.http.register_static_path(url, resources)
+        await hass.components.panel_custom.async_register_panel(
+            webcomponent_name='alarm',
+            frontend_url_path="alarm",
+            html_url=url,
+            sidebar_title='Alarm',
+            sidebar_icon='mdi:shield-home',
+            config={"alarmid": "alarm_control_panel.house"},
+        )
 
     # Setup MQTT if enabled
     #mqtt = None
