@@ -4,7 +4,10 @@
 This fork was created to maintain the original [bwalarm](https://github.com/gazoscalvertos/Hass-Custom-Alarm) custom component until its author is back.  
 The discussion thread on Home Assistant Community to share ideas or ask for help (NOT to report a bug!) is [here](https://community.home-assistant.io/t/bwalarm-akasma74-edition/113666).  
 Feel free to open a [new issue](https://github.com/akasma74/Hass-Custom-Alarm/issues/new/choose) or make a Pull Request.  
-Any constructive feedback/suggestion is welcome.  
+Any constructive feedback/suggestion is welcome.
+
+## Important!
+Since HA 0.115 until further notice this component no longer has a GUI panel and can only be controlled via automations/MQTT commands/Lovelace Alarm Card. 
 
 ## How to: installation
 Manually:  
