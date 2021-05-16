@@ -5,5 +5,6 @@
   "dependencies": [],
   "after_dependencies": ["mqtt"],
   "codeowners": ["@akasma74"],
-  "requirements": ["ruamel.yaml==0.15.100"]
+  "requirements": ["ruamel.yaml==0.15.100"],
+  "version": "0.0.0"
 }
