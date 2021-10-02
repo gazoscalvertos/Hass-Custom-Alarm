@@ -26,6 +26,7 @@ import uuid
 from aiohttp import web
 
 from collections import OrderedDict
+from typing import Union
 
 from homeassistant.const         import (
     ## SERVICES ##
@@ -74,7 +75,6 @@ import homeassistant.components.switch                               as switch
 import homeassistant.helpers.config_validation                       as cv
 
 try:
-    from homeassistant.util.ruamel_yaml import JSON_TYPE
     from ruamel.yaml            import YAML
     from ruamel.yaml.error      import YAMLError
 
@@ -889,7 +889,7 @@ class BWAlarm(AlarmControlPanelEntity):
         self.settings_yaml_save()
         _LOGGER.debug("{} end ".format(FNAME))
 
-    def _save_yaml(self, fname: str, data: JSON_TYPE) -> None:
+    def _save_yaml(self, fname: str, data: Union[list, dict, str]) -> None:
         """Save a YAML file."""
         tmp_fname = fname + "__TEMP__"
         try:
