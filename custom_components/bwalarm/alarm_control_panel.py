@@ -51,9 +51,15 @@ from homeassistant.util.dt       import utcnow                       as now
 from homeassistant.loader        import bind_hass
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.event import async_track_state_change
-from homeassistant.util          import sanitize_path
 from homeassistant.exceptions    import HomeAssistantError
 from homeassistant.components.http import HomeAssistantView
+
+# sanitize_path replaced by raise_if_invalid_path from 2021.12.0b1
+if float(current_HA_version) < 2021.12:
+    from homeassistant.util          import sanitize_path
+else:
+    from homeassistant.util          import raise_if_invalid_path
+
 
 import homeassistant.components.alarm_control_panel                  as parent
 try:
@@ -477,11 +483,21 @@ class BwResources(HomeAssistantView):
 
     async def get(self, request, path):
         """Retrieve file."""
-        safe_path = sanitize_path(path)
-        if path != safe_path:
-            raise web.HTTPBadRequest
-        override_path = "{}/{}".format(self.override_folder, safe_path)
-        default_path = "{}/{}".format(self.default_folder, safe_path)
+        # check if path is valid
+        # use sanitize_path for older HA versions
+        if float(current_HA_version) < 2021.12:
+            safe_path = sanitize_path(path)
+            if path != safe_path:
+                raise web.HTTPBadRequest
+        else:
+            # and raise_if_invalid_path for HA > 2021.11
+            try:
+                raise_if_invalid_path(path)
+            except ValueError as err:
+                raise web.HTTPBadRequest
+
+        override_path = "{}/{}".format(self.override_folder, path)
+        default_path = "{}/{}".format(self.default_folder, path)
 
         if os.path.exists(override_path):
             return web.FileResponse(override_path)
