@@ -741,8 +741,8 @@ class BWAlarm(AlarmControlPanelEntity):
         return self._config[CONF_CODE_TO_ARM]
 
     @property
-    def device_state_attributes(self):
-        FNAME = '[device_state_attributes]'
+    def extra_state_attributes(self):
+        FNAME = '[extra_state_attributes]'
         _LOGGER.debug("{}".format(FNAME))
 
         results = {
@@ -804,6 +804,12 @@ class BWAlarm(AlarmControlPanelEntity):
             results[CONF_STATES] = self._config[CONF_STATES]
 
         return results;
+
+    # device_state_attributes was replaced by extra_state_attributes in 2021.6 and deprecated in 2021.12
+    if float(current_HA_version) < 2021.12:
+        @property
+        def device_state_attributes(self):
+            return self.extra_state_attributes;
 
     @property
     def supported_features(self) -> int:
