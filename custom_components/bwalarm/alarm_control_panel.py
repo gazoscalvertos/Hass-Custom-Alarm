@@ -42,7 +42,7 @@ from homeassistant.const         import (
     CONF_DISARM_AFTER_TRIGGER,
     STATE_ON, STATE_OFF,
     ATTR_ENTITY_ID, ATTR_CODE,
-    EVENT_STATE_CHANGED, EVENT_TIME_CHANGED
+    EVENT_STATE_CHANGED
     )
 
 from operator                    import attrgetter
@@ -53,6 +53,7 @@ from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.exceptions    import HomeAssistantError
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.helpers.event import async_track_time_interval
 
 # sanitize_path replaced by raise_if_invalid_path from 2021.12.0b1
 if float(current_HA_version) < 2021.12:
@@ -446,9 +447,6 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
         alarm.alarm_arm_away_from_panel(service.data.get(ATTR_CODE))
 
     alarm = BWAlarm(hass, config, mqtt)
-    hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
-    hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.time_change_listener)
-    hass.bus.async_listen(EVENT_TIME_CHANGED, alarm.passcode_timeout_listener)
     async_add_devices([alarm])
 
     hass.services.async_register('alarm_control_panel', SERVICE_ALARM_SET_IGNORE_OPEN_SENSORS, async_alarm_set_ignore_open_sensors, SET_IGNORE_OPEN_SENSORS_SCHEMA)
@@ -460,6 +458,10 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_HOME_FROM_PANEL, alarm_arm_home_from_panel, parent.ALARM_SERVICE_SCHEMA)
     hass.services.async_register('alarm_control_panel', SERVICE_ALARM_ARM_AWAY_FROM_PANEL, alarm_arm_away_from_panel, parent.ALARM_SERVICE_SCHEMA)
 
+    hass.bus.async_listen(EVENT_STATE_CHANGED, alarm.state_change_listener)
+    async_track_time_interval(hass, alarm.time_change_listener, datetime.timedelta(seconds=1)) # call the listener every second
+    async_track_time_interval(hass, alarm.passcode_timeout_listener, datetime.timedelta(seconds=1))
+    
     _LOGGER.debug("{} end".format(FNAME))
 
 class BwResources(HomeAssistantView):
